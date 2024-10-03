@@ -1,0 +1,43 @@
+{
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "One Dark Pro",
+  "workbench.editor.enablePreview": false,
+  "workbench.activityBar.location": "hidden",
+  "workbench.tree.enableStickyScroll": true,
+  "workbench.layoutControl.enabled": false,
+  "editor.minimap.enabled": false,
+  "editor.tabSize": 4,
+  "editor.detectIndentation": false,
+  "editor.glyphMargin": false,
+  "editor.accessibilitySupport": "off",
+  "editor.stickyScroll.enabled": true,
+  "editor.snippetSuggestions": "top",
+  "editor.formatOnSave": true,
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "off",
+    "strings": "off"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "python.analysis.extraPaths": ["/.venv/lib/python3.12/site-packages"],
+  "isort.args": ["--profile", "black"],
+  "debug.internalConsoleOptions": "neverOpen",
+  "explorer.confirmDragAndDrop": false,
+  "files.eol": "\n",
+  "terminal.integrated.stickyScroll.enabled": true,
+  "git.openRepositoryInParentFolders": "never",
+  "git.autofetch": true,
+  "githubPullRequests.pullBranch": "never",
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
+  },
+}
