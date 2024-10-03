@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { STATIONS } from "@/utils/constant";
 
-const StationSelect = () => {
+const StationSelect = (station: string) => {
   return (
     <select
       className="border border-gray-300 rounded-md"
@@ -16,3 +15,5 @@ const StationSelect = () => {
     </select>
   );
 };
+
+export default StationSelect;

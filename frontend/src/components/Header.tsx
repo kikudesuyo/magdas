@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
-import Button from "@/components/Button";
+import Button from "@/components/button/Button";
 import { PATHS } from "@/utils/constant";
-import iSpesLogo from "@/assets/imgs/serc_logo.png";
+import iSpesLogo from "@/assets/imgs/i-spes-logo.png";
 
 const Header = () => {
   const navigate = useNavigate();

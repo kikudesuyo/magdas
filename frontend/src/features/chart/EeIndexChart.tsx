@@ -1,5 +1,5 @@
 import Chart from "@/components/chart/Chart";
-import { xLabel } from "@/components/chart/xLabel";
+import { xLabel } from "@/features/chart/xLabel";
 
 type IndexProps = {
   values: {
@@ -11,10 +11,8 @@ type IndexProps = {
 };
 
 const EeIndexChart = ({ values, date }: IndexProps) => {
+  const { er, edst, euel } = values;
   console.log(date);
-  const er = values.er;
-  const edst = values.edst;
-  const euel = values.euel;
   return (
     <Chart
       xLabels={xLabel()}
