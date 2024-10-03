@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "@/components/button/Button";
+import DownloadButton from "@/features/download/DownloadButton";
 
 type DataSelectorProps = {
   onSelect: (station: string, dataKind: string, date: string) => void;
@@ -62,6 +63,7 @@ const DataSelector = ({ onSelect }: DataSelectorProps) => {
         />
       </div>
       <Button label="プロット" func={handleSelect} />
+      <DownloadButton date={date} station={station} />
     </div>
   );
 };
