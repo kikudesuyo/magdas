@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from handler.ee_index.calc_daily_ee_index import Ee_index
+from features.downloads.types.ee_index import RangeEeIndex
+from features.ee_index.types.ee_index import Ee_index
+from handler.download.download_range_ee_index import (
+    calc_range_ee_index as handle_calc_range_ee_index,
+)
 from handler.ee_index.calc_daily_ee_index import (
     calc_daily_ee_index as handle_calc_daily_ee_index,
 )
@@ -26,3 +30,8 @@ async def calc_daily_ee_index(request: Ee_index):
 @app.post("/ee-index/download")
 async def ee_index_download(request: Ee_index):
     return handle_ee_index_download(request)
+
+
+@app.post("/download/ee-index")
+async def download_ee_index(request: RangeEeIndex):
+    return handle_calc_range_ee_index(request)

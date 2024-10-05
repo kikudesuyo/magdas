@@ -31,8 +31,7 @@ class MonthlyEeIndexPlotter(BaseEeIndexPlotter):
         return Er(station, self.start_local_datetime).calc_er_for_days(self.days)
 
     def calculate_edst_values(self):
-        days = DateUtils.get_days_in_month(self.year, self.month)
-        return Edst.calc_for_days(self.start_ut, days)
+        return Edst.calc_for_days(self.start_ut, self.days)
 
     def calculate_euel_values(self, station):
         return Euel.calc_for_month(station, self.year, self.month)
@@ -90,9 +89,6 @@ class MonthlyEeIndexPlotter(BaseEeIndexPlotter):
         ax.set_xlabel("Days")
         ax.set_ylabel("EE Value(nT)")
         self._set_label(ax)
-
-    def get_total_minutes(self):
-        return self.total_minutes
 
     def _set_label(self, ax):
         ax.set_xlim(0, self.total_minutes)

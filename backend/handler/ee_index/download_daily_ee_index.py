@@ -2,10 +2,10 @@ import base64
 
 from ee_index.src.plot.daily_ee_index_plotter import DailyEeIndexPlotter
 from fastapi.responses import JSONResponse
-from features.downloads.iaga.meta_data import get_meta_data
-from features.downloads.iaga.save_iaga_format import save_iaga_format
-from features.downloads.zip.files_zipping import create_zip_buffer
-from features.downloads.zip.remove_files import remove_files
+from features.ee_index.downloads.iaga.meta_data import get_meta_data
+from features.ee_index.downloads.iaga.save_iaga_format import save_iaga_format
+from features.ee_index.downloads.zip.files_zipping import create_zip_buffer
+from features.ee_index.downloads.zip.remove_files import remove_files
 from features.ee_index.types.ee_index import Ee_index
 from utils.date import convert_datetime
 from utils.path import generate_abs_path

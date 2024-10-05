@@ -6,7 +6,6 @@ def generate_abs_path(path):
 
     Arg:
       path (str): ee-index/からの相対パス
-
     Return:
       str: 引数pathへの絶対パス
     """
