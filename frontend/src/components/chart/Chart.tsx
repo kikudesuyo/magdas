@@ -1,4 +1,3 @@
-import { ChartDataset } from "@/utils/types/ui";
 import {
   Chart as ChartJS,
   ChartData,
@@ -15,6 +14,19 @@ import {
   Tooltip,
 } from "chart.js";
 import { Chart as ReactChartJS } from "react-chartjs-2";
+
+type ChartType = "line";
+
+export type ChartDataset = {
+  type: ChartType;
+  label: string;
+  data: number[];
+  borderColor?: string;
+  backgroundColor?: string;
+  borderDash?: number[];
+  tension: number;
+  pointRadius: number;
+};
 
 export type Props = {
   xLabels: string[];

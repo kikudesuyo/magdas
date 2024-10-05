@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "@/components/Header";
-import Home from "@/pages/Home";
-import EeIndexChart from "@/pages/Plot";
+import Home from "@/pages/home";
 import { PATHS } from "@/utils/constant";
+import EeIndex from "@/pages/ee-index";
 
 function App() {
   return (
@@ -11,8 +11,7 @@ function App() {
         <Header />
         <Routes>
           <Route path={PATHS.HOME} element={<Home />} />
-          <Route path={PATHS.PLOT} element={<EeIndexChart />} />
-          <Route path={PATHS.EE_INDEX} element={<EeIndexChart />} />
+          <Route path={PATHS.EE_INDEX} element={<EeIndex />} />
         </Routes>
       </Router>
     </div>
