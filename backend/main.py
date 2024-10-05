@@ -1,5 +1,3 @@
-import time
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from handler.ee_index.calc_daily_ee_index import Ee_index
@@ -27,6 +25,4 @@ async def calc_daily_ee_index(request: Ee_index):
 
 @app.post("/ee-index/download")
 async def ee_index_download(request: Ee_index):
-    hoge = handle_ee_index_download(request)
-    time.sleep(10)
-    return hoge
+    return handle_ee_index_download(request)

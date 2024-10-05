@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Main from "@/components/Main";
-import EeIndexChart from "@/features/chart/EeIndexChart";
-import DataSelector from "@/features/chart/DataRangeSelector";
+import EeIndexChart from "@/pages/ee-index/_components/EeIndexChart";
+import DataRangeSelector from "@/pages/ee-index/_components/DataRangeSelector";
 import { fetchEeIndexData } from "@/services/api";
 
 type ResParams = {
@@ -13,7 +13,7 @@ type ResParams = {
   date: string;
 };
 
-const Plot = () => {
+const EeIndex = () => {
   const [plotData, setPlotData] = useState<ResParams>({
     values: { er: [], edst: [], euel: [] },
     date: "",
@@ -34,11 +34,11 @@ const Plot = () => {
     <Main style="items-center gap-8 pt-4">
       <h1 className="text-4xl">EE-indexのプロット</h1>
       <div className="flex flex-row gap-4">
-        <DataSelector onSelect={handleButtonClick} />
+        <DataRangeSelector onSelect={handleButtonClick} />
         <EeIndexChart values={plotData.values} date={plotData.date} />
       </div>
     </Main>
   );
 };
 
-export default Plot;
+export default EeIndex;

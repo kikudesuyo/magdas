@@ -12,9 +12,9 @@ const Header = () => {
       </Link>
       <div className="flex gap-2">
         <Button
-          label="プロットページへ"
+          label="EE-index"
           func={() => {
-            navigate(PATHS.PLOT);
+            navigate(PATHS.EE_INDEX);
           }}
         />
       </div>

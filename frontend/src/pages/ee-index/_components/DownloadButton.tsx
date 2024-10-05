@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { downloadFile } from "@/features/download/fileDownload";
+import { downloadFile } from "@/pages/ee-index/helper/fileDownload";
 
 type DownloadData = {
   date: string;

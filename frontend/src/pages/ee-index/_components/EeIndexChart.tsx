@@ -1,5 +1,5 @@
 import Chart from "@/components/chart/Chart";
-import { xLabel } from "@/features/chart/xLabel";
+import { xLabel } from "@/pages/ee-index/helper/xLabel";
 
 type IndexProps = {
   values: {

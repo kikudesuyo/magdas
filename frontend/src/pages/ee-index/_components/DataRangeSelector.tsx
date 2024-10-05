@@ -1,12 +1,12 @@
 import { useState } from "react";
 import Button from "@/components/button/Button";
-import DownloadButton from "@/features/download/DownloadButton";
+import DownloadButton from "@/pages/ee-index/_components/DownloadButton";
 
 type DataSelectorProps = {
   onSelect: (station: string, dataKind: string, date: string) => void;
 };
 
-const DataSelector = ({ onSelect }: DataSelectorProps) => {
+const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
   const [station, setStation] = useState("ANC");
   const [dataKind, setDataKind] = useState("EE-index");
   const [date, setDate] = useState("2014-06-03");
@@ -68,4 +68,4 @@ const DataSelector = ({ onSelect }: DataSelectorProps) => {
   );
 };
 
-export default DataSelector;
+export default DataRangeSelector;
