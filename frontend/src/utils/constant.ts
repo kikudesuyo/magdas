@@ -1,6 +1,7 @@
 export const PATHS = {
   HOME: "/",
   EE_INDEX: "/ee-index",
+  DOWNLOAD: "/download",
 } as const;
 
 export const STATIONS = [

@@ -1,19 +1,30 @@
 import axios from "axios";
 
+// const apiURL = process.env.VITE_REACT_APP_API_BASE_URL;
+const apiURL = "http://localhost:8000";
+
 export const fetchEeIndexData = async <T>(data: T) => {
-  const response = await axios.post("http://localhost:8000/ee-index", data);
+  const response = await axios.post(`${apiURL}/ee-index`, data);
   return response.data;
 };
 
-type DownloadData = {
+type DownloadDailyEeIndex = {
   date: string;
   station: string;
 };
 
-export const fetchFile = async (data: DownloadData) => {
-  const response = await axios.post(
-    "http://localhost:8000/ee-index/download",
-    data
-  );
+export const fetchFile = async (data: DownloadDailyEeIndex) => {
+  const response = await axios.post(`${apiURL}/ee-index/download`, data);
+  return response.data;
+};
+
+type DownloadCustomDateEeIndex = {
+  startDate: string;
+  endDate: string;
+  station: string;
+};
+
+export const fetchCustomDateFile = async (data: DownloadCustomDateEeIndex) => {
+  const response = await axios.post(`${apiURL}/download/ee-index`, data);
   return response.data;
 };
