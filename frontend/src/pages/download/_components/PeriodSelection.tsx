@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { downloadFile } from "../helper/fileDownload";
+import { STATIONS } from "@/utils/constant";
 
 interface FormData {
   startYear: string;
@@ -12,6 +13,7 @@ interface FormData {
 }
 
 const PeriodSelectionForm: React.FC = () => {
+  const [station, setStation] = React.useState("ANC");
   const {
     register,
     handleSubmit,
@@ -28,15 +30,9 @@ const PeriodSelectionForm: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     data;
-    // const startDate = `${data.startYear}-${data.startMonth}-${data.startDay}`;
-    // const endDate = `${data.endYear}-${data.endMonth}-${data.endDay}`;
-    // const station = "ANC";
-    // fetchCustomDateFile({ startDate, endDate, station });
-    const props = {
-      startDate: "2014-06-10",
-      endDate: "2014-06-11",
-      station: "ANC",
-    };
+    const startDate = `${data.startYear}-${data.startMonth}-${data.startDay}`;
+    const endDate = `${data.endYear}-${data.endMonth}-${data.endDay}`;
+    const props = { startDate, endDate, station };
     await downloadFile(props);
   };
 
@@ -44,11 +40,29 @@ const PeriodSelectionForm: React.FC = () => {
     <div className="flex flex-col p-4 w-4/5">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className=" bg-white p-6 rounded-lg shadow-md border border-gray-300 "
+        className=" bg-white p-6 rounded-lg shadow-md border border-gray-300 flex flex-col gap-4"
       >
         <h2 className="text-2xl font-semibold text-gray-700 text-center mb-6">
-          ダウンロード期間
+          ダウンロード
         </h2>
+
+        <div>
+          <label className="block text-gray-700 mb-2 font-bold">観測点</label>
+          <div>
+            <select
+              // {...register("station", { required: "観測点は必須です" })}
+              value={station}
+              onChange={(e) => setStation(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            >
+              {STATIONS.map((station) => (
+                <option key={station} value={station}>
+                  {station}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         <div className="mb-4">
           <label className="block text-gray-700  mb-2 font-bold">開始日</label>
@@ -137,10 +151,9 @@ const PeriodSelectionForm: React.FC = () => {
             </p>
           )}
         </div>
-
         <button
           type="submit"
-          className="w-full py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700"
+          className="w-full py-4 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 items-center"
         >
           確認
         </button>
