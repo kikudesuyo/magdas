@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "@/components/button/Button";
 import DownloadButton from "@/pages/ee-index/_components/DownloadButton";
+import { STATIONS } from "@/utils/constant";
 
 type DataSelectorProps = {
   onSelect: (station: string, dataKind: string, date: string) => void;
@@ -33,6 +34,18 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
       <div>
         <label className="text-sm">観測地点</label>
         <select
+          value={station}
+          onChange={(e) => setStation(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        >
+          {STATIONS.map((station) => (
+            <option key={station} value={station}>
+              {station}
+            </option>
+          ))}
+        </select>
+
+        {/* <select
           className="border border-gray-300 rounded-md"
           value={station}
           onChange={(e) => setStation(e.target.value)}
@@ -41,7 +54,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
           <option value="ANC">ANC</option>
           <option value="DAV">DAV</option>
           <option value="EUS">EUS</option>
-        </select>
+        </select> */}
       </div>
       <div>
         <label className="text-sm">データ種別</label>

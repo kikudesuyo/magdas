@@ -5,7 +5,6 @@ import { PATHS } from "@/utils/constant";
 const Home = () => {
   return (
     <Main style="items-center gap-8 pt-4">
-      <h1 className="text-3xl">homeページ</h1>
       <div className="flex flex-row gap-12">
         <Link
           to={PATHS.EE_INDEX}
