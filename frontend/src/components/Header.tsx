@@ -1,23 +1,13 @@
-import { Link, useNavigate } from "react-router-dom";
-import Button from "@/components/button/Button";
-import { PATHS } from "@/utils/constant";
+import { Link } from "react-router-dom";
 import iSpesLogo from "@/assets/imgs/i-spes-logo.png";
 
 const Header = () => {
-  const navigate = useNavigate();
   return (
     <header className="sticky top-0 flex justify-between border-b border-slate-300 bg-white p-3">
       <Link to="/" className="flex flex-col justify-center text-xl">
         <img src={iSpesLogo} />
       </Link>
-      <div className="flex gap-2">
-        <Button
-          label="EE-index"
-          func={() => {
-            navigate(PATHS.EE_INDEX);
-          }}
-        />
-      </div>
+      <div className="flex gap-2"></div>
     </header>
   );
 };
