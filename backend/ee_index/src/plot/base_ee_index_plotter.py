@@ -11,7 +11,6 @@ class BaseEeIndexPlotter:
     def __init__(self):
         self.fig, self.ax = plt.subplots()
 
-    # interpをしたほうがいいいかも
     def plot_er(self, er_values):
         x_axis = np.arange(0, len(er_values), 1)
         y_axis = er_values
