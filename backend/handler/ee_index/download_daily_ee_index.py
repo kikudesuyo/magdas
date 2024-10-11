@@ -39,7 +39,7 @@ def ee_index_download(request: Ee_index):
             f"{str(i//Min.ONE_HOUR.const).zfill(2)}:{str(i%Sec.ONE_MINUTE.const).zfill(2)}:00.000"
             for i in range(Min.ONE_DAY.const)
         ],
-        "DOY": [78] * Min.ONE_DAY.const,
+        "DOY": [date.timetuple().tm_yday] * Min.ONE_DAY.const,
         "EDst1h": edst,
         "EDst6h": edst,
         "ER": er,
