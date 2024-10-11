@@ -1,7 +1,7 @@
 import base64
 from datetime import timedelta
 
-from ee_index.src.plot.custom_date_range_ee_index_plotter import CustomRangeEeIndex
+from ee_index.src.plot.custom_date_range_ee_index_plotter import MulthDayEeIndexPlotter
 from fastapi.responses import JSONResponse
 from features.downloads.iaga.meta_data import get_meta_data
 from features.downloads.iaga.save_iaga_format import save_iaga_format
@@ -22,7 +22,7 @@ def calc_range_ee_index(request: RangeEeIndex):
         end_date
     )
     days = (end_datetime - start_datetime).days + 1
-    plotter = CustomRangeEeIndex(start_datetime, end_datetime)
+    plotter = MulthDayEeIndexPlotter(start_datetime, end_datetime)
     er, edst, euel = plotter.calculate_ee_values(station)
     # 修正するべき項目(IAGAコード、標高は未定)
     meta_data = get_meta_data(station, "", "", "", 8888.88)

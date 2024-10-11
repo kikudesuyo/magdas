@@ -3,6 +3,7 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from ee_index.src.constant.complement import Smooth
+from ee_index.src.constant.time_relation import Day
 from ee_index.src.helper.check_file import is_parent_directory_exist
 from scipy.signal import savgol_filter
 
@@ -55,39 +56,12 @@ class BaseEeIndexPlotter:
     def _set_title(self, title):
         self.ax.set_title(title, loc="center", fontsize=12, fontweight="bold")
 
-    # def _set_axis_labels(self, y_label_name, start_datetime, data_length):
-    #     self.ax.set_ylabel(y_label_name)
-    #     self.ax.set_xlim(0, data_length)
-    #     self.ax.set_ylim(-100, 200)
-    #     # x_labelsの生成
-    #     x_labels = np.arange(0, data_length, data_length // 8)
-    #     # 日数の計算
-    #     num_days = data_length // 1440  # 1日 = 1440分
-    #     if num_days == 0:
-    #         # 1日未満の場合は時刻表示
-    #         x_tick_labels = [
-    #             (start_datetime + timedelta(minutes=i)).strftime("%m-%d %H:%M")
-    #             for i in x_labels
-    #         ]
-    #         self.ax.set_xlabel("UT Time")
-    #     else:
-    #         # 1日以上の場合は日付表示
-    #         x_tick_labels = [
-    #             f"{i // (data_length // num_days) + 1}: {start_datetime + timedelta(days=int(i // (data_length // num_days)))}"
-    #             for i in x_labels
-    #         ]
-    #         self.ax.set_xlabel("Days")
-
-    #     # x軸の設定
-    #     self.ax.set_xticks(x_labels)
-    #     self.ax.set_xticklabels(x_tick_labels)
-
     def _set_axis_labels(self, y_label_name, start_datetime, data_length):
         self.ax.set_ylabel(y_label_name)
         self.ax.set_xlim(0, data_length)
         self.ax.set_ylim(-100, 200)
         x_labels = np.arange(0, data_length, data_length // 8)
-        num_days = data_length // 1440  # 1日 = 1440分
+        num_days = data_length // Day.ONE.const
         if num_days <= 2:
             x_tick_labels = [
                 (start_datetime + timedelta(minutes=int(i))).strftime("%H:%M")

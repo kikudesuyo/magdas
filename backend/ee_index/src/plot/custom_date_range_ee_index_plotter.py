@@ -7,7 +7,7 @@ from ee_index.src.calc.euel_index import Euel
 from ee_index.src.plot.base_ee_index_plotter import BaseEeIndexPlotter
 
 
-class CustomRangeEeIndex:
+class MulthDayEeIndexPlotter:
     """Plotter for daily EE index"""
 
     def __init__(self, start_datetime: datetime, end_datetime: datetime):
