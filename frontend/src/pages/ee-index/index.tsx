@@ -32,7 +32,7 @@ const EeIndex = () => {
 
   return (
     <Main style="items-center gap-8 pt-4">
-      <h1 className="text-4xl">EE-indexのプロット</h1>
+      <h1 className="text-4xl font-bold">EE-index Plot</h1>
       <div className="flex flex-row gap-4">
         <DataRangeSelector onSelect={handleButtonClick} />
         <EeIndexChart values={plotData.values} date={plotData.date} />

@@ -2,7 +2,7 @@ import Main from "@/components/Main";
 import { Link } from "react-router-dom";
 import { PATHS } from "@/utils/constant";
 import References from "@/pages/home/_components/References";
-import MagdasMap from "@/assets/imgs/MAGDAS_map.png";
+import MagdasMap from "@/assets/imgs/magdas_map.png";
 
 const Home = () => {
   return (
@@ -11,13 +11,13 @@ const Home = () => {
         <div className="flex flex-row gap-12 items-center justify-center">
           <Link
             to={PATHS.EE_INDEX}
-            className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 round-xl"
+            className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 rounded-lg border border-slate-400"
           >
             EE-index Plot
           </Link>
           <Link
             to={PATHS.DOWNLOAD}
-            className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 rounded-lg"
+            className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 rounded-lg border border-slate-400"
           >
             Download
           </Link>
