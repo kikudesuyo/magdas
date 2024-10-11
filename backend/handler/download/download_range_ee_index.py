@@ -23,7 +23,7 @@ def calc_range_ee_index(request: RangeEeIndex):
     )
     days = (end_datetime - start_datetime).days + 1
     plotter = MulthDayEeIndexPlotter(start_datetime, end_datetime)
-    er, edst, euel = plotter.calculate_ee_values(station)
+    er, edst, euel = plotter.calc_ee_values(station)
     # 修正するべき項目(IAGAコード、標高は未定)
     meta_data = get_meta_data(station, "", "", "", 8888.88)
     start_day_of_year = start_datetime.timetuple().tm_yday
