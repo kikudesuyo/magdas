@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from ee_index.src.get_index.edst_index import Edst
-from ee_index.src.get_index.er_value import Er
+from ee_index.src.calc.edst_index import Edst
+from ee_index.src.calc.er_value import Er
 from ee_index.src.helper.time_utils import DateUtils
 
 

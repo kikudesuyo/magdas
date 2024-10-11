@@ -1,10 +1,9 @@
 from datetime import datetime, time, timedelta
 
 import numpy as np
-
+from ee_index.src.calc.h_component_extraction import HComponent
 from ee_index.src.constant.er_threshold import MAX_ER_VALUE, MIN_ER_VALUE
 from ee_index.src.constant.time_relation import DawnAndDusk, Day, DayTimeRange, Min
-from ee_index.src.get_index.h_component_extraction import HComponent
 from ee_index.src.helper.time_utils import DateUtils
 from ee_index.src.helper.warnings_suppression import NanCalculator
 

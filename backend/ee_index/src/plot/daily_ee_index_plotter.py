@@ -1,11 +1,10 @@
 from datetime import datetime
 
 import numpy as np
-
+from ee_index.src.calc.edst_index import Edst
+from ee_index.src.calc.er_value import Er
+from ee_index.src.calc.euel_index import Euel
 from ee_index.src.constant.time_relation import Day, Min
-from ee_index.src.get_index.edst_index import Edst
-from ee_index.src.get_index.er_value import Er
-from ee_index.src.get_index.euel_index import Euel
 from ee_index.src.plot.base_ee_index_plotter import BaseEeIndexPlotter
 
 

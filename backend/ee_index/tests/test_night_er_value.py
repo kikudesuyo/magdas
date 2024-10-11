@@ -3,9 +3,9 @@ import warnings
 from datetime import datetime
 
 import numpy as np
-from constant.magdas_station import EeIndexStation
-from get_index.er_value import NightEr
-from helper.time_utils import DateUtils
+from ee_index.src.calc.er_value import NightEr
+from ee_index.src.constant.magdas_station import EeIndexStation
+from ee_index.src.helper.time_utils import DateUtils
 
 
 class TestERValue(unittest.TestCase):

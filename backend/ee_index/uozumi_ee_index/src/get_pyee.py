@@ -1,9 +1,9 @@
 from datetime import datetime
 
 import numpy as np
-from get_index.edst_index import Edst
-from get_index.er_value import Er
-from get_index.euel_index import Euel
+from ee_index.src.calc.edst_index import Edst
+from ee_index.src.calc.er_value import Er
+from ee_index.src.calc.euel_index import Euel
 
 
 def get_py_ee(station, date: datetime, days: int) -> np.ndarray:

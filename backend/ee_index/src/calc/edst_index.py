@@ -1,10 +1,9 @@
 from datetime import datetime
 
 import numpy as np
-
+from ee_index.src.calc.er_value import Er, NightEr
 from ee_index.src.constant.magdas_station import EeIndexStation
 from ee_index.src.constant.time_relation import DawnAndDusk, Min
-from ee_index.src.get_index.er_value import Er, NightEr
 from ee_index.src.helper.time_utils import DateUtils
 from ee_index.src.helper.warnings_suppression import NanCalculator
 

@@ -1,9 +1,8 @@
 import unittest
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 
-import numpy as np
-from get_index.edst_index import Edst
+from ee_index.src.calc.edst_index import Edst
 
 
 class TestEdst(unittest.TestCase):
