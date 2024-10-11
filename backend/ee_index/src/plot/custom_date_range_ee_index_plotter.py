@@ -8,7 +8,7 @@ from ee_index.src.constant.time_relation import Min
 from ee_index.src.plot.base_ee_index_plotter import BaseEeIndexPlotter
 
 
-class CustomRangeEeIndex(BaseEeIndexPlotter):
+class CustomRangeEeIndex:
     """Plotter for daily EE index"""
 
     def __init__(self, start_datetime: datetime, end_datetime: datetime):
