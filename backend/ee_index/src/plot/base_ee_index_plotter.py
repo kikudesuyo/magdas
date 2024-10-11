@@ -3,7 +3,7 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from ee_index.src.constant.complement import Smooth
-from ee_index.src.constant.time_relation import Day
+from ee_index.src.constant.time_relation import Min
 from ee_index.src.helper.check_file import is_parent_directory_exist
 from scipy.signal import savgol_filter
 
@@ -61,16 +61,21 @@ class BaseEeIndexPlotter:
         self.ax.set_xlim(0, data_length)
         self.ax.set_ylim(-100, 200)
         x_labels = np.arange(0, data_length, data_length // 8)
-        num_days = data_length // Day.ONE.const
+        num_days = data_length // Min.ONE_DAY.const
+        # 表示形式の変更
         if num_days <= 2:
+            # 時間表示
             x_tick_labels = [
                 (start_datetime + timedelta(minutes=int(i))).strftime("%H:%M")
                 for i in x_labels
             ]
             self.ax.set_xlabel("UT Time")
         else:
+            # 日付表示
             x_tick_labels = [
-                f"{(start_datetime + timedelta(days=int(i // (data_length // num_days)))).strftime('%m/%d')}"
+                (start_datetime + timedelta(days=int(i // Min.ONE_DAY.const))).strftime(
+                    "%m/%d"
+                )
                 for i in x_labels
             ]
             self.ax.set_xlabel("UT Date")
