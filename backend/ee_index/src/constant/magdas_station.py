@@ -11,6 +11,7 @@ class MagdasStation:
 
 
 class EeIndexStation(MagdasStation, Enum):
+    # 藤本論文2015での観測点データ
     AAB = "AAB", 2.585333333333333, 0.18, 110.47
     ABU = "ABU", 0.49266666666666664, -1.53, 79.4
     AMA = "AMA", 8.622, 21.11, 200.88
