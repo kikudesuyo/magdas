@@ -78,7 +78,7 @@ const Chart = ({ xLabels, datasets, xAxisTitle, yAxisTitle }: Props) => {
   };
 
   return (
-    <div className="w-full max-w-lg">
+    <div className="w-full max-w-4xl">
       <ReactChartJS type={"line"} data={data} options={options} width={300} />
     </div>
   );
