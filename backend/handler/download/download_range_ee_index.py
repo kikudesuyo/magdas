@@ -1,6 +1,11 @@
 import base64
 from datetime import timedelta
 
+from ee_index.src.calc.edst_index import Edst
+from ee_index.src.calc.er_value import Er
+from ee_index.src.calc.euel_index import Euel
+from ee_index.src.constant.magdas_station import EeIndexStation
+from ee_index.src.constant.time_relation import Min, Sec
 from fastapi.responses import JSONResponse
 from features.downloads.iaga.meta_data import get_meta_data
 from features.downloads.iaga.save_iaga_format import save_iaga_format
@@ -9,8 +14,6 @@ from features.downloads.zip.files_zipping import create_zip_buffer
 from features.downloads.zip.remove_files import remove_files
 from utils.date import convert_datetime
 from utils.path import generate_abs_path
-
-from backend.ee_index.src.plot.multi_days_ee_index_plotter import MulthDayEeIndexPlotter
 
 
 def calc_range_ee_index(request: RangeEeIndex):
@@ -23,25 +26,34 @@ def calc_range_ee_index(request: RangeEeIndex):
         end_date
     )
     days = (end_datetime - start_datetime).days + 1
-    plotter = MulthDayEeIndexPlotter(start_datetime, end_datetime)
-    er, edst, euel = plotter.calc_ee_values(station)
+    er = Er(station, start_datetime).calc_er_for_days(days)
+    edst = Edst.compute_smoothed_edst(start_datetime, days)
+    euel = Euel.calculate_euel_for_days(station, start_datetime, days)
     # 修正するべき項目(IAGAコード、標高は未定)
-    meta_data = get_meta_data(station, "", "", "", 8888.88)
+    meta_data = get_meta_data(
+        station,
+        "",
+        EeIndexStation[station].gm_lat,
+        EeIndexStation[station].gm_lon,
+        8888.88,
+    )
     start_day_of_year = start_datetime.timetuple().tm_yday
     data = {
         "DATE": [
             (start_datetime + timedelta(days=j)).strftime("%Y-%m-%d")
             for j in range(days)
-            for _ in range(1440)
+            for _ in range(Min.ONE_DAY.const)
         ],
         "TIME": [
-            f"{str((i % 1440) // 60).zfill(2)}:{str((i % 1440) % 60).zfill(2)}:00.000"
-            for i in range(1440 * days)
+            f"{str((i % Min.ONE_DAY.const) // Min.ONE_HOUR.const).zfill(2)}:{str((i % Min.ONE_DAY.const) % Sec.ONE_MINUTE.const).zfill(2)}:00.000"
+            for i in range(Min.ONE_DAY.const * days)
         ],
-        "DOY": [start_day_of_year + i for i in range(days) for _ in range(1440)],
+        "DOY": [
+            start_day_of_year + i for i in range(days) for _ in range(Min.ONE_DAY.const)
+        ],
         "EDst1h": edst,
         # 未作成
-        "EDst6h": [0.0] * 1440 * days,
+        "EDst6h": [0.0] * Min.ONE_DAY.const * days,
         "ER": er,
         "EUEL": euel,
     }
