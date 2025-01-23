@@ -1,15 +1,13 @@
-import { fetchCustomDateFile } from "@/services/api";
+import { fetchDailyDateFile } from "@/services/api";
 
 export const downloadFile = async (fileParams: {
-  startDate: string;
-  endDate: string;
+  date: string;
   station: string;
 }) => {
-  const { startDate, endDate, station } = fileParams;
-  console.log(startDate, endDate, station);
-  const responseData = await fetchCustomDateFile({
-    startDate,
-    endDate,
+  const { date, station } = fileParams;
+  console.log(date, station);
+  const responseData = await fetchDailyDateFile({
+    date,
     station,
   });
   const byteCharacters = atob(responseData.file);

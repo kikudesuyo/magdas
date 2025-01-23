@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class Ee_index(BaseModel):
+class DailyEeIndex(BaseModel):
     date: str
     station: str

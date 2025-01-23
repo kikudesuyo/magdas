@@ -10,16 +10,11 @@ type DataSelectorProps = {
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
   const [station, setStation] = useState("ANC");
   const [dataKind, setDataKind] = useState("EE-index");
-  const [startDate, setStartDate] = useState("2014-06-03");
-  const [endDate, setEndDate] = useState("2014-06-10");
+  const [date, setDate] = useState("2014-06-03");
 
   const handleSelect = () => {
-    if (!startDate) {
+    if (!date) {
       alert("開始日時を入力してください");
-      return;
-    }
-    if (!endDate) {
-      alert("終了日時を入力してください");
       return;
     }
 
@@ -32,7 +27,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
       return;
     }
 
-    onSelect(station, dataKind, startDate);
+    onSelect(station, dataKind, date);
   };
 
   return (
@@ -62,29 +57,16 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
         </select>
       </div>
       <div>
-        <label className="text-sm">開始日時</label>
+        <label className="text-sm">日時</label>
         <input
           type="date"
           className="border border-gray-300 rounded-md"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="text-sm">終了日時</label>
-        <input
-          type="date"
-          className="border border-gray-300 rounded-md"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
         />
       </div>
       <Button label="プロット" func={handleSelect} />
-      <DownloadButton
-        startDate={startDate}
-        endDate={endDate}
-        station={station}
-      />
+      <DownloadButton date={date} station={station} />
     </div>
   );
 };
