@@ -8,9 +8,6 @@ from handler.download.download_range_ee_index import (
 from handler.ee_index.calc_daily_ee_index import (
     calc_daily_ee_index as handle_calc_daily_ee_index,
 )
-from handler.ee_index.download_daily_ee_index import (
-    ee_index_download as handle_ee_index_download,
-)
 
 app = FastAPI()
 app.add_middleware(
