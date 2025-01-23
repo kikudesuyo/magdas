@@ -6,7 +6,6 @@ export const downloadFile = async (fileParams: {
   station: string;
 }) => {
   const { startDate, endDate, station } = fileParams;
-  console.log(startDate, endDate, station);
   const responseData = await fetchCustomDateFile({
     startDate,
     endDate,

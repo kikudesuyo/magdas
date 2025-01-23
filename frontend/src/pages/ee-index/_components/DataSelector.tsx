@@ -10,13 +10,19 @@ type DataSelectorProps = {
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
   const [station, setStation] = useState("ANC");
   const [dataKind, setDataKind] = useState("EE-index");
-  const [date, setDate] = useState("2014-06-03");
+  const [startDate, setStartDate] = useState("2014-06-03");
+  const [endDate, setEndDate] = useState("2014-06-10");
 
   const handleSelect = () => {
-    if (!date) {
-      alert("日時を入力してください");
+    if (!startDate) {
+      alert("開始日時を入力してください");
       return;
     }
+    if (!endDate) {
+      alert("終了日時を入力してください");
+      return;
+    }
+
     if (!dataKind) {
       alert("データ種別を選択してください");
       return;
@@ -26,7 +32,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
       return;
     }
 
-    onSelect(station, dataKind, date);
+    onSelect(station, dataKind, startDate);
   };
 
   return (
@@ -44,17 +50,6 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
             </option>
           ))}
         </select>
-
-        {/* <select
-          className="border border-gray-300 rounded-md"
-          value={station}
-          onChange={(e) => setStation(e.target.value)}
-        >
-          <option value="AAB">AAB</option>
-          <option value="ANC">ANC</option>
-          <option value="DAV">DAV</option>
-          <option value="EUS">EUS</option>
-        </select> */}
       </div>
       <div>
         <label className="text-sm">データ種別</label>
@@ -71,12 +66,25 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
         <input
           type="date"
           className="border border-gray-300 rounded-md"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+      </div>
+      <div>
+        <label className="text-sm">終了日時</label>
+        <input
+          type="date"
+          className="border border-gray-300 rounded-md"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
         />
       </div>
       <Button label="プロット" func={handleSelect} />
-      <DownloadButton date={date} station={station} />
+      <DownloadButton
+        startDate={startDate}
+        endDate={endDate}
+        station={station}
+      />
     </div>
   );
 };

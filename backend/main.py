@@ -27,11 +27,6 @@ async def calc_daily_ee_index(request: Ee_index):
     return handle_calc_daily_ee_index(request)
 
 
-@app.post("/ee-index/download")
-async def ee_index_download(request: Ee_index):
-    return handle_ee_index_download(request)
-
-
 @app.post("/download/ee-index")
 async def download_ee_index(request: RangeEeIndex):
     return handle_calc_range_ee_index(request)
