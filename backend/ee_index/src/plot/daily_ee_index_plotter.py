@@ -17,37 +17,23 @@ class DailyEeIndexPlotter:
         self.start_datetime = start_datetime
         self.base_plotter = BaseEeIndexPlotter()
 
-    def calc_er_values(self, station):
-        return Er(station, self.start_datetime).calc_er_for_days(Day.ONE.const)
-
-    def calc_edst_values(self):
-        return Edst.compute_smoothed_edst(self.start_datetime, Day.ONE.const)
-
-    def calc_euel_values(self, station):
-        return Euel.calculate_euel_for_days(
-            station,
-            self.start_datetime,
-            Day.ONE.const,
-        )
-
     def save_er_figure(self, station, save_path):
-        er = self.calc_er_values(station)
+        er = Er(station, self.start_datetime).calc_er_for_days(Day.ONE.const)
         self.base_plotter.plot_er(er)
         self.base_plotter.customize_er_plot(station, self.start_datetime, len(er))
         self.base_plotter.save_figure(save_path)
 
     def save_edst_figure(self, save_path):
-        edst = self.calc_edst_values()
+        edst = Edst.compute_smoothed_edst(self.start_datetime, Day.ONE.const)
         self.base_plotter.plot_edst(edst)
         self.base_plotter.customize_edst_plot(self.start_datetime, len(edst))
         self.base_plotter.save_figure(save_path)
 
     def save_ee_figure(self, station, save_path):
-        er, edst, euel = (
-            self.calc_er_values(station),
-            self.calc_edst_values(),
-            self.calc_euel_values(station),
-        )
+        er = Er(station, self.start_datetime).calc_er_for_days(Day.ONE.const)
+        edst = Edst.compute_smoothed_edst(self.start_datetime, Day.ONE.const)
+        euel = Euel.calculate_euel_for_days(station, self.start_datetime, Day.ONE.const)
+        # euel = self.calc_euel_values(station)
         self.base_plotter.plot_ee(er, edst, euel)
         self.base_plotter.customize_ee_plot(station, self.start_datetime, len(er))
         self.base_plotter.save_figure(save_path)
