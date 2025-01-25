@@ -34,19 +34,19 @@ class BaseEeIndexPlotter:
         self.ax.plot(x_axis, edst, label="EDst", color="green", lw=0.5)
         self.ax.plot(x_axis, euel, label="EUEL", color="red", lw=0.5)
 
-    def customize_er_plot(self, station, start_datetime, data_length):
+    def customize_er(self, station, start_datetime, data_length):
         self._set_title(f"{start_datetime.date()}_{station}_UT")
         self._set_axis_labels("ER Value(nT)", start_datetime, data_length)
 
-    def customize_edst_plot(self, start_datetime, data_length):
+    def customize_edst(self, start_datetime, data_length):
         self._set_title(f"{start_datetime.date()}_UT")
         self._set_axis_labels("EDst Value(nT)", start_datetime, data_length)
 
-    def customize_euel_plot(self, station, start_datetime, data_length):
+    def customize_euel(self, station, start_datetime, data_length):
         self._set_title(f"{start_datetime.date()}_{station}_UT")
         self._set_axis_labels("EUEL Value(nT)", start_datetime, data_length)
 
-    def customize_ee_plot(self, station, start_datetime, data_length):
+    def customize_ee(self, station, start_datetime, data_length):
         self._set_title(f"{start_datetime.date()}_{station}_UT")
         self._set_axis_labels("EEindex Value(nT)", start_datetime, data_length)
 
