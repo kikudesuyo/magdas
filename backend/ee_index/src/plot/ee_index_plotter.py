@@ -15,12 +15,6 @@ class EeIndexPlotter:
         self.days = (end_date - start_date).days + 1
         self.base_plotter = BaseEeIndexPlotter()
 
-    def calc_ee_values(self, station):
-        er = Er(station, self.start_datetime).calc_er_for_days(self.days)
-        edst = Edst.compute_smoothed_edst(self.start_datetime, self.days)
-        euel = Euel.calculate_euel_for_days(station, self.start_datetime, self.days)
-        return np.array([er, edst, euel])
-
     def save_er_figure(self, station, save_path):
         er = Er(station, self.start_datetime).calc_er_for_days(self.days)
         self.base_plotter.plot_er(er)
