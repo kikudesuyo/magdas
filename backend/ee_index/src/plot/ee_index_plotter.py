@@ -6,49 +6,33 @@ from ee_index.src.calc.edst_index import Edst
 from ee_index.src.calc.er_value import Er
 from ee_index.src.calc.euel_index import Euel
 from ee_index.src.constant.time_relation import Min
+from ee_index.src.plot.config import PlotConfig
 
 
 class EeIndexPlotter:
     def __init__(self, start_date: datetime, end_date: datetime):
         self.start_datetime = start_date
         self.days = (end_date - start_date).days + 1
+        PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
 
     def plot_er(self, station):
         er = Er(station, self.start_datetime).calc_er_for_days(self.days)
         x_axis, y_axis = np.arange(0, len(er), 1), er
-        self.ax.plot(x_axis, y_axis)
-        self.ax.set_title(
-            f"{self.start_datetime.date()}_{station}_UT",
-            loc="center",
-            fontsize=12,
-            fontweight="bold",
-        )
-        self._set_axis_labels("ER Value(nT)", self.start_datetime, len(er))
+        self.ax.plot(x_axis, y_axis, label="ER", color="black", lw=1.3)
+        self._set_axis_labels(self.start_datetime, len(er))
 
     def plot_edst(self):
         edst = Edst.compute_smoothed_edst(self.start_datetime, self.days)
         x_axis, y_axis = np.arange(0, len(edst), 1), edst
-        self.ax.plot(x_axis, y_axis)
-        self.ax.set_title(
-            f"{self.start_datetime.date()}_UT",
-            loc="center",
-            fontsize=12,
-            fontweight="bold",
-        )
-        self._set_axis_labels("EDst Value(nT)", self.start_datetime, len(edst))
+        self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
+        self._set_axis_labels(self.start_datetime, len(edst))
 
-    def plot_euel(self, station):
+    def plot_euel(self, station, color):
         euel = Euel.calculate_euel_for_days(station, self.start_datetime, self.days)
         x_axis, y_axis = np.arange(0, len(euel), 1), euel
-        self.ax.plot(x_axis, y_axis)
-        self.ax.set_title(
-            f"{self.start_datetime.date()}_{station}_UT",
-            loc="center",
-            fontsize=12,
-            fontweight="bold",
-        )
-        self._set_axis_labels("EUEL Value(nT)", self.start_datetime, len(euel))
+        self.ax.plot(x_axis, y_axis, label=f"{station}_EUEL", color=color, lw=1.3)
+        self._set_axis_labels(self.start_datetime, len(euel))
 
     def plot_ee(self, station):
         er = Er(station, self.start_datetime).calc_er_for_days(self.days)
@@ -60,18 +44,13 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, er, label="ER", color="black", lw=0.5)
         self.ax.plot(x_axis, edst, label="EDst", color="green", lw=0.5)
         self.ax.plot(x_axis, euel, label="EUEL", color="red", lw=0.5)
-        self.ax.set_title(
-            f"{self.start_datetime.date()}_{station}_UT",
-            loc="center",
-            fontsize=12,
-            fontweight="bold",
-        )
-        self._set_axis_labels("EEindex Value(nT)", self.start_datetime, len(er))
+        self._set_axis_labels(self.start_datetime, len(er))
 
-    def _set_axis_labels(self, y_label_name, start_datetime, data_length):
-        self.ax.set_ylabel(y_label_name)
+    def _set_axis_labels(self, start_datetime, data_length):
+        self.ax.set_ylabel("nT", rotation=0)
         self.ax.set_xlim(0, data_length)
         self.ax.set_ylim(-100, 200)
+        self.ax.legend()
         x_labels = np.arange(0, data_length, data_length // 8)
         num_days = data_length // Min.ONE_DAY.const
         # 表示形式の変更
@@ -93,6 +72,9 @@ class EeIndexPlotter:
             self.ax.set_xlabel("UT Date")
         self.ax.set_xticks(x_labels)
         self.ax.set_xticklabels(x_tick_labels)
+
+    def set_title(self, title):
+        self.ax.set_title(title)
 
     def show(self):
         plt.show()
