@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import numpy as np
 import numpy.ma as ma
@@ -6,7 +6,6 @@ from get_pyee import get_py_ee
 from matplotlib import pyplot as plt
 from read_iaga import get_iaga_ee_for_days
 from smoothing import remove_outliers
-from util import generate_abs_path
 
 
 def calculate_correlation(graph1, graph2, window_size):

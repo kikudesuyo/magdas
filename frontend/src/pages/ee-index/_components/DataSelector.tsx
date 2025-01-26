@@ -14,9 +14,10 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
 
   const handleSelect = () => {
     if (!date) {
-      alert("日時を入力してください");
+      alert("開始日時を入力してください");
       return;
     }
+
     if (!dataKind) {
       alert("データ種別を選択してください");
       return;
@@ -44,17 +45,6 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
             </option>
           ))}
         </select>
-
-        {/* <select
-          className="border border-gray-300 rounded-md"
-          value={station}
-          onChange={(e) => setStation(e.target.value)}
-        >
-          <option value="AAB">AAB</option>
-          <option value="ANC">ANC</option>
-          <option value="DAV">DAV</option>
-          <option value="EUS">EUS</option>
-        </select> */}
       </div>
       <div>
         <label className="text-sm">データ種別</label>
@@ -67,7 +57,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
         </select>
       </div>
       <div>
-        <label className="text-sm">開始日時</label>
+        <label className="text-sm">日時</label>
         <input
           type="date"
           className="border border-gray-300 rounded-md"

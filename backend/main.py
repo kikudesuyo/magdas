@@ -1,15 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from features.downloads.types.ee_index import RangeEeIndex
-from features.ee_index.types.ee_index import Ee_index
-from handler.download.download_range_ee_index import (
-    calc_range_ee_index as handle_calc_range_ee_index,
-)
+from features.ee_index.types.ee_index import DailyEeIndex
+from handler.download.download_range_ee_index import generate_ee_index_iaga_file
 from handler.ee_index.calc_daily_ee_index import (
     calc_daily_ee_index as handle_calc_daily_ee_index,
-)
-from handler.ee_index.download_daily_ee_index import (
-    ee_index_download as handle_ee_index_download,
 )
 
 app = FastAPI()
@@ -23,15 +18,20 @@ app.add_middleware(
 
 
 @app.post("/ee-index")
-async def calc_daily_ee_index(request: Ee_index):
+async def calc_daily_ee_index(request: DailyEeIndex):
     return handle_calc_daily_ee_index(request)
 
 
-@app.post("/ee-index/download")
-async def ee_index_download(request: Ee_index):
-    return handle_ee_index_download(request)
+@app.post("/download/ee-index/daily")
+async def download_daily_ee_index(request: DailyEeIndex):
+    r = RangeEeIndex(
+        startDate=request.date,
+        endDate=request.date,
+        station=request.station,
+    )
+    return generate_ee_index_iaga_file(r)
 
 
 @app.post("/download/ee-index")
 async def download_ee_index(request: RangeEeIndex):
-    return handle_calc_range_ee_index(request)
+    return generate_ee_index_iaga_file(request)

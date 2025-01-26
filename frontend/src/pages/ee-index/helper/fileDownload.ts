@@ -1,11 +1,12 @@
-import { fetchFile } from "@/services/api";
+import { fetchDailyDateFile } from "@/services/api";
 
 export const downloadFile = async (fileParams: {
   date: string;
   station: string;
 }) => {
   const { date, station } = fileParams;
-  const responseData = await fetchFile({
+  console.log(date, station);
+  const responseData = await fetchDailyDateFile({
     date,
     station,
   });

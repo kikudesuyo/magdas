@@ -4,11 +4,11 @@ from ee_index.src.calc.er_value import Er
 from ee_index.src.calc.euel_index import Euel
 from ee_index.src.constant.time_relation import Day
 from fastapi.responses import JSONResponse
-from features.ee_index.types.ee_index import Ee_index
+from features.ee_index.types.ee_index import DailyEeIndex
 from utils.date import convert_datetime
 
 
-def calc_daily_ee_index(request: Ee_index):
+def calc_daily_ee_index(request: DailyEeIndex):
     date, station = request.date, request.station
     date = convert_datetime(date)
     er = Er(station, date).calc_er_for_days(Day.ONE.const)

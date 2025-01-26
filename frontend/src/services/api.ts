@@ -8,16 +8,6 @@ export const fetchEeIndexData = async <T>(data: T) => {
   return response.data;
 };
 
-type DownloadDailyEeIndex = {
-  date: string;
-  station: string;
-};
-
-export const fetchFile = async (data: DownloadDailyEeIndex) => {
-  const response = await axios.post(`${apiURL}/ee-index/download`, data);
-  return response.data;
-};
-
 type DownloadCustomDateEeIndex = {
   startDate: string;
   endDate: string;
@@ -26,5 +16,16 @@ type DownloadCustomDateEeIndex = {
 
 export const fetchCustomDateFile = async (data: DownloadCustomDateEeIndex) => {
   const response = await axios.post(`${apiURL}/download/ee-index`, data);
+  return response.data;
+};
+
+type DownloadDailyDateEeIndex = {
+  date: string;
+  station: string;
+};
+
+export const fetchDailyDateFile = async (data: DownloadDailyDateEeIndex) => {
+  console.log(data);
+  const response = await axios.post(`${apiURL}/download/ee-index/daily`, data);
   return response.data;
 };

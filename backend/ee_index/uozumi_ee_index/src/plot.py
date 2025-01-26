@@ -1,13 +1,12 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 import numpy as np
+from ee_index.src.constant.time_relation import Min
 from get_pyee import get_py_ee
 from get_ut_array import get_ut_array
 from matplotlib import pyplot as plt
 from read_iaga import get_iaga_ee_for_days
 from smoothing import remove_outliers
-
-from ee_index.src.constant.time_relation import Min
 
 
 class Plotter:

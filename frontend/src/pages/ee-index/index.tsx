@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Main from "@/components/Main";
 import EeIndexChart from "@/pages/ee-index/_components/EeIndexChart";
-import DataRangeSelector from "@/pages/ee-index/_components/DataRangeSelector";
+import DataRangeSelector from "@/pages/ee-index/_components/DataSelector";
 import { fetchEeIndexData } from "@/services/api";
 
 type ResParams = {
