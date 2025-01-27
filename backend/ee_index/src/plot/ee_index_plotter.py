@@ -8,6 +8,8 @@ from ee_index.src.calc.euel_index import Euel
 from ee_index.src.constant.time_relation import Min
 from ee_index.src.plot.config import PlotConfig
 
+from backend.dst.dst_data import get_dst_values
+
 
 class EeIndexPlotter:
     def __init__(self, start_date: datetime, end_date: datetime):
@@ -31,6 +33,14 @@ class EeIndexPlotter:
         euel = Euel.calculate_euel_for_days(station, self.start_datetime, self.days)
         x_axis, y_axis = np.arange(0, len(euel), 1), euel
         self.ax.plot(x_axis, y_axis, label=f"{station}_EUEL", color=color, lw=1.3)
+
+    def plot_dst(self, color):
+        dst = get_dst_values(
+            self.start_datetime, self.start_datetime + timedelta(days=self.days - 1)
+        )
+        dst_interpolated = np.repeat(dst, 60)  # 1時間ごとに補間
+        x_axis = np.arange(0, len(dst_interpolated), 1)
+        self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
     def plot_ee(self, station):
         er = Er(station, self.start_datetime).calc_er_for_days(self.days)
