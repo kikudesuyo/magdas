@@ -8,6 +8,11 @@ class PlotConfig:
         plt.rcParams["xtick.direction"] = "in"  # x軸の目盛りの向き
         plt.rcParams["ytick.direction"] = "in"  # y軸の目盛りの向き
         plt.rcParams["xtick.labelsize"] = 11  # x軸目盛りのフォントサイズ
+        plt.rcParams["grid.linestyle"] = "--"  # グリッド線のスタイル
+        plt.rcParams["grid.color"] = "gray"  # グリッド線の色
+        plt.rcParams["grid.alpha"] = 0.7  # グリッド線の透明度
+        plt.rcParams["grid.linewidth"] = 0.7  # グリッド線の幅
+        plt.rcParams["axes.grid"] = True  # グリッドを表示
         plt.rcParams["ytick.labelsize"] = 11  # y軸目盛りのフォントサイズ
         plt.rcParams["xtick.top"] = True  # x軸の上部目盛り
         plt.rcParams["ytick.right"] = True  # y軸の右部目盛り

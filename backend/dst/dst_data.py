@@ -51,41 +51,41 @@ def is_dst_quiet(dst_index: int):
     return dst_index >= -50
 
 
-def validate_date_period(start_ym: Tuple[int, int], end_ym) -> None:
-    if start_ym[1] < 1 or start_ym[1] > 12:
-        raise ValueError("開始年月が不正です")
-    if end_ym[1] < 1 or end_ym[1] > 12:
-        raise ValueError("終了年月が不正です")
+def validate_date_period(start_ym: date, end_ym: date) -> None:
     if start_ym > end_ym:
         raise ValueError("開始年月は終了年月よりも前の日付である必要があります")
-    if start_ym < (1963, 1):
+    if start_ym < date(1963, 1, 1):
         raise ValueError("1963年1月以降のデータしか取得できません")
-    if end_ym[0] > date.today().year or (
-        end_ym[0] == date.today().year and end_ym[1] > date.today().month
-    ):
+    if end_ym > date.today():
         raise ValueError("未来のデータは取得できません")
 
 
 def get_dst_values(start_date: date, end_date: date) -> List[int]:
-    dst = []
+    validate_date_period(start_date, end_date)
+    dst_data = []
     current_date = start_date
     while current_date <= end_date:
-        if current_date.year == end_date.year and current_date.month == end_date.month:
-            days_in_month = end_date.day
-        else:
-            days_in_month = (current_date + relativedelta(months=1, days=-1)).day
         monthly_dst = fetch_dst_data(current_date.year, current_date.month)
-        for day in range(1, days_in_month + 1):
-            dst.extend(monthly_dst[day - 1])
+        # 開始日と終了日の計算
+        if (
+            current_date.year == start_date.year
+            and current_date.month == start_date.month
+        ):
+            start_day = start_date.day
+        else:
+            start_day = 1
+        if current_date.month == end_date.month and current_date.year == end_date.year:
+            end_day = end_date.day
+        else:
+            end_day = len(monthly_dst)
+        dst_data.extend(monthly_dst[start_day - 1 : end_day])
         current_date = current_date + relativedelta(months=1)
-    return dst
+    return dst_data
 
 
-def fetch_disturbued_days(start_ym, end_ym) -> List[date]:
-    validate_date_period(start_ym, end_ym)
+def fetch_disturbued_days(start_date: date, end_date: date) -> List[date]:
+    validate_date_period(start_date, end_date)
     disturbance_days = []
-    start_date = date(start_ym[0], start_ym[1], 1)
-    end_date = date(end_ym[0], end_ym[1], 1)
     current_date = start_date
     while current_date <= end_date:
         monthly_dst = fetch_dst_data(current_date.year, current_date.month)
@@ -98,8 +98,6 @@ def fetch_disturbued_days(start_ym, end_ym) -> List[date]:
     return disturbance_days
 
 
-# start_ym = (2024, 12)
-# end_ym = (2025, 1)
-# disturbance_days = fetch_disturbance_days(start_ym, end_ym)
-# print(len(disturbance_days))
-# print(disturbance_days)
+start, end = date(2024, 11, 1), date(2024, 11, 1)
+dst_values = get_dst_values(start, end)
+print(dst_values)
