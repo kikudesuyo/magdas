@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 
 
-def fetch_dst_index(year, month):
+def fetch_dst_data(year, month):
     base_url = "https://wdc.kugi.kyoto-u.ac.jp"
     urls = [
         f"{base_url}/dst_final/{year:04d}{month:02}/index.html",
@@ -47,11 +47,11 @@ def fetch_dst_index(year, month):
     return data_array
 
 
-def is_quiet(dst_index: int):
+def is_dst_quiet(dst_index: int):
     return dst_index >= -50
 
 
-def validate_date_range(start_ym: Tuple[int, int], end_ym) -> None:
+def validate_date_period(start_ym: Tuple[int, int], end_ym) -> None:
     if start_ym[1] < 1 or start_ym[1] > 12:
         raise ValueError("開始年月が不正です")
     if end_ym[1] < 1 or end_ym[1] > 12:
@@ -66,16 +66,31 @@ def validate_date_range(start_ym: Tuple[int, int], end_ym) -> None:
         raise ValueError("未来のデータは取得できません")
 
 
-def fetch_disturbance_days(start_ym, end_ym) -> List[date]:
-    validate_date_range(start_ym, end_ym)
+def get_dst_values(start_date: date, end_date: date) -> List[int]:
+    dst = []
+    current_date = start_date
+    while current_date <= end_date:
+        if current_date.year == end_date.year and current_date.month == end_date.month:
+            days_in_month = end_date.day
+        else:
+            days_in_month = (current_date + relativedelta(months=1, days=-1)).day
+        monthly_dst = fetch_dst_data(current_date.year, current_date.month)
+        for day in range(1, days_in_month + 1):
+            dst.extend(monthly_dst[day - 1])
+        current_date = current_date + relativedelta(months=1)
+    return dst
+
+
+def fetch_disturbued_days(start_ym, end_ym) -> List[date]:
+    validate_date_period(start_ym, end_ym)
     disturbance_days = []
     start_date = date(start_ym[0], start_ym[1], 1)
     end_date = date(end_ym[0], end_ym[1], 1)
     current_date = start_date
     while current_date <= end_date:
-        monthly_dst = fetch_dst_index(current_date.year, current_date.month)
+        monthly_dst = fetch_dst_data(current_date.year, current_date.month)
         for day, day_dst in enumerate(monthly_dst, 1):
-            if any(not is_quiet(hour_dst) for hour_dst in day_dst):
+            if any(not is_dst_quiet(hour_dst) for hour_dst in day_dst):
                 disturbance_days.append(
                     date(current_date.year, current_date.month, day)
                 )
@@ -83,8 +98,8 @@ def fetch_disturbance_days(start_ym, end_ym) -> List[date]:
     return disturbance_days
 
 
-start_ym = (2024, 12)
-end_ym = (2025, 1)
-disturbance_days = fetch_disturbance_days(start_ym, end_ym)
-print(len(disturbance_days))
-print(disturbance_days)
+# start_ym = (2024, 12)
+# end_ym = (2025, 1)
+# disturbance_days = fetch_disturbance_days(start_ym, end_ym)
+# print(len(disturbance_days))
+# print(disturbance_days)
