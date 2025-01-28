@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,9 +36,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, moving_avg, label=f"{station}_EUEL", color=color, lw=1.3)
 
     def plot_dst(self, color):
-        dst = get_dst_values(self.start_datetime, self.end_datetime + timedelta(days=1))
-        print(len(dst))
-        print(len(get_dst_values(self.start_datetime, self.end_datetime)))
+        dst = get_dst_values(self.start_datetime.date(), self.end_datetime.date())
         dst_interpolated = np.repeat(dst, 60)
         x_axis = np.arange(0, len(dst_interpolated), 1)
         self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
