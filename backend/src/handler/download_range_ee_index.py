@@ -16,7 +16,7 @@ from src.utils.date import convert_datetime
 from src.utils.path import generate_abs_path
 
 
-def generate_ee_index_iaga_file(request: RangeEeIndex):
+def handle_generate_ee_index_iaga_file(request: RangeEeIndex):
     start_date, end_date, station = (
         request.startDate,
         request.endDate,

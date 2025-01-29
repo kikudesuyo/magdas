@@ -8,7 +8,7 @@ from src.features.ee_index.types.ee_index import DailyEeIndex
 from src.utils.date import convert_datetime
 
 
-def calc_daily_ee_index(request: DailyEeIndex):
+def handle_calc_daily_ee_index(request: DailyEeIndex):
     date, station = request.date, request.station
     date = convert_datetime(date)
     er = Er(station, date).calc_er_for_days(Day.ONE.const)
