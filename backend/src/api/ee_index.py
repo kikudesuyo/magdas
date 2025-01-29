@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from src.features.types.ee_index import DailyEeIndex, RangeEeIndex
 from src.handler.calc_daily_ee_index import handle_calc_daily_ee_index
 from src.handler.download_range_ee_index import handle_generate_ee_index_iaga_file
+from src.service.types.ee_index import DailyEeIndex, RangeEeIndex
 
 router = APIRouter()
 
