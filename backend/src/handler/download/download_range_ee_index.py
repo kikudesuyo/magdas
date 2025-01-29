@@ -1,19 +1,19 @@
 import base64
 from datetime import timedelta
 
-from ee_index.src.calc.edst_index import Edst
-from ee_index.src.calc.er_value import Er
-from ee_index.src.calc.euel_index import Euel
-from ee_index.src.constant.magdas_station import EeIndexStation
-from ee_index.src.constant.time_relation import Min, Sec
 from fastapi.responses import JSONResponse
-from features.downloads.iaga.meta_data import get_meta_data
-from features.downloads.iaga.save_iaga_format import save_iaga_format
-from features.downloads.types.ee_index import RangeEeIndex
-from features.downloads.zip.files_zipping import create_zip_buffer
-from features.downloads.zip.remove_files import remove_files
-from utils.date import convert_datetime
-from utils.path import generate_abs_path
+from src.ee_index.calc.edst_index import Edst
+from src.ee_index.calc.er_value import Er
+from src.ee_index.calc.euel_index import Euel
+from src.ee_index.constant.magdas_station import EeIndexStation
+from src.ee_index.constant.time_relation import Min, Sec
+from src.features.downloads.iaga.meta_data import get_meta_data
+from src.features.downloads.iaga.save_iaga_format import save_iaga_format
+from src.features.downloads.types.ee_index import RangeEeIndex
+from src.features.downloads.zip.files_zipping import create_zip_buffer
+from src.features.downloads.zip.remove_files import remove_files
+from src.utils.date import convert_datetime
+from src.utils.path import generate_abs_path
 
 
 def generate_ee_index_iaga_file(request: RangeEeIndex):

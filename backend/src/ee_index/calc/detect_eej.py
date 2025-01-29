@@ -1,8 +1,5 @@
 import os
 
-# from ee_index.src.calc.euel_index import Euel
-from datetime import datetime
-
 from ee_index.constant.magdas_station import EeIndexStation
 
 anc = EeIndexStation.ANC
