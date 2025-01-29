@@ -2,8 +2,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
-
-from util import generate_abs_path
+from src.utils.path import generate_abs_path
 
 
 def read_iaga_data(abs_path):
