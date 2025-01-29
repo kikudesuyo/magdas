@@ -142,12 +142,8 @@ class NightEr(ErEDstConnecter):
     def extract_night_er(self) -> np.ndarray:
         condition = self.is_daytime()
         night_er = np.vstack(
-            (
-                np.where(
-                    condition,
-                    np.nan,
-                    super().get_er_for_edst(self.datetime, self.days),
-                )
+            np.where(
+                condition, np.nan, super().get_er_for_edst(self.datetime, self.days)
             )
         ).ravel()
         return night_er
