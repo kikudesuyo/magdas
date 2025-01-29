@@ -1,6 +1,6 @@
 import re
 from datetime import date
-from typing import List, Tuple
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup
@@ -96,8 +96,3 @@ def fetch_disturbued_days(start_date: date, end_date: date) -> List[date]:
                 )
         current_date = current_date + relativedelta(months=1)
     return disturbance_days
-
-
-start, end = date(2024, 11, 1), date(2024, 11, 1)
-dst_values = get_dst_values(start, end)
-print(dst_values)

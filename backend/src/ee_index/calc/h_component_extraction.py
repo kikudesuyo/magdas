@@ -2,12 +2,11 @@ from datetime import date, datetime, timedelta
 from glob import glob
 
 import numpy as np
-
-from ee_index.src.constant.magdas_station import EeIndexStation
-from ee_index.src.constant.raw_data import MAX_H, MIN_H
-from ee_index.src.constant.time_relation import Min
-from ee_index.src.helper.raw_data_reader import read_raw_min_data
-from ee_index.src.path import generate_parent_abs_path
+from src.ee_index.constant.magdas_station import EeIndexStation
+from src.ee_index.constant.raw_data import MAX_H, MIN_H
+from src.ee_index.constant.time_relation import Min
+from src.ee_index.helper.raw_data_reader import read_raw_min_data
+from src.ee_index.path import generate_parent_abs_path
 
 
 class HComponent:

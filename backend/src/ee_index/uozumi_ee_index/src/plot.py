@@ -1,7 +1,7 @@
 from datetime import date, datetime
 
 import numpy as np
-from ee_index.src.constant.time_relation import Min
+from ee_index.constant.time_relation import Min
 from get_pyee import get_py_ee
 from get_ut_array import get_ut_array
 from matplotlib import pyplot as plt
@@ -62,7 +62,7 @@ class Plotter:
 
 from datetime import datetime
 
-from ee_index.src.path import generate_abs_path
+from ee_index.path import generate_abs_path
 
 plot = Plotter("ANC", datetime(2014, 1, 1), 1)
 plot.ee_plot(generate_abs_path("/uozumi_ee-index/img/sample_EE-index.png"))

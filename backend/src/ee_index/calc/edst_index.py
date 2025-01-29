@@ -1,11 +1,11 @@
 from datetime import datetime
 
 import numpy as np
-from ee_index.src.calc.er_value import Er, NightEr
-from ee_index.src.constant.magdas_station import EeIndexStation
-from ee_index.src.constant.time_relation import DawnAndDusk, Min
-from ee_index.src.helper.time_utils import DateUtils
-from ee_index.src.helper.warnings_suppression import NanCalculator
+from src.ee_index.calc.er_value import Er, NightEr
+from src.ee_index.constant.magdas_station import EeIndexStation
+from src.ee_index.constant.time_relation import DawnAndDusk, Min
+from src.ee_index.helper.time_utils import DateUtils
+from src.ee_index.helper.warnings_suppression import NanCalculator
 
 
 class Edst:

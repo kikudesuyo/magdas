@@ -1,8 +1,8 @@
 import calendar
 from datetime import datetime, timedelta
 
-from ee_index.src.constant.magdas_station import EeIndexStation
-from ee_index.src.constant.time_relation import Day, Sec
+from src.ee_index.constant.magdas_station import EeIndexStation
+from src.ee_index.constant.time_relation import Day, Sec
 
 
 def calculate_time_difference(start_date: datetime, end_date: datetime):
