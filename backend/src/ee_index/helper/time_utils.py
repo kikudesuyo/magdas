@@ -5,15 +5,6 @@ from src.ee_index.constant.magdas_station import EeIndexStation
 from src.ee_index.constant.time_relation import Day, Sec
 
 
-def calculate_time_difference(start_date: datetime, end_date: datetime):
-    time_difference = end_date - start_date
-
-    days = time_difference.days
-    hours = time_difference.seconds // Sec.ONE_HOUR.const
-    minutes = time_difference.seconds % Sec.ONE_HOUR.const // Sec.ONE_MINUTE.const
-    return days, hours, minutes
-
-
 class DateUtils:
     @staticmethod
     def get_days_in_month(year, month) -> int:
