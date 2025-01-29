@@ -1,7 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
+from dst.dst_data import get_dst_values
 from ee_index.src.calc.edst_index import Edst
 from ee_index.src.calc.er_value import Er
 from ee_index.src.calc.euel_index import Euel
@@ -12,6 +13,7 @@ from ee_index.src.plot.config import PlotConfig
 class EeIndexPlotter:
     def __init__(self, start_date: datetime, end_date: datetime):
         self.start_datetime = start_date
+        self.end_datetime = end_date
         self.days = (end_date - start_date).days + 1
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
@@ -29,8 +31,15 @@ class EeIndexPlotter:
 
     def plot_euel(self, station, color):
         euel = Euel.calculate_euel_for_days(station, self.start_datetime, self.days)
-        x_axis, y_axis = np.arange(0, len(euel), 1), euel
-        self.ax.plot(x_axis, y_axis, label=f"{station}_EUEL", color=color, lw=1.3)
+        moving_avg = self.calc_moving_ave(euel, 60)
+        x_axis = np.arange(0, len(moving_avg), 1)
+        self.ax.plot(x_axis, moving_avg, label=f"{station}_EUEL", color=color, lw=1.3)
+
+    def plot_dst(self, color):
+        dst = get_dst_values(self.start_datetime.date(), self.end_datetime.date())
+        dst_interpolated = np.repeat(dst, 60)
+        x_axis = np.arange(0, len(dst_interpolated), 1)
+        self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
     def plot_ee(self, station):
         er = Er(station, self.start_datetime).calc_er_for_days(self.days)
@@ -42,6 +51,15 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, er, label="ER", color="black", lw=0.5)
         self.ax.plot(x_axis, edst, label="EDst", color="green", lw=0.5)
         self.ax.plot(x_axis, euel, label="EUEL", color="red", lw=0.5)
+
+    def calc_moving_ave(self, data, window):
+        weights = np.ones(window) / window
+        valid_cnt = np.convolve(~np.isnan(data), weights, mode="same")
+        data_filled = np.nan_to_num(data, nan=0)
+        moving_sum = np.convolve(data_filled, weights, mode="same")
+        moving_avg = np.divide(moving_sum, valid_cnt, where=(valid_cnt > 0))
+        moving_avg[valid_cnt == 0] = np.nan
+        return moving_avg
 
     def _set_axis_labels(self, start_datetime, data_length):
         self.ax.set_ylabel("nT", rotation=0)
