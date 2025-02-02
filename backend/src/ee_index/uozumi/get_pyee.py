@@ -9,6 +9,6 @@ from src.ee_index.calc.euel_index import Euel
 def get_py_ee(station, date: datetime, days: int) -> np.ndarray:
     er = Er(station, date).calc_er_for_days(days)
     edst = Edst.compute_smoothed_edst(date, days)
-    euel = Euel.calculate_euel_for_days(station, date, days)
+    euel = Euel.calc_euel_for_days(station, date, days)
     ee = np.array([er, edst, euel])
     return ee
