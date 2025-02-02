@@ -13,9 +13,7 @@ class Edst:
     def calc_for_min(target_datetime: datetime):
         night_er_list = np.array([])
         for station in EeIndexStation:
-            local_datetime = DateUtils.convert_to_local_time(
-                station.code, target_datetime
-            )
+            local_datetime = DateUtils.to_local_time(station.code, target_datetime)
             if (
                 local_datetime.time() >= DawnAndDusk.NIGHTSIDE.start
                 or local_datetime.time() <= DawnAndDusk.NIGHTSIDE.end
