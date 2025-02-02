@@ -124,7 +124,7 @@ class NightEr(ErEDstConnecter):
         self.days = days
 
     def get_corresponding_local_time(self) -> np.ndarray:
-        local_datetime = DateUtils.convert_to_local_time(self.station, self.datetime)
+        local_datetime = DateUtils.to_local_time(self.station, self.datetime)
         return np.array(
             [
                 (local_datetime + timedelta(minutes=i)).time()

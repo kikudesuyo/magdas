@@ -1,9 +1,15 @@
-import os
+from datetime import datetime, timedelta
 
+from ee_index.calc.euel_index import Euel
 from ee_index.constant.magdas_station import EeIndexStation
 
-anc = EeIndexStation.ANC
-print(anc)
 
-# station_anc_euel = Euel.calculate_euel_for_days("ANC", datetime(2020, 1, 1), 31)
-# station_eus_euel = Euel.calculate_euel_for_days("EUS", datetime(2020, 1, 1), 31)
+def get_local_euel(station: EeIndexStation, local_start_dt: datetime, local_end_dt):
+    start_utc = (local_start_dt - timedelta(hours=station.time_diff)).replace(
+        second=0, microsecond=0
+    )
+    end_utc = (local_end_dt - timedelta(hours=station.time_diff)).replace(
+        second=0, microsecond=0
+    )
+    euel = Euel.calc_euel(station.code, start_utc, end_utc)
+    return euel

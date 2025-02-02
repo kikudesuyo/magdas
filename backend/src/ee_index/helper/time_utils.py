@@ -32,7 +32,7 @@ class DateUtils:
         return days
 
     @staticmethod
-    def convert_to_local_time(station, ut_time: datetime) -> datetime:
+    def to_local_time(station, ut_time: datetime) -> datetime:
         """Convert to local time
         Args:
           station (str):
@@ -45,7 +45,7 @@ class DateUtils:
         return local_time
 
     @staticmethod
-    def convert_to_ut_time(station, local_time: datetime) -> datetime:
+    def to_ut_time(station, local_time: datetime) -> datetime:
         """Convert to UT time
         Args:
           station (str):
