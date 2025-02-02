@@ -13,7 +13,7 @@ def handle_calc_daily_ee_index(request: DailyEeIndex):
     date = convert_datetime(date)
     er = Er(station, date).calc_er_for_days(Day.ONE.const)
     edst = Edst.compute_smoothed_edst(date, Day.ONE.const)
-    euel = Euel.calculate_euel_for_days(
+    euel = Euel.calc_euel_for_days(
         station,
         date,
         Day.ONE.const,

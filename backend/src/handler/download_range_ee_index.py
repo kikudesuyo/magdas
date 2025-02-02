@@ -28,7 +28,7 @@ def handle_generate_ee_index_iaga_file(request: RangeEeIndex):
     days = (end_datetime - start_datetime).days + 1
     er = Er(station, start_datetime).calc_er_for_days(days)
     edst = Edst.compute_smoothed_edst(start_datetime, days)
-    euel = Euel.calculate_euel_for_days(station, start_datetime, days)
+    euel = Euel.calc_euel_for_days(station, start_datetime, days)
     # 修正するべき項目(IAGAコード、標高は未定)
     meta_data = get_meta_data(
         station,
