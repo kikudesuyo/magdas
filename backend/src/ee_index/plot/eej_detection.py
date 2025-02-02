@@ -22,6 +22,10 @@ class EejDetection:
         self._set_axis_labels(self.local_start_dt, length)
 
     def plot_local_euel(self, station: EeIndexStation):
+        """_summary_
+        TODO: 正しいデータ範囲を取り出すことが出来ていない。ERが開始時刻からN日のデータを取ってくるメソッドのせいで、期待しているデータの数と異なってしまっている。
+        ERのメソッドを開始時刻と終了時刻で指定させる
+        """
         local_euel = get_local_euel(station, self.local_start_dt, self.local_end_dt)
         moving_avg = calc_moving_ave(local_euel, 120)
         x_axis = np.arange(0, len(moving_avg), 1)

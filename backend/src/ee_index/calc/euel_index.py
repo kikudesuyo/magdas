@@ -17,8 +17,7 @@ class Euel:
         required_days = (end_dt.date() - start_dt.date()).days + 1
         er = Er(station, start_dt).calc_er_for_days(required_days)
         edst = Edst.compute_smoothed_edst(start_dt, required_days)
-        euel = er - edst
-        return euel
+        return er - edst
 
     @staticmethod
     def calc_euel_for_days(station, datetime: datetime, days):
