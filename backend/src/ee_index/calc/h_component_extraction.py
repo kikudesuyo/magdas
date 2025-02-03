@@ -92,10 +92,35 @@ class HComponent:
         return h_component_value
 
     @staticmethod
-    def interpolate_h_component(station, datetime, days):
-        h_component = HComponent.get_h_for_days(station, datetime, days)
+    def get_h_component(station, start_dt: datetime, end_dt: datetime):
+        """ "任意の時刻から指定した日数分のH値を取得する"""
+        start_date, end_date = start_dt.date(), end_dt.date()
+        if start_date == end_date:
+            start_idx = start_dt.hour * Min.ONE_HOUR.const + start_dt.minute
+            end_idx = end_dt.hour * Min.ONE_HOUR.const + end_dt.minute
+            day_h_data = HComponent.read_for_day(station, start_date)[
+                start_idx : end_idx + 1
+            ]
+            return day_h_data
+        h_values = np.array([], dtype=np.float32)
+        for i in range((end_date - start_date).days + 1):
+            current_date = start_date + timedelta(days=i)
+            day_h_data = HComponent.read_for_day(station, current_date)
+            if current_date == start_date:
+                start_idx = start_dt.hour * Min.ONE_HOUR.const + start_dt.minute
+                h_values = np.concatenate((h_values, day_h_data[start_idx:]))
+            elif current_date == end_date:
+                end_idx = end_dt.hour * Min.ONE_HOUR.const + end_dt.minute
+                h_values = np.concatenate((h_values, day_h_data[: end_idx + 1]))
+            else:
+                h_values = np.concatenate((h_values, day_h_data))
+        return h_values
+
+    @staticmethod
+    def interpolate_h(station, start_dt: datetime, end_dt: datetime):
+        h_value = HComponent.get_h_component(station, start_dt, end_dt)
         gm_latitude = EeIndexStation[station].gm_lat
-        equational_h_component = h_component / np.cos(np.deg2rad(gm_latitude))
+        equational_h_component = h_value / np.cos(np.deg2rad(gm_latitude))
         return equational_h_component
 
     @staticmethod

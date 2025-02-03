@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,18 +8,19 @@ from src.ee_index.calc.er_value import Er
 from src.ee_index.calc.euel_index import Euel
 from src.ee_index.calc.moving_ave import calc_moving_ave
 from src.ee_index.constant.time_relation import Min
+from src.ee_index.helper.time_utils import DateUtils
 from src.ee_index.plot.config import PlotConfig
 
 
 class EeIndexPlotter:
-    def __init__(self, start_date: date, end_date: date):
-        self.start_date = start_date
-        self.end_date = end_date
-        self.start_dt = datetime.combine(start_date, datetime.min.time())
-        self.days = (end_date - start_date).days + 1
+    def __init__(self, start_dt: datetime, end_dt: datetime):
+        self.start_dt = start_dt
+        self.end_dt = end_dt
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
-        self._set_axis_labels(self.start_dt, self.days * Min.ONE_DAY.const)
+        days, hour, min = DateUtils.time_diff(start_dt, end_dt)
+        length = days * Min.ONE_DAY.const + hour * Min.ONE_HOUR.const + min
+        self._set_axis_labels(self.start_dt, length)
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
         self.info_text = self.ax.text(
             0.5,
@@ -33,31 +34,33 @@ class EeIndexPlotter:
         )
 
     def plot_er(self, station):
-        er = Er(station, self.start_dt).calc_er_for_days(self.days)
+        er = Er(station, self.start_dt, self.end_dt).calc_er()
         x_axis, y_axis = np.arange(0, len(er), 1), er
         self.ax.plot(x_axis, y_axis, label="ER", color="black", lw=1.3)
 
     def plot_edst(self):
-        edst = Edst.compute_smoothed_edst(self.start_dt, self.days)
+        edst = Edst.compute_smoothed_edst(self.start_dt, self.end_dt)
         x_axis, y_axis = np.arange(0, len(edst), 1), edst
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
     def plot_euel(self, station, color):
-        euel = Euel.calc_euel_for_days(station, self.start_dt, self.days)
-        moving_avg = calc_moving_ave(euel, 120)
-        x_axis = np.arange(0, len(moving_avg), 1)
-        self.ax.plot(x_axis, moving_avg, label=f"{station}_EUEL", color=color, lw=1.3)
+        euel = Euel.calc_euel(station, self.start_dt, self.end_dt)
+        smoothed_euel = calc_moving_ave(euel, 120)
+        x_axis = np.arange(0, len(smoothed_euel), 1)
+        self.ax.plot(
+            x_axis, smoothed_euel, label=f"{station}_EUEL", color=color, lw=1.3
+        )
 
-    def plot_dst(self, color):
-        dst = get_dst_values(self.start_date, self.end_date)
-        dst_interpolated = np.repeat(dst, 60)
-        x_axis = np.arange(0, len(dst_interpolated), 1)
-        self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
+    # def plot_dst(self, color):
+    #     dst = get_dst_values(self.start_date, self.end_date)
+    #     dst_interpolated = np.repeat(dst, 60)
+    #     x_axis = np.arange(0, len(dst_interpolated), 1)
+    #     self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
     def plot_ee(self, station):
-        er = Er(station, self.start_dt).calc_er_for_days(self.days)
-        edst = Edst.compute_smoothed_edst(self.start_dt, self.days)
-        euel = Euel.calc_euel_for_days(station, self.start_dt, self.days)
+        er = Er(station, self.start_dt, self.end_dt).calc_er()
+        edst = Edst.compute_smoothed_edst(self.start_dt, self.end_dt)
+        euel = Euel.calc_euel(station, self.start_dt, self.end_dt)
         if len(er) != len(edst) or len(er) != len(euel):
             raise ValueError("The length of the arrays must be the same")
         x_axis = np.arange(0, len(er), 1)
@@ -80,11 +83,9 @@ class EeIndexPlotter:
         self.ax.set_xticklabels(time_labels)
 
     def _on_move(self, event):
-        # カーソルがグラフ内にあれば
         if not event.inaxes:
             return
         x, y = event.xdata, event.ydata
-        # 時間軸から対応する時間を取得
         time_str = (self.start_dt + timedelta(minutes=int(x))).strftime("%m/%d %H:%M")
         self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
@@ -105,3 +106,10 @@ class EeIndexPlotter:
         """
         self.ax.legend(loc="lower left", fontsize=18)
         plt.savefig(path)
+
+
+p = EeIndexPlotter(datetime(2014, 1, 1, 0, 0), datetime(2014, 1, 10, 23, 59))
+p.plot_euel("DAV", "red")
+p.plot_euel("EUS", "blue")
+p.show()
+# p.plot_er("kakioka")
