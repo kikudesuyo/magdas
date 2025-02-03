@@ -22,13 +22,12 @@ def handle_generate_ee_index_iaga_file(request: RangeEeIndex):
         request.endDate,
         request.station,
     )
-    start_datetime, end_datetime = convert_datetime(start_date), convert_datetime(
-        end_date
-    )
-    days = (end_datetime - start_datetime).days + 1
-    er = Er(station, start_datetime).calc_er_for_days(days)
-    edst = Edst.compute_smoothed_edst(start_datetime, days)
-    euel = Euel.calc_euel_for_days(station, start_datetime, days)
+    start_date, end_date = convert_datetime(start_date), convert_datetime(end_date)
+    start_dt = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_dt = end_date.replace(hour=23, minute=59, second=59, microsecond=0)
+    er = Er(station, start_dt, end_dt).calc_er()
+    edst = Edst.compute_smoothed_edst(start_dt, end_dt)
+    euel = Euel.calc_euel(station, start_dt, end_dt)
     # 修正するべき項目(IAGAコード、標高は未定)
     meta_data = get_meta_data(
         station,
@@ -37,10 +36,11 @@ def handle_generate_ee_index_iaga_file(request: RangeEeIndex):
         EeIndexStation[station].gm_lon,
         8888.88,
     )
-    start_day_of_year = start_datetime.timetuple().tm_yday
+    days = (end_date - start_date).days + 1
+    start_day_of_year = start_date.timetuple().tm_yday
     data = {
         "DATE": [
-            (start_datetime + timedelta(days=j)).strftime("%Y-%m-%d")
+            (start_date + timedelta(days=j)).strftime("%Y-%m-%d")
             for j in range(days)
             for _ in range(Min.ONE_DAY.const)
         ],
@@ -57,7 +57,7 @@ def handle_generate_ee_index_iaga_file(request: RangeEeIndex):
         "ER": er,
         "EUEL": euel,
     }
-    save_iaga_format(meta_data, data, generate_abs_path("/tmp/iaga_format"))
+    save_iaga_format(meta_data, data, generate_abs_path("/tmp/iaga_format.txt"))
     zip_buffer = create_zip_buffer()
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     remove_files()
