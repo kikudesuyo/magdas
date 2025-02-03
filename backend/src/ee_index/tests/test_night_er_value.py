@@ -1,11 +1,11 @@
 import unittest
 import warnings
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import numpy as np
-from ee_index.src.calc.er_value import NightEr
-from ee_index.src.constant.magdas_station import EeIndexStation
-from ee_index.src.helper.time_utils import DateUtils
+from src.ee_index.calc.er_value import NightEr
+from src.ee_index.constant.magdas_station import EeIndexStation
+from src.ee_index.helper.time_utils import DateUtils
 
 
 class TestERValue(unittest.TestCase):
@@ -24,8 +24,9 @@ class TestERValue(unittest.TestCase):
 
     def test_is_dayside_er_nan(self):
         """This function is a test code that checks whether the daytime values are set to np.NaN."""
-        local_time_start = DateUtils.convert_to_local_time(self.station, self.ut_date)
-        nightside = NightEr(self.station, local_time_start, self.days)
+        local_start_dt = DateUtils.to_local_time(self.station, self.ut_date)
+        local_end_dt = local_start_dt + timedelta(days=self.days, minutes=-1)
+        nightside = NightEr(self.station, local_start_dt, local_end_dt)
         nightside_er = nightside.extract_night_er()
         # onset time is dayside
         time_zone = EeIndexStation[self.station].time_diff
