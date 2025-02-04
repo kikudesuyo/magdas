@@ -53,3 +53,12 @@ class EejDetection:
     def save(self, path):
         self.ax.legend(loc="lower left", fontsize=18)
         plt.savefig(path)
+
+
+start_local_dt = datetime(2014, 1, 1, 0, 0)
+end_local_dt = datetime(2014, 1, 10, 23, 59)
+detection = EejDetection(start_local_dt, end_local_dt)
+detection.plot_local_euel(EeIndexStation.ANC)
+detection.plot_local_euel(EeIndexStation.DAV)
+detection.plot_local_euel(EeIndexStation.EUS)
+detection.show()

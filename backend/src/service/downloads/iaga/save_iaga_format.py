@@ -3,7 +3,7 @@ import pandas as pd
 
 def save_iaga_format(meta_data, data, file_name):
     df = pd.DataFrame(data)
-    with open(f"{file_name}.txt", "w") as f:
+    with open(file_name, "w") as f:
         # メタデータ
         for key, value in meta_data.items():
             f.write(f"{key:<25} {value:<40}\n")

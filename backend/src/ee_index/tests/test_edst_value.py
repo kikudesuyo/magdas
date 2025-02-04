@@ -2,7 +2,7 @@ import unittest
 import warnings
 from datetime import datetime
 
-from ee_index.src.calc.edst_index import Edst
+from src.ee_index.calc.edst_index import Edst
 
 
 class TestEdst(unittest.TestCase):
