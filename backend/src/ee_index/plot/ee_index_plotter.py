@@ -7,8 +7,7 @@ from src.ee_index.calc.edst_index import Edst
 from src.ee_index.calc.er_value import Er
 from src.ee_index.calc.euel_index import Euel
 from src.ee_index.calc.moving_ave import calc_moving_ave
-from src.ee_index.constant.time_relation import Min
-from src.ee_index.helper.time_utils import DateUtils
+from src.ee_index.constant.time_relation import Sec
 from src.ee_index.plot.config import PlotConfig
 
 
@@ -18,11 +17,9 @@ class EeIndexPlotter:
         self.end_dt = end_dt
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
-        days, hour, min = DateUtils.time_diff(start_dt, end_dt)
-        length = days * Min.ONE_DAY.const + hour * Min.ONE_HOUR.const + min
-        self._set_axis_labels(self.start_dt, length)
+        self._set_axis_labels()
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
-        self.info_text = self.ax.text(
+        self.ax.text(
             0.5,
             0.95,
             "",
@@ -68,7 +65,11 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, edst, label="EDst", color="green", lw=0.5)
         self.ax.plot(x_axis, euel, label="EUEL", color="red", lw=0.5)
 
-    def _set_axis_labels(self, start_datetime, data_length):
+    def _set_axis_labels(self):
+        data_length = (
+            int((self.end_dt - self.start_dt).total_seconds()) // Sec.ONE_MINUTE.const
+            + 1
+        )
         self.ax.set_ylabel("nT", rotation=0)
         self.ax.set_xlim(0, data_length)
         self.ax.set_ylim(-100, 200)
@@ -76,7 +77,7 @@ class EeIndexPlotter:
         tick_interval = max(1, data_length // 8)
         ticks = range(0, data_length, tick_interval)
         time_labels = [
-            (start_datetime + timedelta(minutes=i)).strftime("%m/%d %H:%M")
+            (self.start_dt + timedelta(minutes=i)).strftime("%m/%d %H:%M")
             for i in ticks
         ]
         self.ax.set_xticks(ticks)
