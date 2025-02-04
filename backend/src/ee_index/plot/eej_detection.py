@@ -15,11 +15,8 @@ class EejDetection:
         self.local_end_dt = local_end_dt
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
-        length = (
-            int((local_end_dt - local_start_dt).total_seconds()) // Sec.ONE_MINUTE.const
-            + 1
-        )
-        self._set_axis_labels(self.local_start_dt, length)
+        self._set_axis_labels()
+        self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
         """_summary_
@@ -33,7 +30,12 @@ class EejDetection:
         self.ax.plot(x_axis, moving_avg, label=station.name)
         return moving_avg
 
-    def _set_axis_labels(self, start_dt, data_length):
+    def _set_axis_labels(self):
+        data_length = (
+            int((self.local_end_dt - self.local_start_dt).total_seconds())
+            // Sec.ONE_MINUTE.const
+            + 1
+        )
         self.ax.set_ylabel("nT", rotation=0)
         self.ax.set_xlim(0, data_length)
         self.ax.set_ylim(-100, 200)
@@ -41,10 +43,21 @@ class EejDetection:
         tick_interval = max(1, data_length // 8)
         ticks = range(0, data_length, tick_interval)
         time_labels = [
-            (start_dt + timedelta(minutes=i)).strftime("%m/%d %H:%M") for i in ticks
+            (self.local_start_dt + timedelta(minutes=i)).strftime("%m/%d %H:%M")
+            for i in ticks
         ]
         self.ax.set_xticks(ticks)
         self.ax.set_xticklabels(time_labels)
+
+    def _on_move(self, event):
+        if not event.inaxes:
+            return
+        x, y = event.xdata, event.ydata
+        time_str = (self.local_start_dt + timedelta(minutes=int(x))).strftime(
+            "%m/%d %H:%M"
+        )
+        self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
+        self.ax.figure.canvas.draw()
 
     def show(self):
         self.ax.legend(loc="lower left", fontsize=18)
@@ -56,9 +69,8 @@ class EejDetection:
 
 
 start_local_dt = datetime(2014, 1, 1, 0, 0)
-end_local_dt = datetime(2014, 1, 10, 23, 59)
+end_local_dt = datetime(2014, 1, 31, 23, 59)
 detection = EejDetection(start_local_dt, end_local_dt)
 detection.plot_local_euel(EeIndexStation.ANC)
-detection.plot_local_euel(EeIndexStation.DAV)
 detection.plot_local_euel(EeIndexStation.EUS)
 detection.show()
