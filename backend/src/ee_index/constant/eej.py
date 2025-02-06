@@ -1,6 +1,6 @@
 from datetime import time
 
-EEJ_THRESHOLD = 50
+EEJ_THRESHOLD = 30
 
 
 class EejDetectionTime:

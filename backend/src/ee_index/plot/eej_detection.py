@@ -24,11 +24,9 @@ class EejDetection:
         ERのメソッドを開始時刻と終了時刻で指定させる
         """
         local_euel = get_local_euel(station, self.local_start_dt, self.local_end_dt)
-        moving_avg = calc_moving_ave(local_euel, 120)
+        moving_avg = calc_moving_ave(local_euel, 120, 60)
         x_axis = np.arange(0, len(moving_avg), 1)
-        print("x_axis length", len(x_axis))
         self.ax.plot(x_axis, moving_avg, label=station.name)
-        return moving_avg
 
     def _set_axis_labels(self):
         data_length = (
@@ -68,8 +66,8 @@ class EejDetection:
         plt.savefig(path)
 
 
-start_local_dt = datetime(2014, 1, 1, 0, 0)
-end_local_dt = datetime(2014, 1, 31, 23, 59)
+start_local_dt = datetime(2014, 1, 13, 0, 0)
+end_local_dt = datetime(2014, 1, 13, 23, 59)
 detection = EejDetection(start_local_dt, end_local_dt)
 detection.plot_local_euel(EeIndexStation.ANC)
 detection.plot_local_euel(EeIndexStation.EUS)

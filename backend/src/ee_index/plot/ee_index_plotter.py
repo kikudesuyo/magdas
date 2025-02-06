@@ -42,7 +42,7 @@ class EeIndexPlotter:
 
     def plot_euel(self, station, color):
         euel = Euel.calc_euel(station, self.start_dt, self.end_dt)
-        smoothed_euel = calc_moving_ave(euel, 120)
+        smoothed_euel = calc_moving_ave(euel, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(
             x_axis, smoothed_euel, label=f"{station}_EUEL", color=color, lw=1.3
