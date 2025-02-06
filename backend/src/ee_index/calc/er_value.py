@@ -28,9 +28,9 @@ class Er:
             self.station, self.start_dt, self.end_dt
         )
         base_values = self.calc_base_value()
-        er = h_component - base_values
-        interpolated_er = self.remove_er_outliers(er)
-        return interpolated_er
+        raw_er = h_component - base_values
+        er = self.remove_er_outliers(raw_er)
+        return er
 
     def remove_er_outliers(self, rough_er: np.ndarray) -> np.ndarray:
         """Remove outliers from ER value"""
