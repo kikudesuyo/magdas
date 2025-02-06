@@ -1,9 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import numpy as np
 from ee_index.calc.euel_index import Euel
 from ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
 from ee_index.constant.magdas_station import EeIndexStation
+from matplotlib import pyplot as plt
+from src.ee_index.calc.moving_ave import calc_moving_ave
 
 
 def get_local_euel(station: EeIndexStation, local_start_dt: datetime, local_end_dt):
@@ -25,25 +27,29 @@ def is_dip_station(station: EeIndexStation):
     return 3 <= abs(station.gm_lat) <= 15
 
 
-def is_eej_present(
-    equatorial_station, dip_station, local_start_dt: datetime, local_end_dt: datetime
-):
+def is_eej_present(equatorial_station, dip_station, date: date):
     # TODO: ピークtoピークを比較するべき。
     # 例えば11時とかのピークじゃないところで50nT以上があった場合にEEJと判定するのはおかしい
     if not is_equatorial_station(equatorial_station):
         raise ValueError("Equatorial station is not in equatorial region")
     if not is_dip_station(dip_station):
         raise ValueError("Dip station is not in dip region")
-    equatorial_euel = get_local_euel(equatorial_station, local_start_dt, local_end_dt)
-    dip_euel = get_local_euel(dip_station, local_start_dt, local_end_dt)
-    euel_diff = equatorial_euel - dip_euel
+
+    start_dt = datetime(date.year, date.month, date.day, 0, 0)
+    end_dt = start_dt + timedelta(days=1, minutes=-1)
+    dip_euel = get_local_euel(equatorial_station, start_dt, end_dt)
+    off_dip_euel = get_local_euel(dip_station, start_dt, end_dt)
+    smoothed_dip_euel = calc_moving_ave(dip_euel, 120, 60)
+    smoothed_off_dip_euel = calc_moving_ave(off_dip_euel, 120, 60)
     time_stamp = np.array(
-        [local_start_dt + timedelta(minutes=i) for i in range(len(euel_diff))]
+        [start_dt + timedelta(minutes=i) for i in range(len(smoothed_dip_euel))]
     )
-    start_time = EejDetectionTime.START
-    end_time = EejDetectionTime.END
     is_noon = np.array(
-        [start_time <= dt.time() <= end_time for dt in time_stamp], dtype=bool
+        [
+            EejDetectionTime.START <= dt.time() <= EejDetectionTime.END
+            for dt in time_stamp
+        ]
     )
-    is_eej_present = any(is_noon & (euel_diff > EEJ_THRESHOLD))
-    return is_eej_present
+    dip_max = np.max(smoothed_dip_euel[is_noon])
+    off_dip_max = np.max(smoothed_off_dip_euel[is_noon])
+    return dip_max - off_dip_max >= EEJ_THRESHOLD
