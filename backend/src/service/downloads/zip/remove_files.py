@@ -2,8 +2,10 @@ import os
 import shutil
 
 from src.service.downloads.constant.tmp_path import TMP_DIR_PATH
+from src.utils.path import generate_parent_abs_path
 
 
 def remove_files():
-    shutil.rmtree(TMP_DIR_PATH)
-    os.mkdir(TMP_DIR_PATH)
+    tmp_dir_p = generate_parent_abs_path(TMP_DIR_PATH)
+    shutil.rmtree(tmp_dir_p)
+    os.mkdir(tmp_dir_p)
