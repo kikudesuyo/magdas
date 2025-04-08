@@ -4,7 +4,7 @@ import numpy as np
 from ee_index.calc.euel_index import get_local_euel
 from ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
 from ee_index.constant.magdas_station import EeIndexStation
-from src.ee_index.calc.moving_ave import calc_moving_ave
+from src.service.ee_index.calc.moving_ave import calc_moving_ave
 
 
 def is_dip_station(station: EeIndexStation):

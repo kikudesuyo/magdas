@@ -2,13 +2,13 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-from src.dst.dst_data import get_dst_values
-from src.ee_index.calc.edst_index import Edst
-from src.ee_index.calc.er_value import Er
-from src.ee_index.calc.euel_index import Euel
-from src.ee_index.calc.moving_ave import calc_moving_ave
-from src.ee_index.constant.time_relation import Sec
-from src.ee_index.plot.config import PlotConfig
+from src.service.dst.dst_data import get_dst_values
+from src.service.ee_index.calc.edst_index import Edst
+from src.service.ee_index.calc.er_value import Er
+from src.service.ee_index.calc.euel_index import Euel
+from src.service.ee_index.calc.moving_ave import calc_moving_ave
+from src.service.ee_index.constant.time_relation import Sec
+from src.service.ee_index.plot.config import PlotConfig
 
 
 class EeIndexPlotter:

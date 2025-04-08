@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
-from src.ee_index.calc.edst_index import Edst
-from src.ee_index.calc.er_value import Er
-from src.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.calc.edst_index import Edst
+from src.service.ee_index.calc.er_value import Er
+from src.service.ee_index.constant.magdas_station import EeIndexStation
 
 
 class Euel:

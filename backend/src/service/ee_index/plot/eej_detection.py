@@ -2,11 +2,11 @@ from datetime import datetime, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from src.ee_index.calc.euel_index import get_local_euel
-from src.ee_index.calc.moving_ave import calc_moving_ave
-from src.ee_index.constant.magdas_station import EeIndexStation
-from src.ee_index.constant.time_relation import Sec
-from src.ee_index.plot.config import PlotConfig
+from src.service.ee_index.calc.euel_index import get_local_euel
+from src.service.ee_index.calc.moving_ave import calc_moving_ave
+from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.constant.time_relation import Sec
+from src.service.ee_index.plot.config import PlotConfig
 
 
 class EejDetectionPlotter:
