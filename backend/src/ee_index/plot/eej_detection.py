@@ -2,14 +2,14 @@ from datetime import datetime, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from src.ee_index.calc.detect_eej import get_local_euel
+from src.ee_index.calc.euel_index import get_local_euel
 from src.ee_index.calc.moving_ave import calc_moving_ave
 from src.ee_index.constant.magdas_station import EeIndexStation
 from src.ee_index.constant.time_relation import Sec
 from src.ee_index.plot.config import PlotConfig
 
 
-class EejDetection:
+class EejDetectionPlotter:
     def __init__(self, local_start_dt: datetime, local_end_dt: datetime):
         self.local_start_dt = local_start_dt
         self.local_end_dt = local_end_dt
@@ -66,9 +66,9 @@ class EejDetection:
         plt.savefig(path)
 
 
-start_local_dt = datetime(2014, 1, 13, 0, 0)
-end_local_dt = datetime(2014, 1, 13, 23, 59)
-detection = EejDetection(start_local_dt, end_local_dt)
+start_local_dt = datetime(2014, 1, 1, 0, 0)
+end_local_dt = datetime(2014, 1, 31, 23, 59)
+detection = EejDetectionPlotter(start_local_dt, end_local_dt)
 detection.plot_local_euel(EeIndexStation.ANC)
 detection.plot_local_euel(EeIndexStation.EUS)
 detection.show()
