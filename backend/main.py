@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.ee_index import router as ee_index
+from src.router.routes import r
 
 app = FastAPI()
 app.add_middleware(
@@ -11,4 +11,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(ee_index)
+app.include_router(r)
