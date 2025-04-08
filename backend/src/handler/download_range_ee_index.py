@@ -2,16 +2,16 @@ import base64
 from datetime import timedelta
 
 from fastapi.responses import JSONResponse
-from src.ee_index.calc.edst_index import Edst
-from src.ee_index.calc.er_value import Er
-from src.ee_index.calc.euel_index import Euel
-from src.ee_index.constant.magdas_station import EeIndexStation
-from src.ee_index.constant.time_relation import Min, Sec
 from src.handler.types.ee_index import RangeEeIndex
 from src.service.downloads.iaga.meta_data import get_meta_data
 from src.service.downloads.iaga.save_iaga_format import save_iaga_format
 from src.service.downloads.zip.files_zipping import create_zip_buffer
 from src.service.downloads.zip.remove_files import remove_files
+from src.service.ee_index.calc.edst_index import Edst
+from src.service.ee_index.calc.er_value import Er
+from src.service.ee_index.calc.euel_index import Euel
+from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.constant.time_relation import Min, Sec
 from src.utils.date import convert_datetime
 from src.utils.path import generate_abs_path
 

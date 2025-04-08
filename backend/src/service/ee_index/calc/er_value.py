@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
 import numpy as np
-from src.ee_index.calc.h_component_extraction import HComponent
-from src.ee_index.constant.er_threshold import MAX_ER_VALUE, MIN_ER_VALUE
-from src.ee_index.constant.time_relation import DawnAndDusk
-from src.ee_index.helper.time_utils import DateUtils
-from src.ee_index.helper.warnings_suppression import NanCalculator
+from src.service.ee_index.calc.h_component_extraction import HComponent
+from src.service.ee_index.constant.er_threshold import MAX_ER_VALUE, MIN_ER_VALUE
+from src.service.ee_index.constant.time_relation import DawnAndDusk
+from src.service.ee_index.helper.time_utils import DateUtils
+from src.service.ee_index.helper.warnings_suppression import NanCalculator
 
 
 class Er:
@@ -28,9 +28,9 @@ class Er:
             self.station, self.start_dt, self.end_dt
         )
         base_values = self.calc_base_value()
-        er = h_component - base_values
-        interpolated_er = self.remove_er_outliers(er)
-        return interpolated_er
+        raw_er = h_component - base_values
+        er = self.remove_er_outliers(raw_er)
+        return er
 
     def remove_er_outliers(self, rough_er: np.ndarray) -> np.ndarray:
         """Remove outliers from ER value"""

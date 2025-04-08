@@ -10,7 +10,7 @@
 
 環境変数の登録
 
-`.venv/bin/activate`にて`YOURPATH`を指定して下記を記述してください
+`.venv/bin/activate`にて`YOUR_PATH`を指定して下記を記述してください
 
 ```.sh
 #環境変数を追加
