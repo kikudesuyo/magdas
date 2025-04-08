@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from src.ee_index.calc.edst_index import Edst
 from src.ee_index.calc.er_value import Er
+from src.ee_index.constant.magdas_station import EeIndexStation
 
 
 class Euel:
@@ -16,3 +17,12 @@ class Euel:
         er = Er(station, start_dt, end_dt).calc_er()
         edst = Edst.calc_edst(start_dt, end_dt)
         return er - edst
+
+
+def get_local_euel(
+    station: EeIndexStation, local_start_dt: datetime, local_end_dt: datetime
+):
+    utc_offset = timedelta(hours=station.time_diff)
+    start_utc = (local_start_dt - utc_offset).replace(second=0, microsecond=0)
+    end_utc = (local_end_dt - utc_offset).replace(second=0, microsecond=0)
+    return Euel.calc_euel(station.code, start_utc, end_utc)
