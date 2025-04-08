@@ -32,9 +32,10 @@ class DownloadEeIndexReq(BaseModel):
         return cls(startDate=startDate, endDate=endDate, station=station)
 
 
-def handle_get_ee_index_iaga_file(
+def handle_get_ee_index_zip_file(
     request: DownloadEeIndexReq = Depends(DownloadEeIndexReq.from_query),
 ):
+    # TODO 現在のファイルははIAGA形式、もし他の形式を実装する場合は、クエリパラメータでフォーマットを指定させる
     start_date, end_date, station = (
         request.start_date,
         request.end_date,
