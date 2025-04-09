@@ -1,8 +1,9 @@
 import base64
 from datetime import timedelta
 
+from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
-from src.handler.types.ee_index import RangeEeIndex
+from pydantic import BaseModel
 from src.service.downloads.iaga.meta_data import get_meta_data
 from src.service.downloads.iaga.save_iaga_format import save_iaga_format
 from src.service.downloads.zip.files_zipping import create_zip_buffer
@@ -16,10 +17,28 @@ from src.utils.date import convert_datetime
 from src.utils.path import generate_abs_path
 
 
-def handle_generate_ee_index_iaga_file(request: RangeEeIndex):
+class DownloadEeIndexReq(BaseModel):
+    start_date: str
+    end_date: str
+    station: str
+
+    @classmethod
+    def from_query(
+        cls,
+        start_date: str = Query(alias="startDate", description="YYYY-MM-DD"),
+        end_date: str = Query(alias="endDate", description="YYYY-MM-DD"),
+        station: str = Query(description="station"),
+    ):
+        return cls(start_date=start_date, end_date=end_date, station=station)
+
+
+def handle_get_ee_index_zip_file(
+    request: DownloadEeIndexReq = Depends(DownloadEeIndexReq.from_query),
+):
+    # TODO 現在のファイルははIAGA形式、もし他の形式を実装する場合は、クエリパラメータでフォーマットを指定させる
     start_date, end_date, station = (
-        request.startDate,
-        request.endDate,
+        request.start_date,
+        request.end_date,
         request.station,
     )
     start_date, end_date = convert_datetime(start_date), convert_datetime(end_date)

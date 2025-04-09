@@ -1,1 +1,1 @@
-TMP_DIR_PATH = "src/tmp"
+TMP_DIR_PATH = "/src/tmp"
