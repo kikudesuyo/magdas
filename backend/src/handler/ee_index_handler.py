@@ -14,16 +14,16 @@ from src.utils.date import convert_datetime
 class DailyEeIndexReq(BaseModel):
     date: str
     station: str
-    data_kind: str = Field(..., alias="dataKind")
+    data_kind: str
 
     @classmethod
     def from_query(
         cls,
-        date: str = Query(..., description="YYYY-MM-DD"),
-        station: str = Query(..., description="station"),
-        dataKind: str = Query(..., description="data_kind"),
+        date: str = Query(description="YYYY-MM-DD"),
+        station: str = Query(description="station"),
+        data_kind: str = Query(alias="dataKind", description="data_kind"),
     ):
-        return cls(date=date, station=station, dataKind=dataKind)
+        return cls(date=date, station=station, data_kind=data_kind)
 
 
 def handle_get_daily_ee_index(
@@ -34,7 +34,6 @@ def handle_get_daily_ee_index(
         req.station,
         req.data_kind,
     )
-    print(f"date: {date}, station: {station}, dataKind: {data_kind}")
     start_dt = convert_datetime(date)
     end_dt = start_dt + timedelta(days=Day.ONE.const, minutes=-1)
     er = Er(station, start_dt, end_dt).calc_er()

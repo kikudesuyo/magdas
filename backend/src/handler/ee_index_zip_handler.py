@@ -18,18 +18,18 @@ from src.utils.path import generate_abs_path
 
 
 class DownloadEeIndexReq(BaseModel):
-    start_date: str = Field(..., alias="startDate")
-    end_date: str = Field(..., alias="endDate")
+    start_date: str
+    end_date: str
     station: str
 
     @classmethod
     def from_query(
         cls,
-        startDate: str = Query(..., description="YYYY-MM-DD"),
-        endDate: str = Query(..., description="YYYY-MM-DD"),
-        station: str = Query(..., description="station"),
+        start_date: str = Query(alias="startDate", description="YYYY-MM-DD"),
+        end_date: str = Query(alias="endDate", description="YYYY-MM-DD"),
+        station: str = Query(description="station"),
     ):
-        return cls(startDate=startDate, endDate=endDate, station=station)
+        return cls(start_date=start_date, end_date=end_date, station=station)
 
 
 def handle_get_ee_index_zip_file(
