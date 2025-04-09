@@ -1,11 +1,14 @@
-def get_meta_data(station_name, iaga_code, latitude, longitude, elevation):
+from src.service.ee_index.constant.magdas_station import EeIndexStation
+
+
+def get_meta_data(station: EeIndexStation, iaga_code, elevation):
     metadata = {
         "Format": "IAGA-2002",
         "Source of Data": "Kyushu University (KU)",
-        "Station Name": f"{station_name}",
+        "Station Name": f"{station.code}",
         "IAGA CODE": f"{iaga_code} (KU code)",
-        "Geodetic Latitude": latitude,
-        "Geodetic Longitude": longitude,
+        "Geodetic Latitude": station.gm_lat,
+        "Geodetic Longitude": station.gm_lon,
         "Elevation": elevation,
         "Reported": "EE-index",
         "Recorded data": "EE-index: EDst1h, EDst6h, ER_HUA, EUEL_HUA",
