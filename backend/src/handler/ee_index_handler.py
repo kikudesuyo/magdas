@@ -3,7 +3,7 @@ from datetime import timedelta
 import numpy as np
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.er_value import Er
 from src.service.ee_index.calc.euel_index import Euel

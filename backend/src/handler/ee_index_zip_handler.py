@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from src.service.downloads.iaga.meta_data import get_meta_data
 from src.service.downloads.iaga.save_iaga_format import save_iaga_format
 from src.service.downloads.zip.files_zipping import create_zip_buffer
