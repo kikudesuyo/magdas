@@ -2,11 +2,12 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-from src.service.dst.dst_data import get_dst_values
+from src.service.dst import get_dst_values
 from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.er_value import Er
 from src.service.ee_index.calc.euel_index import Euel
 from src.service.ee_index.calc.moving_ave import calc_moving_ave
+from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
 from src.service.ee_index.plot.config import PlotConfig
 
@@ -109,8 +110,12 @@ class EeIndexPlotter:
         plt.savefig(path)
 
 
+dav = EeIndexStation.DAV
+eus = EeIndexStation.EUS
+
+
 p = EeIndexPlotter(datetime(2014, 1, 1, 0, 0), datetime(2014, 1, 10, 23, 59))
-p.plot_euel("DAV", "red")
-p.plot_euel("EUS", "blue")
+p.plot_euel(dav, "red")
+p.plot_euel(eus, "blue")
 p.show()
 # p.plot_er("kakioka")
