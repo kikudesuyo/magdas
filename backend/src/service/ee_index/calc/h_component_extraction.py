@@ -11,7 +11,7 @@ from src.utils.path import generate_parent_abs_path
 
 class HComponent:
     @staticmethod
-    def read_for_day(station_code, ut_date: date):
+    def read_for_day(station_code: str, ut_date: date):
         year, month, day = (
             ut_date.strftime("%Y"),
             ut_date.strftime("%m"),
