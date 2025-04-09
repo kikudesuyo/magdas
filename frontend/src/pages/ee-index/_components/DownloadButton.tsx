@@ -3,9 +3,9 @@ import { downloadFile } from "@/pages/ee-index/helper/fileDownload";
 
 type DailyDownloadData = {
   date: string;
-  station: string;
+  stationCode: string;
 };
-const DownloadButton = ({ date, station }: DailyDownloadData) => {
+const DownloadButton = ({ date, stationCode }: DailyDownloadData) => {
   const [loading, setLoading] = useState(false);
   const handleDownload = async () => {
     setLoading(true);
@@ -13,7 +13,7 @@ const DownloadButton = ({ date, station }: DailyDownloadData) => {
     try {
       await downloadFile({
         date: date,
-        station: station,
+        stationCode: stationCode,
       });
     } catch (err) {
       console.error(err);

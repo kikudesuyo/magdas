@@ -13,7 +13,7 @@ interface FormData {
 }
 
 const PeriodSelectionForm: React.FC = () => {
-  const [station, setStation] = React.useState("ANC");
+  const [stationCode, setStationCode] = React.useState("ANC");
   const {
     register,
     handleSubmit,
@@ -32,7 +32,7 @@ const PeriodSelectionForm: React.FC = () => {
     data;
     const startDate = `${data.startYear}-${data.startMonth}-${data.startDay}`;
     const endDate = `${data.endYear}-${data.endMonth}-${data.endDay}`;
-    const props = { startDate, endDate, station };
+    const props = { startDate, endDate, stationCode };
     await downloadFile(props);
   };
 
@@ -50,13 +50,13 @@ const PeriodSelectionForm: React.FC = () => {
           <label className="block text-gray-700 mb-2 font-bold">観測点</label>
           <div>
             <select
-              value={station}
-              onChange={(e) => setStation(e.target.value)}
+              value={stationCode}
+              onChange={(e) => setStationCode(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
-              {STATIONS.map((station) => (
-                <option key={station} value={station}>
-                  {station}
+              {STATIONS.map((stationCode) => (
+                <option key={stationCode} value={stationCode}>
+                  {stationCode}
                 </option>
               ))}
             </select>

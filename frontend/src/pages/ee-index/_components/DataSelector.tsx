@@ -66,7 +66,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
         />
       </div>
       <Button label="プロット" func={handleSelect} />
-      <DownloadButton date={date} station={station} />
+      <DownloadButton date={date} stationCode={station} />
     </div>
   );
 };
