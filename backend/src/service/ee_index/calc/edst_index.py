@@ -10,7 +10,7 @@ from src.service.ee_index.helper.warnings_suppression import NanCalculator
 
 class Edst:
     @staticmethod
-    def calc_edst(start_dt: datetime, end_dt: datetime):
+    def calc_edst(start_dt: datetime, end_dt: datetime) -> np.ndarray:
         days, hours, minutes = DateUtils.time_diff(start_dt, end_dt)
         data_length = (
             days * Min.ONE_DAY.const + hours * Min.ONE_HOUR.const + minutes + 1
@@ -25,7 +25,7 @@ class Edst:
         return edst
 
     @staticmethod
-    def compute_smoothed_edst(start_dt: datetime, end_dt: datetime):
+    def compute_smoothed_edst(start_dt: datetime, end_dt: datetime) -> np.ndarray:
         edst = Edst.calc_edst(start_dt, end_dt)
         weight = np.ones(60) / 60
         moved_edst = np.convolve(edst, weight, mode="same")
