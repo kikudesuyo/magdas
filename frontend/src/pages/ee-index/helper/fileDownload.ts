@@ -2,13 +2,13 @@ import { fetchDailyDateFile } from "@/services/api";
 
 export const downloadFile = async (fileParams: {
   date: string;
-  station: string;
+  stationCode: string;
 }) => {
-  const { date, station } = fileParams;
-  console.log(date, station);
+  const { date, stationCode } = fileParams;
+  console.log(date, stationCode);
   const responseData = await fetchDailyDateFile({
     date,
-    station,
+    stationCode,
   });
   const byteCharacters = atob(responseData.file);
   const byteNumbers = new Uint8Array(byteCharacters.length);

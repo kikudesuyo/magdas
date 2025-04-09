@@ -20,11 +20,11 @@ const EeIndex = () => {
   });
 
   const handleButtonClick = async (
-    station: string,
+    stationCode: string,
     dataKind: string,
     date: string
   ) => {
-    const reqParams = { station, dataKind, date };
+    const reqParams = { stationCode, dataKind, date };
     const data = await fetchEeIndexData(reqParams);
     if (!data) return;
     setPlotData(data);

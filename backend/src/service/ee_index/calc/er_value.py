@@ -3,13 +3,14 @@ from datetime import datetime, timedelta
 import numpy as np
 from src.service.ee_index.calc.h_component_extraction import HComponent
 from src.service.ee_index.constant.er_threshold import MAX_ER_VALUE, MIN_ER_VALUE
+from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import DawnAndDusk
 from src.service.ee_index.helper.time_utils import DateUtils
 from src.service.ee_index.helper.warnings_suppression import NanCalculator
 
 
 class Er:
-    def __init__(self, station, start_dt: datetime, end_dt: datetime):
+    def __init__(self, station: EeIndexStation, start_dt: datetime, end_dt: datetime):
         self.station = station
         self.start_dt = start_dt
         self.end_dt = end_dt
@@ -40,7 +41,7 @@ class Er:
 
 
 class NightEr:
-    def __init__(self, station, start_dt: datetime, end_dt: datetime):
+    def __init__(self, station: EeIndexStation, start_dt: datetime, end_dt: datetime):
         self.station = station
         self.start_dt = start_dt
         self.end_dt = end_dt

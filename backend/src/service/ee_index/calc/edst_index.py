@@ -18,7 +18,7 @@ class Edst:
         night_er_list = np.empty((0, data_length), dtype=float)
         for station in EeIndexStation:
             night_er = np.array([])
-            night_er_instance = NightEr(station.code, start_dt, end_dt)
+            night_er_instance = NightEr(station, start_dt, end_dt)
             night_er = np.concatenate((night_er, night_er_instance.extract_night_er()))
             night_er_list = np.vstack((night_er_list, night_er))
         edst = NanCalculator.nanmean(night_er_list)

@@ -20,16 +20,16 @@ from src.utils.path import generate_abs_path
 class DownloadEeIndexReq(BaseModel):
     start_date: str
     end_date: str
-    station: str
+    station_code: str
 
     @classmethod
     def from_query(
         cls,
         start_date: str = Query(alias="startDate", description="YYYY-MM-DD"),
         end_date: str = Query(alias="endDate", description="YYYY-MM-DD"),
-        station: str = Query(description="station"),
+        station_code: str = Query(alias="stationCode", description="station_code"),
     ):
-        return cls(start_date=start_date, end_date=end_date, station=station)
+        return cls(start_date=start_date, end_date=end_date, station_code=station_code)
 
 
 def handle_get_ee_index_zip_file(
@@ -39,8 +39,9 @@ def handle_get_ee_index_zip_file(
     start_date, end_date, station = (
         request.start_date,
         request.end_date,
-        request.station,
+        request.station_code,
     )
+    station = EeIndexStation[station]
     start_date, end_date = convert_datetime(start_date), convert_datetime(end_date)
     start_dt = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
     end_dt = end_date.replace(hour=23, minute=59, second=59, microsecond=0)
@@ -51,8 +52,6 @@ def handle_get_ee_index_zip_file(
     meta_data = get_meta_data(
         station,
         "",
-        EeIndexStation[station].gm_lat,
-        EeIndexStation[station].gm_lon,
         8888.88,
     )
     days = (end_date - start_date).days + 1

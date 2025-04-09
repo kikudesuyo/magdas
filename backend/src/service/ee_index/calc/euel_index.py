@@ -7,7 +7,7 @@ from src.service.ee_index.constant.magdas_station import EeIndexStation
 
 class Euel:
     @staticmethod
-    def calc_euel(station, start_dt: datetime, end_dt: datetime):
+    def calc_euel(station: EeIndexStation, start_dt: datetime, end_dt: datetime):
         """Calculate EUEL value for a specific period.
 
         注意:
@@ -25,4 +25,4 @@ def get_local_euel(
     utc_offset = timedelta(hours=station.time_diff)
     start_utc = (local_start_dt - utc_offset).replace(second=0, microsecond=0)
     end_utc = (local_end_dt - utc_offset).replace(second=0, microsecond=0)
-    return Euel.calc_euel(station.code, start_utc, end_utc)
+    return Euel.calc_euel(station, start_utc, end_utc)

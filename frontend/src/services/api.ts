@@ -12,7 +12,7 @@ export const fetchEeIndexData = async <T>(data: T) => {
 type DownloadCustomDateEeIndex = {
   startDate: string;
   endDate: string;
-  station: string;
+  stationCode: string;
 };
 
 export const fetchCustomDateFile = async (data: DownloadCustomDateEeIndex) => {
@@ -24,7 +24,7 @@ export const fetchCustomDateFile = async (data: DownloadCustomDateEeIndex) => {
 
 type DownloadDailyDateEeIndex = {
   date: string;
-  station: string;
+  stationCode: string;
 };
 
 export const fetchDailyDateFile = async (data: DownloadDailyDateEeIndex) => {

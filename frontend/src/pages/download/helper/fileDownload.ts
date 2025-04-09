@@ -3,13 +3,13 @@ import { fetchCustomDateFile } from "@/services/api";
 export const downloadFile = async (fileParams: {
   startDate: string;
   endDate: string;
-  station: string;
+  stationCode: string;
 }) => {
-  const { startDate, endDate, station } = fileParams;
+  const { startDate, endDate, stationCode } = fileParams;
   const responseData = await fetchCustomDateFile({
     startDate,
     endDate,
-    station,
+    stationCode,
   });
   const byteCharacters = atob(responseData.file);
   const byteNumbers = new Uint8Array(byteCharacters.length);

@@ -32,7 +32,7 @@ class DateUtils:
         return days
 
     @staticmethod
-    def to_local_time(station, ut_time: datetime) -> datetime:
+    def to_local_time(station: EeIndexStation, ut_time: datetime) -> datetime:
         """Convert to local time
         Args:
           station (str):
@@ -40,7 +40,7 @@ class DateUtils:
         Return:
           local_time (datetime.datetime): local time
         """
-        time_diff = timedelta(hours=EeIndexStation[station].time_diff)
+        time_diff = timedelta(hours=station.time_diff)
         local_time = ut_time + time_diff
         return local_time
 
