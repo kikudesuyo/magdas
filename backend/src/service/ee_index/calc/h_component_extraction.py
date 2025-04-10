@@ -40,60 +40,6 @@ class HComponent:
             return h_for_day
 
     @staticmethod
-    def get_h_for_days(station_code, datetime: datetime, days: int) -> np.ndarray:
-        """ "任意の時刻から指定した日数分のH値を取得する"""
-        date, hour, minute = (
-            datetime.date(),
-            datetime.hour,
-            datetime.minute,
-        )
-        initial_index = hour * Min.ONE_HOUR.const + minute
-        total_index = days * Min.ONE_DAY.const
-        h_component_value = np.array([], dtype=np.float32)
-        for day in range(days + 1):
-            try:
-                if day == 0:
-                    h_component_value = HComponent.read_for_day(station_code, date)[
-                        initial_index:
-                    ]
-                elif day == days:
-                    h_component_value = np.concatenate(
-                        (
-                            h_component_value,
-                            HComponent.read_for_day(
-                                station_code, date + timedelta(days=day)
-                            )[:initial_index],
-                        )
-                    )
-                    if total_index != len(h_component_value):
-                        raise ValueError(
-                            f"total_index: {total_index}, len(h_component_value): {len(h_component_value)}"
-                        )
-                    return h_component_value
-                else:
-                    h_component_value = np.concatenate(
-                        (
-                            h_component_value,
-                            HComponent.read_for_day(
-                                station_code, date + timedelta(days=day)
-                            ),
-                        )
-                    )
-            except FileNotFoundError as e:
-                print(e)
-                if day == 0:
-                    offset = Min.ONE_DAY.const - initial_index
-                else:
-                    offset = Min.ONE_DAY.const
-                h_component_value = np.concatenate(
-                    (
-                        h_component_value,
-                        HComponent._handle_file_not_found_error(offset),
-                    )
-                )
-        return h_component_value
-
-    @staticmethod
     def get_h_component(station_code, start_dt: datetime, end_dt: datetime):
         """ "任意の時刻から指定した日数分のH値を取得する"""
         start_date, end_date = start_dt.date(), end_dt.date()
