@@ -1,12 +1,12 @@
 import os
 
 
-def is_parent_directory_exist(absolute_path):
+def is_parent_directory_exist(abs_path):
     """Check if the directory exist
     Args:
-      absolute_path (str):
+      abs_path (str):
     Return:
       bool: True if file exist, False otherwise
     """
-    parent_directory = os.path.dirname(absolute_path)
+    parent_directory = os.path.dirname(abs_path)
     return os.path.isdir(parent_directory)

@@ -24,6 +24,11 @@ class EejDetectionPlotter:
         x_axis = np.arange(0, len(moving_avg), 1)
         self.ax.plot(x_axis, moving_avg, label=station.name)
 
+    def plot_pure(self, station: EeIndexStation):
+        local_euel = get_local_euel(station, self.local_start_dt, self.local_end_dt)
+        x_axis = np.arange(0, len(local_euel), 1)
+        self.ax.plot(x_axis, local_euel, label=station.name)
+
     def _set_axis_labels(self):
         data_length = (
             int((self.local_end_dt - self.local_start_dt).total_seconds())
@@ -62,9 +67,11 @@ class EejDetectionPlotter:
         plt.savefig(path)
 
 
-start_local_dt = datetime(2014, 1, 1, 0, 0)
-end_local_dt = datetime(2014, 1, 31, 23, 59)
+start_local_dt = datetime(2014, 1, 20, 0, 0)
+end_local_dt = datetime(2014, 1, 27, 23, 59)
 detection = EejDetectionPlotter(start_local_dt, end_local_dt)
 detection.plot_local_euel(EeIndexStation.ANC)
 detection.plot_local_euel(EeIndexStation.EUS)
+detection.plot_pure(EeIndexStation.ANC)
+detection.plot_pure(EeIndexStation.EUS)
 detection.show()

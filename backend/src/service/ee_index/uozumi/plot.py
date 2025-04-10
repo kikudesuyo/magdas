@@ -6,7 +6,7 @@ from get_ut_array import get_ut_array
 from matplotlib import pyplot as plt
 from read_iaga import get_iaga_ee_for_days
 from smoothing import remove_outliers
-from src.ee_index.constant.time_relation import Min
+from src.service.ee_index.constant.time_relation import Min
 
 
 class Plotter:
@@ -38,7 +38,7 @@ class Plotter:
         ax.set_xticks(np.arange(0, 1441, 180))
         ax.set_xticklabels(hours)
 
-    def ee_plot(self, absolute_path):
+    def ee_plot(self, abs_path):
         fig, ax = plt.subplots()
         ee = self.interpolate_ee()
         py_er, py_edst, py_euel = self.py_ee
@@ -53,10 +53,10 @@ class Plotter:
         for text in legend.get_texts():
             text.set_fontsize(20)
         self.set_plot(ax)
-        self.save_figure(absolute_path)
+        self.save_figure(abs_path)
 
-    def save_figure(self, absolute_path):
-        plt.savefig(absolute_path)
+    def save_figure(self, abs_path):
+        plt.savefig(abs_path)
         plt.clf()
 
 

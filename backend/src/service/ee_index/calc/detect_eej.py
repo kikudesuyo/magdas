@@ -79,7 +79,7 @@ class EejDetection:
 
 anc = EeIndexStation.ANC
 eus = EeIndexStation.EUS
-d = date(2014, 1, 1)
+d = date(2014, 1, 20)
 while d < date(2014, 1, 31):
     eej = EejDetection(anc, eus, d)
     if eej.is_singular_eej():
