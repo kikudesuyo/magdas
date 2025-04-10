@@ -1,4 +1,3 @@
-import calendar
 from datetime import datetime, timedelta
 
 from src.service.ee_index.constant.magdas_station import EeIndexStation
@@ -6,30 +5,6 @@ from src.service.ee_index.constant.time_relation import Day, Sec
 
 
 class DateUtils:
-    @staticmethod
-    def get_days_in_month(year, month) -> int:
-        """Get the number of days in the month
-        Args:
-          year (int):
-          month (int):
-        Return:
-          days (int): number of days in the month
-        """
-        days = calendar.monthrange(year, month)[1]
-        return days
-
-    @staticmethod
-    def get_days_in_year(year) -> int:
-        """Get the number of days in the year
-        Args:
-          year (int):
-        Return:
-          days (int): number of days in the year
-        """
-        days = Day.IN_NON_LEAP_YEAR.const
-        if calendar.isleap(year):
-            days = Day.IN_LEAP_YEAR.const
-        return days
 
     @staticmethod
     def to_lt(station: EeIndexStation, ut: datetime) -> datetime:
@@ -71,14 +46,3 @@ class DateUtils:
         hours = time_diff.seconds // Sec.ONE_HOUR.const
         minutes = time_diff.seconds % Sec.ONE_HOUR.const // Sec.ONE_MINUTE.const
         return days, hours, minutes
-
-    @staticmethod
-    def get_day_start(input_datetime: datetime) -> datetime:
-        """Get the start time of the day
-
-        Args:
-          datetime (datetime.datetime):
-        Return:
-          datetime (datetime.datetime): start time of the day
-        """
-        return datetime.replace(input_datetime, hour=0, minute=0, second=0)
