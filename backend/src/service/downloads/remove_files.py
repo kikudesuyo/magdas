@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from src.service.downloads.constant.tmp_path import TMP_DIR_PATH
+from src.service.downloads.tmp_path import TMP_DIR_PATH
 from src.utils.path import generate_parent_abs_path
 
 
