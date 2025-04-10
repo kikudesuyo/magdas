@@ -38,6 +38,8 @@ class Er:
 
 
 class NightEr:
+    """Night definition 18:00 to 05:59"""
+
     def __init__(self, station: EeIndexStation, start_ut: datetime, end_ut: datetime):
         self.station = station
         self.start_ut = start_ut
