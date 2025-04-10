@@ -26,8 +26,7 @@ class Er:
         h_component = HComponent().to_equatorial_h(
             self.station, self.start_ut, self.end_ut
         )
-        base_values = self.calc_base_value()
-        raw_er = h_component - base_values
+        raw_er = h_component - self.calc_base_value()
         er = self.remove_er_outliers(raw_er)
         return er
 
