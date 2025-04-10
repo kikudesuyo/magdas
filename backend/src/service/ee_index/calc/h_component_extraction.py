@@ -41,7 +41,6 @@ class HComponent:
 
     @staticmethod
     def get_h_component(station_code, start_dt: datetime, end_dt: datetime):
-        """ "任意の時刻から指定した日数分のH値を取得する"""
         start_date, end_date = start_dt.date(), end_dt.date()
         if start_date == end_date:
             start_idx = start_dt.hour * Min.ONE_HOUR.const + start_dt.minute
@@ -66,6 +65,7 @@ class HComponent:
 
     @staticmethod
     def interpolate_h(station: EeIndexStation, start_dt: datetime, end_dt: datetime):
+        """磁気赤道を基準(gm_lat=0)にしたh成分を計算"""
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
         h_value = HComponent.get_h_component(station.code, start_dt, end_dt)
         equational_h_component = h_value / np.cos(np.deg2rad(station.gm_lat))
