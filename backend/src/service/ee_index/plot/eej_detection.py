@@ -65,7 +65,7 @@ class EejDetectionPlotter:
 
 
 start_lt = datetime(2014, 1, 20, 0, 0)
-end_lt = datetime(2014, 1, 27, 23, 59)
+end_lt = datetime(2014, 1, 20, 23, 59)
 detection = EejDetectionPlotter(start_lt, end_lt)
 detection.plot_local_euel(EeIndexStation.ANC)
 detection.plot_local_euel(EeIndexStation.EUS)
