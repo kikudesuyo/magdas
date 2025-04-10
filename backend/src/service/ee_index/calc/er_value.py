@@ -17,7 +17,7 @@ class Er:
 
     def calc_base_value(self) -> np.ndarray:
         """Callculate the daily median of the h component for ER calculation"""
-        h_component = HComponent().interpolate_h(
+        h_component = HComponent().to_equatorial_h(
             self.station, self.start_ut, self.end_ut
         )
         median = NanCalculator.nanmedian(h_component)
@@ -25,7 +25,7 @@ class Er:
         return base_values
 
     def calc_er(self):
-        h_component = HComponent().interpolate_h(
+        h_component = HComponent().to_equatorial_h(
             self.station, self.start_ut, self.end_ut
         )
         base_values = self.calc_base_value()

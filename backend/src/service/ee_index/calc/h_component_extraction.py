@@ -64,8 +64,8 @@ class HComponent:
         return h_values
 
     @staticmethod
-    def interpolate_h(station: EeIndexStation, start_ut: datetime, end_ut: datetime):
-        """磁気赤道を基準(gm_lat=0)にしたh成分を計算"""
+    def to_equatorial_h(station: EeIndexStation, start_ut: datetime, end_ut: datetime):
+        """指定された観測点のh成分を、磁気赤道（gm_lat=0）での値に換算"""
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
         h_value = HComponent.get_h_component(station.code, start_ut, end_ut)
         equational_h_component = h_value / np.cos(np.deg2rad(station.gm_lat))
