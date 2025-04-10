@@ -11,7 +11,7 @@ from src.utils.path import generate_parent_abs_path
 
 class HComponent:
     @staticmethod
-    def read_for_day(station_code, ut_date: date):
+    def read_for_day(station_code: str, ut_date: date):
         year, month, day = (
             ut_date.strftime("%Y"),
             ut_date.strftime("%m"),
@@ -40,66 +40,11 @@ class HComponent:
             return h_for_day
 
     @staticmethod
-    def get_h_for_days(station_code, datetime: datetime, days: int) -> np.ndarray:
-        """ "任意の時刻から指定した日数分のH値を取得する"""
-        date, hour, minute = (
-            datetime.date(),
-            datetime.hour,
-            datetime.minute,
-        )
-        initial_index = hour * Min.ONE_HOUR.const + minute
-        total_index = days * Min.ONE_DAY.const
-        h_component_value = np.array([], dtype=np.float32)
-        for day in range(days + 1):
-            try:
-                if day == 0:
-                    h_component_value = HComponent.read_for_day(station_code, date)[
-                        initial_index:
-                    ]
-                elif day == days:
-                    h_component_value = np.concatenate(
-                        (
-                            h_component_value,
-                            HComponent.read_for_day(
-                                station_code, date + timedelta(days=day)
-                            )[:initial_index],
-                        )
-                    )
-                    if total_index != len(h_component_value):
-                        raise ValueError(
-                            f"total_index: {total_index}, len(h_component_value): {len(h_component_value)}"
-                        )
-                    return h_component_value
-                else:
-                    h_component_value = np.concatenate(
-                        (
-                            h_component_value,
-                            HComponent.read_for_day(
-                                station_code, date + timedelta(days=day)
-                            ),
-                        )
-                    )
-            except FileNotFoundError as e:
-                print(e)
-                if day == 0:
-                    offset = Min.ONE_DAY.const - initial_index
-                else:
-                    offset = Min.ONE_DAY.const
-                h_component_value = np.concatenate(
-                    (
-                        h_component_value,
-                        HComponent._handle_file_not_found_error(offset),
-                    )
-                )
-        return h_component_value
-
-    @staticmethod
-    def get_h_component(station_code, start_dt: datetime, end_dt: datetime):
-        """ "任意の時刻から指定した日数分のH値を取得する"""
-        start_date, end_date = start_dt.date(), end_dt.date()
+    def get_h_component(station_code, start_ut: datetime, end_ut: datetime):
+        start_date, end_date = start_ut.date(), end_ut.date()
         if start_date == end_date:
-            start_idx = start_dt.hour * Min.ONE_HOUR.const + start_dt.minute
-            end_idx = end_dt.hour * Min.ONE_HOUR.const + end_dt.minute
+            start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
+            end_idx = end_ut.hour * Min.ONE_HOUR.const + end_ut.minute
             day_h_data = HComponent.read_for_day(station_code, start_date)[
                 start_idx : end_idx + 1
             ]
@@ -109,19 +54,20 @@ class HComponent:
             current_date = start_date + timedelta(days=i)
             day_h_data = HComponent.read_for_day(station_code, current_date)
             if current_date == start_date:
-                start_idx = start_dt.hour * Min.ONE_HOUR.const + start_dt.minute
+                start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
                 h_values = np.concatenate((h_values, day_h_data[start_idx:]))
             elif current_date == end_date:
-                end_idx = end_dt.hour * Min.ONE_HOUR.const + end_dt.minute
+                end_idx = end_ut.hour * Min.ONE_HOUR.const + end_ut.minute
                 h_values = np.concatenate((h_values, day_h_data[: end_idx + 1]))
             else:
                 h_values = np.concatenate((h_values, day_h_data))
         return h_values
 
     @staticmethod
-    def interpolate_h(station: EeIndexStation, start_dt: datetime, end_dt: datetime):
+    def to_equatorial_h(station: EeIndexStation, start_ut: datetime, end_ut: datetime):
+        """指定された観測点のh成分を、磁気赤道（gm_lat=0）での値に換算"""
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
-        h_value = HComponent.get_h_component(station.code, start_dt, end_dt)
+        h_value = HComponent.get_h_component(station.code, start_ut, end_ut)
         equational_h_component = h_value / np.cos(np.deg2rad(station.gm_lat))
         return equational_h_component
 

@@ -37,11 +37,11 @@ def handle_get_daily_ee_index(
     )
     print(f"date: {date}, station_code: {station_code}, data_kind: {data_kind}")
     station = EeIndexStation[station_code]
-    start_dt = convert_datetime(date)
-    end_dt = start_dt + timedelta(days=Day.ONE.const, minutes=-1)
-    er = Er(station, start_dt, end_dt).calc_er()
-    edst = Edst.compute_smoothed_edst(start_dt, end_dt)
-    euel = Euel.calc_euel(station, start_dt, end_dt)
+    start_ut = convert_datetime(date)
+    end_ut = start_ut + timedelta(days=Day.ONE.const, minutes=-1)
+    er = Er(station, start_ut, end_ut).calc_er()
+    edst = Edst.compute_smoothed_edst(start_ut, end_ut)
+    euel = Euel.calc_euel(station, start_ut, end_ut)
     er_with_none = [float(x) if not np.isnan(x) else None for x in er]
     edst_with_none = [float(x) if not np.isnan(x) else None for x in edst]
     euel_with_none = [float(x) if not np.isnan(x) else None for x in euel]

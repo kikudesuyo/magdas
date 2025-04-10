@@ -43,11 +43,11 @@ def handle_get_ee_index_zip_file(
     )
     station = EeIndexStation[station]
     start_date, end_date = convert_datetime(start_date), convert_datetime(end_date)
-    start_dt = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_dt = end_date.replace(hour=23, minute=59, second=59, microsecond=0)
-    er = Er(station, start_dt, end_dt).calc_er()
-    edst = Edst.compute_smoothed_edst(start_dt, end_dt)
-    euel = Euel.calc_euel(station, start_dt, end_dt)
+    start_ut = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_ut = end_date.replace(hour=23, minute=59, second=59, microsecond=0)
+    er = Er(station, start_ut, end_ut).calc_er()
+    edst = Edst.compute_smoothed_edst(start_ut, end_ut)
+    euel = Euel.calc_euel(station, start_ut, end_ut)
     # 修正するべき項目(IAGAコード、標高は未定)
     meta_data = get_meta_data(
         station,

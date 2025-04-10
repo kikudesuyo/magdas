@@ -18,18 +18,18 @@ class TestERValue(unittest.TestCase):
             "ignore", category=RuntimeWarning, message="All-NaN slice encountered"
         )
 
-    station = "EUS"
+    station = EeIndexStation.EUS
     ut_date = datetime(2010, 4, 1)
     days = 3
 
     def test_is_dayside_er_nan(self):
         """This function is a test code that checks whether the daytime values are set to np.NaN."""
-        local_start_dt = DateUtils.to_local_time(self.station, self.ut_date)
-        local_end_dt = local_start_dt + timedelta(days=self.days, minutes=-1)
-        nightside = NightEr(self.station, local_start_dt, local_end_dt)
+        start_lt = DateUtils.to_lt(self.station, self.ut_date)
+        local_end_dt = start_lt + timedelta(days=self.days, minutes=-1)
+        nightside = NightEr(self.station, start_lt, local_end_dt)
         nightside_er = nightside.extract_night_er()
         # onset time is dayside
-        time_zone = EeIndexStation[self.station].time_diff
+        time_zone = self.station.time_diff
         if time_zone < -6:
             nightside_start_index = (abs(time_zone) - 6) * 60
             nightside_end_index = nightside_start_index + 12 * 60 - 1
