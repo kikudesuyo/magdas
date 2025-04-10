@@ -5,8 +5,8 @@ from src.service.ee_index.calc.h_component_extraction import HComponent
 from src.service.ee_index.constant.er_threshold import MAX_ER_VALUE, MIN_ER_VALUE
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import DawnAndDusk
+from src.service.ee_index.helper.nan_calculator import NanCalculator
 from src.service.ee_index.helper.time_utils import DateUtils
-from src.service.ee_index.helper.warnings_suppression import NanCalculator
 
 
 class Er:
@@ -15,14 +15,12 @@ class Er:
         self.start_ut = start_ut
         self.end_ut = end_ut
 
-    def calc_base_value(self) -> np.ndarray:
+    def calc_base_value(self) -> np.float32:
         """Callculate the daily median of the h component for ER calculation"""
         h_component = HComponent().to_equatorial_h(
             self.station, self.start_ut, self.end_ut
         )
-        median = NanCalculator.nanmedian(h_component)
-        base_values = np.repeat(median, len(h_component))
-        return base_values
+        return NanCalculator.nanmedian(h_component)
 
     def calc_er(self):
         h_component = HComponent().to_equatorial_h(
