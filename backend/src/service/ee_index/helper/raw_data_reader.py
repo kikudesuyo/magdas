@@ -7,18 +7,18 @@ from src.service.ee_index.constant.raw_data import (
 from src.service.ee_index.constant.time_relation import Min, Sec
 
 
-def read_raw_min_data(abs_path):
+def read_raw_min_data(path):
     """
     .mag形式の読み込み
 
     Arg:
-      abs_path (str): .mag形式の絶対パス
+      path (str): .mag形式の絶対パス
     Return:
       data (np.array): 1440分のデータ
     Raises:
       ValueError: データに欠損がある場合
     """
-    with open(abs_path, "rb") as file:
+    with open(path, "rb") as file:
         # header情報の除去
         # デリミタ(^Z\00)までがheader
         while True:
@@ -37,18 +37,18 @@ def read_raw_min_data(abs_path):
     return array
 
 
-def read_raw_sec_data(abs_path):
+def read_raw_sec_data(path):
     """
     .mgdファイルの読み込み
 
     Arg:
-      abs_path (str): .mgdファイルの絶対パス
+      path (str): .mgdファイルの絶対パス
     Return:
       array (np.array): [[h,d,z,f],[h,d,z,f],...]] (86400, 4) 1 day data per second
     Raises:
       ValueError: データに欠損がある場合
     """
-    with open(abs_path, "rb") as file:
+    with open(path, "rb") as file:
         # header情報の除去
         # デリミタ(^Z\00)までがheader
         while True:

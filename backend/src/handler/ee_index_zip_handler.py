@@ -4,10 +4,10 @@ from datetime import timedelta
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from src.service.downloads.iaga.meta_data import get_meta_data
-from src.service.downloads.iaga.save_iaga_format import save_iaga_format
-from src.service.downloads.zip.files_zipping import create_zip_buffer
-from src.service.downloads.zip.remove_files import remove_files
+from src.service.downloads.iaga_meta_data import get_meta_data
+from src.service.downloads.iaga_save_file import save_iaga_format
+from src.service.downloads.remove_files import remove_files
+from src.service.downloads.zip_create import create_zip_buffer
 from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.er_value import Er
 from src.service.ee_index.calc.euel_index import Euel
