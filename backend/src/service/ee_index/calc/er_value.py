@@ -10,15 +10,15 @@ from src.service.ee_index.helper.warnings_suppression import NanCalculator
 
 
 class Er:
-    def __init__(self, station: EeIndexStation, start_dt: datetime, end_dt: datetime):
+    def __init__(self, station: EeIndexStation, start_ut: datetime, end_ut: datetime):
         self.station = station
-        self.start_dt = start_dt
-        self.end_dt = end_dt
+        self.start_ut = start_ut
+        self.end_ut = end_ut
 
     def calc_base_value(self) -> np.ndarray:
         """Callculate the daily median of the h component for ER calculation"""
         h_component = HComponent().interpolate_h(
-            self.station, self.start_dt, self.end_dt
+            self.station, self.start_ut, self.end_ut
         )
         median = NanCalculator.nanmedian(h_component)
         base_values = np.repeat(median, len(h_component))
@@ -26,7 +26,7 @@ class Er:
 
     def calc_er(self):
         h_component = HComponent().interpolate_h(
-            self.station, self.start_dt, self.end_dt
+            self.station, self.start_ut, self.end_ut
         )
         base_values = self.calc_base_value()
         raw_er = h_component - base_values
@@ -41,30 +41,30 @@ class Er:
 
 
 class NightEr:
-    def __init__(self, station: EeIndexStation, start_dt: datetime, end_dt: datetime):
+    def __init__(self, station: EeIndexStation, start_ut: datetime, end_ut: datetime):
         self.station = station
-        self.start_dt = start_dt
-        self.end_dt = end_dt
+        self.start_ut = start_ut
+        self.end_ut = end_ut
 
-    def get_corresponding_local_time(self) -> np.ndarray:
-        total_minutes = int((self.end_dt - self.start_dt).total_seconds() // 60) + 1
-        local_times = []
+    def get_corresponding_lt(self) -> np.ndarray:
+        total_minutes = int((self.end_ut - self.start_ut).total_seconds() // 60) + 1
+        lt_arr = []
         for i in range(total_minutes):
-            local_time = DateUtils.to_local_time(
-                self.station, self.start_dt + timedelta(minutes=i)
+            lt = DateUtils.to_lt(
+                self.station, self.start_ut + timedelta(minutes=i)
             ).time()
-            local_times.append(local_time)
-        return np.array(local_times)
+            lt_arr.append(lt)
+        return np.array(lt_arr)
 
     def is_daytime(self) -> np.ndarray:
         condition = np.logical_and(
-            DawnAndDusk.DAYSIDE.start <= self.get_corresponding_local_time(),
-            self.get_corresponding_local_time() <= DawnAndDusk.DAYSIDE.end,
+            DawnAndDusk.DAYSIDE.start <= self.get_corresponding_lt(),
+            self.get_corresponding_lt() <= DawnAndDusk.DAYSIDE.end,
         )
         return condition
 
     def extract_night_er(self) -> np.ndarray:
-        er = Er(self.station, self.start_dt, self.end_dt).calc_er()
+        er = Er(self.station, self.start_ut, self.end_ut).calc_er()
         night_er = np.where(
             self.is_daytime(),
             np.nan,

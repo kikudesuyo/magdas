@@ -20,16 +20,16 @@ def is_offdip_station(station: EeIndexStation):
 def calc_eej_value(
     dip_station: EeIndexStation, offdip_station: EeIndexStation, target_date: date
 ):
-    start_dt = datetime(target_date.year, target_date.month, target_date.day, 0, 0)
-    end_dt = start_dt + timedelta(days=1, minutes=-1)
-    dip_euel = get_local_euel(dip_station, start_dt, end_dt)
-    offdip_euel = get_local_euel(offdip_station, start_dt, end_dt)
+    start_ut = datetime(target_date.year, target_date.month, target_date.day, 0, 0)
+    end_dt = start_ut + timedelta(days=1, minutes=-1)
+    dip_euel = get_local_euel(dip_station, start_ut, end_dt)
+    offdip_euel = get_local_euel(offdip_station, start_ut, end_dt)
     smoothed_dip_euel, smoothed_offdip_euel = (
         calc_moving_ave(dip_euel, 120, 60),
         calc_moving_ave(offdip_euel, 120, 60),
     )
     timestamp = np.array(
-        [start_dt + timedelta(minutes=i) for i in range(len(smoothed_dip_euel))]
+        [start_ut + timedelta(minutes=i) for i in range(len(smoothed_dip_euel))]
     )
     is_noon = np.array([EejDetectionTime.contains(dt.time()) for dt in timestamp])
     dip_max = np.max(smoothed_dip_euel[is_noon])

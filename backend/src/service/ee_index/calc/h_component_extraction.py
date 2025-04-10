@@ -40,11 +40,11 @@ class HComponent:
             return h_for_day
 
     @staticmethod
-    def get_h_component(station_code, start_dt: datetime, end_dt: datetime):
-        start_date, end_date = start_dt.date(), end_dt.date()
+    def get_h_component(station_code, start_ut: datetime, end_ut: datetime):
+        start_date, end_date = start_ut.date(), end_ut.date()
         if start_date == end_date:
-            start_idx = start_dt.hour * Min.ONE_HOUR.const + start_dt.minute
-            end_idx = end_dt.hour * Min.ONE_HOUR.const + end_dt.minute
+            start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
+            end_idx = end_ut.hour * Min.ONE_HOUR.const + end_ut.minute
             day_h_data = HComponent.read_for_day(station_code, start_date)[
                 start_idx : end_idx + 1
             ]
@@ -54,20 +54,20 @@ class HComponent:
             current_date = start_date + timedelta(days=i)
             day_h_data = HComponent.read_for_day(station_code, current_date)
             if current_date == start_date:
-                start_idx = start_dt.hour * Min.ONE_HOUR.const + start_dt.minute
+                start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
                 h_values = np.concatenate((h_values, day_h_data[start_idx:]))
             elif current_date == end_date:
-                end_idx = end_dt.hour * Min.ONE_HOUR.const + end_dt.minute
+                end_idx = end_ut.hour * Min.ONE_HOUR.const + end_ut.minute
                 h_values = np.concatenate((h_values, day_h_data[: end_idx + 1]))
             else:
                 h_values = np.concatenate((h_values, day_h_data))
         return h_values
 
     @staticmethod
-    def interpolate_h(station: EeIndexStation, start_dt: datetime, end_dt: datetime):
+    def interpolate_h(station: EeIndexStation, start_ut: datetime, end_ut: datetime):
         """磁気赤道を基準(gm_lat=0)にしたh成分を計算"""
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
-        h_value = HComponent.get_h_component(station.code, start_dt, end_dt)
+        h_value = HComponent.get_h_component(station.code, start_ut, end_ut)
         equational_h_component = h_value / np.cos(np.deg2rad(station.gm_lat))
         return equational_h_component
 

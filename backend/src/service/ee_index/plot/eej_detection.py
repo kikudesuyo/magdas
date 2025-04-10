@@ -10,29 +10,28 @@ from src.service.ee_index.plot.config import PlotConfig
 
 
 class EejDetectionPlotter:
-    def __init__(self, local_start_dt: datetime, local_end_dt: datetime):
-        self.local_start_dt = local_start_dt
-        self.local_end_dt = local_end_dt
+    def __init__(self, start_lt: datetime, end_lt: datetime):
+        self.start_lt = start_lt
+        self.end_lt = end_lt
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
-        local_euel = get_local_euel(station, self.local_start_dt, self.local_end_dt)
+        local_euel = get_local_euel(station, self.start_lt, self.end_lt)
         moving_avg = calc_moving_ave(local_euel, 120, 60)
         x_axis = np.arange(0, len(moving_avg), 1)
         self.ax.plot(x_axis, moving_avg, label=station.name)
 
     def plot_pure(self, station: EeIndexStation):
-        local_euel = get_local_euel(station, self.local_start_dt, self.local_end_dt)
+        local_euel = get_local_euel(station, self.start_lt, self.end_lt)
         x_axis = np.arange(0, len(local_euel), 1)
         self.ax.plot(x_axis, local_euel, label=station.name)
 
     def _set_axis_labels(self):
         data_length = (
-            int((self.local_end_dt - self.local_start_dt).total_seconds())
-            // Sec.ONE_MINUTE.const
+            int((self.end_lt - self.start_lt).total_seconds()) // Sec.ONE_MINUTE.const
             + 1
         )
         self.ax.set_ylabel("nT", rotation=0)
@@ -42,7 +41,7 @@ class EejDetectionPlotter:
         tick_interval = max(1, data_length // 8)
         ticks = range(0, data_length, tick_interval)
         time_labels = [
-            (self.local_start_dt + timedelta(minutes=i)).strftime("%m/%d %H:%M")
+            (self.start_lt + timedelta(minutes=i)).strftime("%m/%d %H:%M")
             for i in ticks
         ]
         self.ax.set_xticks(ticks)
@@ -52,9 +51,7 @@ class EejDetectionPlotter:
         if not event.inaxes:
             return
         x, y = event.xdata, event.ydata
-        time_str = (self.local_start_dt + timedelta(minutes=int(x))).strftime(
-            "%m/%d %H:%M"
-        )
+        time_str = (self.start_lt + timedelta(minutes=int(x))).strftime("%m/%d %H:%M")
         self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
@@ -67,9 +64,9 @@ class EejDetectionPlotter:
         plt.savefig(path)
 
 
-start_local_dt = datetime(2014, 1, 20, 0, 0)
-end_local_dt = datetime(2014, 1, 27, 23, 59)
-detection = EejDetectionPlotter(start_local_dt, end_local_dt)
+start_lt = datetime(2014, 1, 20, 0, 0)
+end_lt = datetime(2014, 1, 27, 23, 59)
+detection = EejDetectionPlotter(start_lt, end_lt)
 detection.plot_local_euel(EeIndexStation.ANC)
 detection.plot_local_euel(EeIndexStation.EUS)
 detection.plot_pure(EeIndexStation.ANC)

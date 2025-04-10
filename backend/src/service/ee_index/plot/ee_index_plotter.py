@@ -13,8 +13,8 @@ from src.service.ee_index.plot.config import PlotConfig
 
 
 class EeIndexPlotter:
-    def __init__(self, start_dt: datetime, end_dt: datetime):
-        self.start_dt = start_dt
+    def __init__(self, start_ut: datetime, end_dt: datetime):
+        self.start_ut = start_ut
         self.end_dt = end_dt
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
@@ -32,17 +32,17 @@ class EeIndexPlotter:
         )
 
     def plot_er(self, station):
-        er = Er(station, self.start_dt, self.end_dt).calc_er()
+        er = Er(station, self.start_ut, self.end_dt).calc_er()
         x_axis, y_axis = np.arange(0, len(er), 1), er
         self.ax.plot(x_axis, y_axis, label="ER", color="black", lw=1.3)
 
     def plot_edst(self):
-        edst = Edst.compute_smoothed_edst(self.start_dt, self.end_dt)
+        edst = Edst.compute_smoothed_edst(self.start_ut, self.end_dt)
         x_axis, y_axis = np.arange(0, len(edst), 1), edst
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
     def plot_euel(self, station, color):
-        euel = Euel.calc_euel(station, self.start_dt, self.end_dt)
+        euel = Euel.calc_euel(station, self.start_ut, self.end_dt)
         smoothed_euel = calc_moving_ave(euel, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(
@@ -56,9 +56,9 @@ class EeIndexPlotter:
     #     self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
     def plot_ee(self, station):
-        er = Er(station, self.start_dt, self.end_dt).calc_er()
-        edst = Edst.compute_smoothed_edst(self.start_dt, self.end_dt)
-        euel = Euel.calc_euel(station, self.start_dt, self.end_dt)
+        er = Er(station, self.start_ut, self.end_dt).calc_er()
+        edst = Edst.compute_smoothed_edst(self.start_ut, self.end_dt)
+        euel = Euel.calc_euel(station, self.start_ut, self.end_dt)
         if len(er) != len(edst) or len(er) != len(euel):
             raise ValueError("The length of the arrays must be the same")
         x_axis = np.arange(0, len(er), 1)
@@ -68,7 +68,7 @@ class EeIndexPlotter:
 
     def _set_axis_labels(self):
         data_length = (
-            int((self.end_dt - self.start_dt).total_seconds()) // Sec.ONE_MINUTE.const
+            int((self.end_dt - self.start_ut).total_seconds()) // Sec.ONE_MINUTE.const
             + 1
         )
         self.ax.set_ylabel("nT", rotation=0)
@@ -78,7 +78,7 @@ class EeIndexPlotter:
         tick_interval = max(1, data_length // 8)
         ticks = range(0, data_length, tick_interval)
         time_labels = [
-            (self.start_dt + timedelta(minutes=i)).strftime("%m/%d %H:%M")
+            (self.start_ut + timedelta(minutes=i)).strftime("%m/%d %H:%M")
             for i in ticks
         ]
         self.ax.set_xticks(ticks)
@@ -88,7 +88,7 @@ class EeIndexPlotter:
         if not event.inaxes:
             return
         x, y = event.xdata, event.ydata
-        time_str = (self.start_dt + timedelta(minutes=int(x))).strftime("%m/%d %H:%M")
+        time_str = (self.start_ut + timedelta(minutes=int(x))).strftime("%m/%d %H:%M")
         self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
