@@ -18,9 +18,9 @@ class TestERValue(unittest.TestCase):
             "ignore", category=RuntimeWarning, message="All-NaN slice encountered"
         )
 
-    station = EeIndexStation.EUS
-    start_ut = datetime(2010, 4, 1, 0, 0)
-    end_ut = datetime(2010, 4, 2, 0, 0)
+    station = EeIndexStation.ANC
+    start_ut = datetime(2014, 4, 1, 0, 0)
+    end_ut = datetime(2014, 4, 2, 0, 0)
 
     def test_is_dayside_er_nan(self):
         """This function is a test code that checks whether the daytime values are set to np.NaN."""
