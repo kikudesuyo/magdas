@@ -3,7 +3,7 @@ import warnings
 from datetime import datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.er_value import NightEr
+from src.service.ee_index.calc.er_value import Er, NightEr
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.helper.time_utils import DateUtils
 
@@ -19,59 +19,25 @@ class TestERValue(unittest.TestCase):
         )
 
     station = EeIndexStation.EUS
-    ut_date = datetime(2010, 4, 1)
-    days = 3
+    start_ut = datetime(2010, 4, 1, 0, 0)
+    end_ut = datetime(2010, 4, 2, 0, 0)
 
     def test_is_dayside_er_nan(self):
         """This function is a test code that checks whether the daytime values are set to np.NaN."""
-        start_lt = DateUtils.to_lt(self.station, self.ut_date)
-        local_end_dt = start_lt + timedelta(days=self.days, minutes=-1)
-        nightside = NightEr(self.station, start_lt, local_end_dt)
-        nightside_er = nightside.extract_night_er()
-        # onset time is dayside
-        time_zone = self.station.time_diff
-        if time_zone < -6:
-            nightside_start_index = (abs(time_zone) - 6) * 60
-            nightside_end_index = nightside_start_index + 12 * 60 - 1
-            i = 0
-            while True:
-                if i < nightside_start_index or i > nightside_end_index:
-                    self.assertTrue(
-                        np.isnan(nightside_er[i]), "Error: 昼間側に値がある"
-                    )
-                i += 1
-                if i == 1440:
-                    break
-        elif -6 <= time_zone < 0:
-            nightside_end_index = (abs(time_zone) + 6) * 60 - 1
-            nightside_start_index = nightside_end_index + 12 * 60 + 1
-            i = 0
-            while True:
-                if nightside_end_index < i < nightside_start_index:
-                    self.assertTrue(
-                        np.isnan(nightside_er[i]), "Error: 昼間側に値がある"
-                    )
-                i += 1
-                if i == 1440:
-                    break
-        elif 0 <= time_zone < 6:
-            nightside_end_index = (abs(time_zone)) * 60 - 1
-            nightside_start_index = nightside_end_index + 12 * 60 + 1
-            i = 0
-            while True:
-                if nightside_end_index < i < nightside_start_index:
-                    self.assertTrue(np.isnan(nightside_er[i]), "Error:昼間側に値がある")
-                i += 1
-                if i == 1440:
-                    break
-        elif 6 <= time_zone:
-            nightside_start_index = (18 - abs(time_zone)) * 60
-            nightside_end_index = nightside_start_index + 12 * 60 - 1
-            i = 0
-            while True:
-                if i < nightside_start_index or i > nightside_end_index:
-                    self.assertTrue(np.isnan(nightside_er[i]), "Error:昼間側に値がある")
-                i += 1
-                if i == 1440:
-                    break
+        start_lt = DateUtils.to_lt(self.station, self.start_ut)
+        end_lt = DateUtils.to_lt(self.station, self.end_ut)
+        n = NightEr(self.station, start_lt, end_lt)
+        night_er = n.extract_night_er()
+
+        current_time = start_lt
+        i = 0
+        while current_time <= end_lt:
+            # 1分ごとに時間を進める
+            if n.is_daytime()[i]:
+                err_msg = (
+                    f"Error: 昼間側に値が存在します。index: {i}, 値: {night_er[i]}"
+                )
+                self.assertTrue(np.isnan(night_er[i]), err_msg)
+            i += 1
+            current_time += timedelta(minutes=1)
         print("Success!: 昼間側の値は全てnp.NaNです。in test_night_er_values.py")
