@@ -31,10 +31,10 @@ class EeIndexPlotter:
             color="black",
         )
 
-    def plot_er(self, station):
+    def plot_er(self, station, color):
         er = Er(station, self.start_ut, self.end_dt).calc_er()
         x_axis, y_axis = np.arange(0, len(er), 1), er
-        self.ax.plot(x_axis, y_axis, label="ER", color="black", lw=1.3)
+        self.ax.plot(x_axis, y_axis, label="ER", color=color)
 
     def plot_edst(self):
         edst = Edst.compute_smoothed_edst(self.start_ut, self.end_dt)
@@ -45,9 +45,7 @@ class EeIndexPlotter:
         euel = Euel.calc_euel(station, self.start_ut, self.end_dt)
         smoothed_euel = calc_moving_ave(euel, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
-        self.ax.plot(
-            x_axis, smoothed_euel, label=f"{station}_EUEL", color=color, lw=1.3
-        )
+        self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
 
     # def plot_dst(self, color):
     #     dst = get_dst_values(self.start_date, self.end_date)
@@ -110,12 +108,14 @@ class EeIndexPlotter:
         plt.savefig(path)
 
 
-dav = EeIndexStation.DAV
-eus = EeIndexStation.EUS
+if __name__ == "__main__":
+    start_date = datetime(2014, 1, 1, 0, 0)
+    end_date = datetime(2014, 1, 31, 23, 59)
 
-
-p = EeIndexPlotter(datetime(2014, 1, 1, 0, 0), datetime(2014, 1, 10, 23, 59))
-p.plot_euel(dav, "red")
-p.plot_euel(eus, "blue")
-p.show()
-# p.plot_er("kakioka")
+    anc = EeIndexStation.ANC
+    eus = EeIndexStation.EUS
+    p = EeIndexPlotter(start_date, end_date)
+    p.plot_er(anc, "blue")
+    p.plot_er(eus, "red")
+    p.plot_edst()
+    p.show()
