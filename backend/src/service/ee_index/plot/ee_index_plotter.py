@@ -6,7 +6,7 @@ from src.service.dst import get_dst_values
 from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.er_value import Er
 from src.service.ee_index.calc.euel_index import Euel
-from src.service.ee_index.calc.moving_ave import calc_moving_ave
+from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
 from src.service.ee_index.plot.config import PlotConfig
@@ -43,7 +43,7 @@ class EeIndexPlotter:
 
     def plot_euel(self, station, color):
         euel = Euel.calc_euel(station, self.start_ut, self.end_dt)
-        smoothed_euel = calc_moving_ave(euel, 120, 60)
+        smoothed_euel = calc_moving_avg(euel, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
 
