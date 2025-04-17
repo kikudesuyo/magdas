@@ -8,15 +8,15 @@ from src.service.ee_index.constant.magdas_station import EeIndexStation
 
 class Euel:
     @staticmethod
-    def calc_euel(station: EeIndexStation, start_ut: datetime, end_dt: datetime):
+    def calc_euel(station: EeIndexStation, start_ut: datetime, end_ut: datetime):
         """Calculate EUEL value for a specific period.
 
         注意:
         開始時刻と終了時刻は共に含めます
         一分値で計算しているため、start_utとend_utは(year, month, day, hour, minute)の粒度で指定してください
         """
-        er = Er(station, start_ut, end_dt).calc_er()
-        edst = Edst.calc_edst(start_ut, end_dt)
+        er = Er(station, start_ut, end_ut).calc_er()
+        edst = Edst.calc_edst(start_ut, end_ut)
         return er - edst
 
 
