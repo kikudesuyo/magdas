@@ -10,14 +10,6 @@ from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.kp import Kp
 
 
-def is_dip_station(station: EeIndexStation) -> bool:
-    return abs(station.gm_lat) < 3
-
-
-def is_offdip_station(station: EeIndexStation) -> bool:
-    return 3 <= abs(station.gm_lat) <= 15
-
-
 def calc_eej_peak_diff(
     dip_station: EeIndexStation, offdip_station: EeIndexStation, local_date: date
 ) -> float:
@@ -55,10 +47,10 @@ class EejDetection:
         offdip_station: EeIndexStation,
         target_date: date,
     ):
-        if not is_dip_station(dip_station):
+        if not dip_station.is_dip():
             raise ValueError("station is not in dip region")
-        if not is_offdip_station(offdip_station):
-            raise ValueError("station is not in off dip region")
+        if not offdip_station.is_offdip():
+            raise ValueError("station is not in dip region")
         edst_val = Edst.compute_smoothed_edst(
             datetime(target_date.year, target_date.month, target_date.day, 0, 0),
             datetime(target_date.year, target_date.month, target_date.day, 23, 59),
