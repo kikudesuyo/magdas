@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 
 import numpy as np
 from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.euel_index import get_local_euel, has_night_euel
+from src.service.ee_index.calc.euel_index import EuelLt
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
@@ -29,8 +29,10 @@ def calc_eej_peak_diff(
 def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     s_lt = datetime(local_date.year, local_date.month, local_date.day, 0, 0)
     e_lt = s_lt.replace(hour=23, minute=59)
-    euel = get_local_euel(station, s_lt, e_lt)
-    if not has_night_euel(station, local_date):
+
+    euel_lt = EuelLt(station, s_lt, e_lt)
+    euel = euel_lt.calc_euel()
+    if not euel_lt.has_night_data():
         return euel
     euel_for_baseline = np.concatenate(
         (euel[0 : 5 * 60], np.nan * np.ones(14 * 60), euel[19 * 60 : 24 * 60])
@@ -83,8 +85,8 @@ class EejDetection:
 if __name__ == "__main__":
     anc = EeIndexStation.ANC
     eus = EeIndexStation.EUS
-    d = date(2018, 1, 1)
-    while d <= date(2018, 1, 31):
+    d = date(2018, 1, 14)
+    while d <= date(2018, 1, 25):
         eej = EejDetection(anc, eus, d)
         if eej.is_singular_eej():
             print(d)
