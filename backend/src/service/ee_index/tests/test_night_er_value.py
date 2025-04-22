@@ -3,7 +3,7 @@ import warnings
 from datetime import datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.er_value import Er, NightEr
+from src.service.ee_index.calc.er_value import NightEr
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.helper.time_utils import DateUtils
 
@@ -33,7 +33,7 @@ class TestERValue(unittest.TestCase):
         i = 0
         while current_time <= end_lt:
             # 1分ごとに時間を進める
-            if n.is_daytime()[i]:
+            if not n.is_nighttime_arr()[i]:
                 err_msg = (
                     f"Error: 昼間側に値が存在します。index: {i}, 値: {night_er[i]}"
                 )
