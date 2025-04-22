@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
+from src.service.ee_index.helper.params import Period
 
 
 class DateUtils:
@@ -32,7 +33,7 @@ class DateUtils:
         return ut_time
 
     @staticmethod
-    def time_diff(start_time: datetime, end_time: datetime) -> tuple:
+    def time_diff(period: Period) -> tuple:
         """Calculate the time difference
 
         Args:
@@ -41,7 +42,7 @@ class DateUtils:
         Return:
           (days, hours, minutes) (tuple(int)): time difference
         """
-        time_diff = end_time - start_time
+        time_diff = period.end - period.start
         days = time_diff.days
         hours = time_diff.seconds // Sec.ONE_HOUR.const
         minutes = time_diff.seconds % Sec.ONE_HOUR.const // Sec.ONE_MINUTE.const

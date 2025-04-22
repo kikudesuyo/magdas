@@ -5,9 +5,9 @@ from matplotlib import pyplot as plt
 from src.service.ee_index.calc.detect_eej import calc_euel_for_eej_detection
 from src.service.ee_index.calc.euel_index import EuelLt
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
-from src.service.ee_index.calc.params import CalcParams, Period
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
+from src.service.ee_index.helper.params import CalcParams, Period
 from src.service.ee_index.plot.config import PlotConfig
 
 

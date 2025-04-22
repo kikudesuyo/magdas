@@ -1,9 +1,9 @@
 import numpy as np
 from src.service.ee_index.calc.er_value import NightEr
-from src.service.ee_index.calc.params import CalcParams, Period
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Min
 from src.service.ee_index.helper.nan_calculator import NanCalculator
+from src.service.ee_index.helper.params import CalcParams, Period
 from src.service.ee_index.helper.time_utils import DateUtils
 
 
@@ -13,11 +13,9 @@ class Edst:
         period: Period,
     ):
         self.period = period
-        self.start_ut = period.start
-        self.end_ut = period.end
 
     def calc_edst(self) -> np.ndarray:
-        days, hours, minutes = DateUtils.time_diff(self.start_ut, self.end_ut)
+        days, hours, minutes = DateUtils.time_diff(self.period)
         data_length = (
             days * Min.ONE_DAY.const + hours * Min.ONE_HOUR.const + minutes + 1
         )

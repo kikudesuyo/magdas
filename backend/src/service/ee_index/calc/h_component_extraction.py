@@ -2,9 +2,9 @@ from datetime import date, timedelta
 from glob import glob
 
 import numpy as np
-from src.service.ee_index.calc.params import CalcParams
 from src.service.ee_index.constant.raw_data import MAX_H, MIN_H
 from src.service.ee_index.constant.time_relation import Min
+from src.service.ee_index.helper.params import CalcParams
 from src.service.ee_index.helper.raw_data_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 

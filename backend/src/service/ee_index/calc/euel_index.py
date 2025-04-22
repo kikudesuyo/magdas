@@ -1,12 +1,12 @@
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
 
 import numpy as np
 from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.er_value import Er
 from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.h_component_extraction import HComponent
-from src.service.ee_index.calc.params import CalcParams, Period
 from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.helper.params import CalcParams, Period
 
 
 class Euel:

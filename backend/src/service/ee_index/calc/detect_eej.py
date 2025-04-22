@@ -5,9 +5,9 @@ from src.service.ee_index.calc.euel_index import EuelLt
 from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
-from src.service.ee_index.calc.params import CalcParams, Period
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
 from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.helper.params import CalcParams, Period
 from src.service.kp import Kp
 
 
