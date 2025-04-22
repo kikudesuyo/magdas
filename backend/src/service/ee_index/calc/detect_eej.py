@@ -85,6 +85,10 @@ class EejDetection:
 
 
 if __name__ == "__main__":
+    import time
+
+    log_s = time.time()
+
     anc = EeIndexStation.ANC
     eus = EeIndexStation.EUS
     d = date(2018, 1, 1)
@@ -94,3 +98,5 @@ if __name__ == "__main__":
             print(d)
             print(eej.eej_peak_diff)
         d += timedelta(days=1)
+    log_e = time.time()
+    print("log time: ", log_e - log_s)
