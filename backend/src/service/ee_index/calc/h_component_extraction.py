@@ -70,8 +70,3 @@ class HComponent:
         h_value = HComponent.get_h_component(station.code, start_ut, end_ut)
         equational_h_component = h_value / np.cos(np.deg2rad(station.gm_lat))
         return equational_h_component
-
-    @staticmethod
-    def _handle_file_not_found_error(number_of_elements):
-        h_component = np.full(number_of_elements, np.NaN)
-        return h_component
