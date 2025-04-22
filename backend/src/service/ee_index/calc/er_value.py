@@ -26,13 +26,15 @@ class Er:
 
 
 class NightEr:
-    """Night definition  18:00 to 05:59"""
+    """Night definition 18:00 to 05:59"""
 
     def __init__(self, params: CalcParams):
         self.p = params
         self.station = params.station
         self.start_ut = params.period.start
         self.end_ut = params.period.end
+        h = HComponent(params)
+        self.er = Er(h)
 
     def get_corresponding_lt(self) -> np.ndarray:
         total_minutes = int((self.end_ut - self.start_ut).total_seconds() // 60) + 1
@@ -49,11 +51,9 @@ class NightEr:
         return np.array([DawnAndDusk.NIGHTSIDE.contains(lt) for lt in lt_arr])
 
     def extract_night_er(self) -> np.ndarray:
-        h = HComponent(self.p)
-        er = Er(h).calc_er()
         night_er = np.where(
             self.nighttime_mask(),
-            er,
+            self.er.calc_er(),
             np.nan,
         )
         return night_er
