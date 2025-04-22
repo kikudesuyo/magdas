@@ -16,10 +16,8 @@ class Edst:
 
     def calc_edst(self) -> np.ndarray:
         days, hours, minutes = DateUtils.time_diff(self.period)
-        data_length = (
-            days * Min.ONE_DAY.const + hours * Min.ONE_HOUR.const + minutes + 1
-        )
-        night_er_list = np.empty((0, data_length), dtype=float)
+        length = days * Min.ONE_DAY.const + hours * Min.ONE_HOUR.const + minutes + 1
+        night_er_list = np.empty((0, length), dtype=float)
         for station in EeIndexStation:
             params = CalcParams(station, self.period)
             night_er = NightEr(params)

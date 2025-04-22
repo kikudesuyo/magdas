@@ -29,7 +29,6 @@ class NightEr:
     """Night definition 18:00 to 05:59"""
 
     def __init__(self, params: CalcParams):
-        self.p = params
         self.station = params.station
         self.start_ut = params.period.start
         self.end_ut = params.period.end
