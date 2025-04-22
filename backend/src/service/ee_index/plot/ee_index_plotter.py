@@ -5,7 +5,7 @@ import numpy as np
 from src.service.dst import get_dst_values
 from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.er_value import Er
-from src.service.ee_index.calc.euel_index import Euel
+from src.service.ee_index.calc.euel_index import create_euel
 from src.service.ee_index.calc.h_component_extraction import HComponent
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
@@ -37,22 +37,20 @@ class EeIndexPlotter:
     def plot_er(self, station, color):
         params = CalcParams(station, self.period)
         h = HComponent(params)
-        er = Er(h).calc_er()
-        # er = Er(station, self.start_ut, self.end_ut).calc_er()
-        x_axis, y_axis = np.arange(0, len(er), 1), er
+        er_values = Er(h).calc_er()
+        x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label="ER", color=color)
 
     def plot_edst(self):
-        # edst = Edst.compute_smoothed_edst(self.start_ut, self.end_ut)
-        # edst = Edst(self.start_ut, self.end_ut).compute_smoothed_edst()
         edst = Edst(self.period).compute_smoothed_edst()
         x_axis, y_axis = np.arange(0, len(edst), 1), edst
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
     def plot_euel(self, station, color):
         p = CalcParams(station, self.period)
-        euel = Euel(p).calc_euel()
-        smoothed_euel = calc_moving_avg(euel, 120, 60)
+        euel = create_euel(p)
+        euel_values = euel.calc_euel()
+        smoothed_euel = calc_moving_avg(euel_values, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
 
@@ -63,11 +61,12 @@ class EeIndexPlotter:
     #     self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
     def plot_ee(self, station):
+        # TODO: 各インデックスの宣言においてパフォーマンス改善の余地あり
         params = CalcParams(station, self.period)
         h = HComponent(params)
         er = Er(h)
         edst = Edst(self.period)
-        euel = Euel(params)
+        euel = create_euel(params)
         er_values = er.calc_er()
         edst_values = edst.compute_smoothed_edst()
         euel_values = euel.calc_euel()

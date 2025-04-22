@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta
 
 import numpy as np
+from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.euel_index import EuelLt
-from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
@@ -57,12 +57,14 @@ class EejDetection:
             raise ValueError("station is not in dip region")
         if not offdip_station.is_offdip():
             raise ValueError("station is not in dip region")
-        ee = EeFactory(
-            dip_station,
-            datetime(target_date.year, target_date.month, target_date.day, 0, 0),
-            datetime(target_date.year, target_date.month, target_date.day, 23, 59),
+
+        edst = Edst(
+            Period(
+                datetime(target_date.year, target_date.month, target_date.day, 0, 0),
+                datetime(target_date.year, target_date.month, target_date.day, 23, 59),
+            )
         )
-        self.min_edst = np.min(ee.edst.calc_edst())
+        self.min_edst = np.min(edst.calc_edst())
         self.kp = Kp().get_max(
             datetime(target_date.year, target_date.month, target_date.day, 0, 0),
             datetime(target_date.year, target_date.month, target_date.day, 23, 59),
