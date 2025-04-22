@@ -22,8 +22,8 @@ class EejDetectionPlotter:
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
-        local_euel = EuelLt(station, self.start_lt, self.end_lt).calc_euel()
-        moving_avg = calc_moving_avg(local_euel, 120, 60)
+        euel_lt = EuelLt(station, self.start_lt, self.end_lt)
+        moving_avg = calc_moving_avg(euel_lt.euel_values, 120, 60)
         x_axis = np.arange(0, len(moving_avg), 1)
         self.ax.plot(x_axis, moving_avg, label=station.name)
 
@@ -43,9 +43,9 @@ class EejDetectionPlotter:
         self.ax.plot(x_axis, euel, label=station.name, color=color)
 
     def plot_pure(self, station: EeIndexStation, color):
-        local_euel = EuelLt(station, self.start_lt, self.end_lt).calc_euel()
-        x_axis = np.arange(0, len(local_euel), 1)
-        self.ax.plot(x_axis, local_euel, label=station.name, color=color)
+        euel_lt = EuelLt(station, self.start_lt, self.end_lt)
+        x_axis = np.arange(0, len(euel_lt.euel_values), 1)
+        self.ax.plot(x_axis, euel_lt.euel_values, label=station.name, color=color)
 
     def _set_axis_labels(self):
         data_length = (

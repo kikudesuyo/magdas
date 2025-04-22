@@ -29,16 +29,18 @@ def calc_eej_peak_diff(
 def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     s_lt = datetime(local_date.year, local_date.month, local_date.day, 0, 0)
     e_lt = s_lt.replace(hour=23, minute=59)
-
     euel_lt = EuelLt(station, s_lt, e_lt)
-    euel = euel_lt.calc_euel()
     if not euel_lt.has_night_data():
-        return euel
+        return euel_lt.euel_values
     euel_for_baseline = np.concatenate(
-        (euel[0 : 5 * 60], np.nan * np.ones(14 * 60), euel[19 * 60 : 24 * 60])
+        (
+            euel_lt.euel_values[0 : 5 * 60],
+            np.nan * np.ones(14 * 60),
+            euel_lt.euel_values[19 * 60 : 24 * 60],
+        )
     )
     y_filled = interpolate_nan(euel_for_baseline)
-    euel_for_eej_detection = euel - y_filled
+    euel_for_eej_detection = euel_lt.euel_values - y_filled
     return calc_moving_avg(euel_for_eej_detection, 60, 30)
 
 

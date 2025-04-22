@@ -25,9 +25,9 @@ class EuelLt:
         self.station = station
         self.start_lt = start_lt
         self.end_lt = end_lt
-        self.local_euel = self.calc_euel()
+        self.euel_values = self.__calc_euel()
 
-    def calc_euel(self) -> np.ndarray:
+    def __calc_euel(self) -> np.ndarray:
         utc_offset = timedelta(hours=self.station.time_diff)
         start_ut = (self.start_lt - utc_offset).replace(second=0, microsecond=0)
         end_ut = (self.end_lt - utc_offset).replace(second=0, microsecond=0)
@@ -39,6 +39,6 @@ class EuelLt:
             raise ValueError("start_lt and end_lt must be the same date.")
         if self.start_lt.time() != time(0, 0) or self.end_lt.time() != time(23, 59):
             raise ValueError("start_lt must be 00:00 and end_lt must be 23:59.")
-        dawn_e = self.local_euel[0 : 5 * 60]
-        dusk_e = self.local_euel[19 * 60 : 24 * 60]
+        dawn_e = self.euel_values[0 : 5 * 60]
+        dusk_e = self.euel_values[19 * 60 : 24 * 60]
         return not (np.all(np.isnan(dawn_e)) and np.all(np.isnan(dusk_e)))
