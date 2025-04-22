@@ -84,10 +84,10 @@ class EejDetectionPlotter:
 
 if __name__ == "__main__":
     start_date = datetime(2018, 1, 10, 0, 0)
-    end_date = datetime(2018, 1, 20, 23, 59)
+    end_date = datetime(2018, 1, 31, 23, 59)
     detection = EejDetectionPlotter(start_date, end_date)
-    detection.plot_local_euel(EeIndexStation.ANC)
-    detection.plot_local_euel(EeIndexStation.EUS)
-    # detection.plot_euel_to_detect_eej(EeIndexStation.ANC, "red")
-    # detection.plot_euel_to_detect_eej(EeIndexStation.EUS, "purple")
+    # detection.plot_local_euel(EeIndexStation.ANC)
+    # detection.plot_local_euel(EeIndexStation.EUS)
+    detection.plot_euel_to_detect_eej(EeIndexStation.ANC, "red")
+    detection.plot_euel_to_detect_eej(EeIndexStation.EUS, "purple")
     detection.show()
