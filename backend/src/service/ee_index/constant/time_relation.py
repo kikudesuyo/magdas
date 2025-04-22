@@ -34,6 +34,13 @@ class TimeRange:
     start: datetime.time
     end: datetime.time
 
+    def contains(self, time: datetime.time) -> bool:
+        """Check if the given time is within the range."""
+        if self.start <= self.end:
+            return self.start <= time <= self.end
+        else:
+            return self.start <= time or time <= self.end
+
 
 class DawnAndDusk(TimeRange, Enum):
     DAYSIDE = (
