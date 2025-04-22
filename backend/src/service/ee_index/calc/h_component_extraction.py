@@ -9,50 +9,48 @@ from src.service.ee_index.helper.raw_data_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 
 
-class HComponent:
-    @staticmethod
-    def read_for_day(station_code: str, ut_date: date):
-        year, month, day = (
-            ut_date.strftime("%Y"),
-            ut_date.strftime("%m"),
-            ut_date.strftime("%d"),
+def get_h_for_a_day(station_code: str, ut_date: date):
+    year = ut_date.strftime("%Y")
+    month = ut_date.strftime("%m")
+    day = ut_date.strftime("%d")
+    filenames = glob(
+        generate_parent_abs_path(
+            f"/Storage/{station_code}/Min/{year}/{station_code}_MIN_{year}{month}{day}*.mgd"
         )
-        filenames = glob(
-            generate_parent_abs_path(
-                f"/Storage/{station_code}/Min/{year}/{station_code}_MIN_{year}{month}{day}*.mgd"
-            )
+    )
+    if len(filenames) == 0:
+        h_for_day = np.full(Min.ONE_DAY.const, np.NaN)
+        return h_for_day
+    if len(filenames) > 1:
+        raise FileNotFoundError(
+            f"Multiple files found for {station_code} at {ut_date}: {filenames}"
         )
-        try:
-            if not filenames:
-                raise FileNotFoundError(
-                    f"File not found for {station_code} at {ut_date}"
-                )
-            h_for_day = read_raw_min_data(filenames[0])[:, 0]
-            for i in range(Min.ONE_DAY.const):
-                if h_for_day[i] <= MIN_H or h_for_day[i] >= MAX_H:
-                    h_for_day[i] = np.NaN
-            return h_for_day
-        except FileNotFoundError as e:
-            h_for_day = np.full(Min.ONE_DAY.const, np.NaN)
-            return h_for_day
-        except ValueError as e:
-            h_for_day = np.full(Min.ONE_DAY.const, np.NaN)
-            return h_for_day
+    try:
+        h_for_day = read_raw_min_data(filenames[0])[:, 0]
+        for i in range(Min.ONE_DAY.const):
+            if h_for_day[i] <= MIN_H or h_for_day[i] >= MAX_H:
+                h_for_day[i] = np.NaN
+        return h_for_day
+    except ValueError as e:  # ファイルのデータ形式によるエラーが発生する場合がある
+        h_for_day = np.full(Min.ONE_DAY.const, np.NaN)
+        return h_for_day
 
+
+class HComponent:
     @staticmethod
     def get_h_component(station_code, start_ut: datetime, end_ut: datetime):
         start_date, end_date = start_ut.date(), end_ut.date()
         if start_date == end_date:
             start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
             end_idx = end_ut.hour * Min.ONE_HOUR.const + end_ut.minute
-            day_h_data = HComponent.read_for_day(station_code, start_date)[
+            day_h_data = get_h_for_a_day(station_code, start_date)[
                 start_idx : end_idx + 1
             ]
             return day_h_data
         h_values = np.array([], dtype=np.float32)
         for i in range((end_date - start_date).days + 1):
             current_date = start_date + timedelta(days=i)
-            day_h_data = HComponent.read_for_day(station_code, current_date)
+            day_h_data = get_h_for_a_day(station_code, current_date)
             if current_date == start_date:
                 start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
                 h_values = np.concatenate((h_values, day_h_data[start_idx:]))
