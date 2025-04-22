@@ -55,18 +55,19 @@ class NightEr:
             lt_arr.append(lt)
         return np.array(lt_arr)
 
-    def is_daytime(self) -> np.ndarray:
-        condition = np.logical_and(
-            DawnAndDusk.DAYSIDE.start <= self.get_corresponding_lt(),
-            self.get_corresponding_lt() <= DawnAndDusk.DAYSIDE.end,
+    def is_nighttime_arr(self) -> np.ndarray:
+        lt_arr = self.get_corresponding_lt()
+        condition = np.logical_or(
+            DawnAndDusk.NIGHTSIDE.start <= lt_arr,
+            lt_arr <= DawnAndDusk.NIGHTSIDE.end,
         )
         return condition
 
     def extract_night_er(self) -> np.ndarray:
         er = Er(self.station, self.start_ut, self.end_ut).calc_er()
         night_er = np.where(
-            self.is_daytime(),
-            np.nan,
+            self.is_nighttime_arr(),
             er,
+            np.nan,
         )
         return night_er
