@@ -1,8 +1,8 @@
 from datetime import time, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.er_value import Er
+from src.service.ee_index.calc.edst import Edst
+from src.service.ee_index.calc.er import Er
 from src.service.ee_index.calc.h_component_extraction import HComponent
 from src.service.ee_index.helper.params import CalcParams, Period
 

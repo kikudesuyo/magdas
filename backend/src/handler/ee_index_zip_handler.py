@@ -8,9 +8,9 @@ from src.service.downloads.iaga_meta_data import get_meta_data
 from src.service.downloads.iaga_save_file import save_iaga_format
 from src.service.downloads.remove_files import remove_files
 from src.service.downloads.zip_create import create_zip_buffer
-from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.er_value import Er
-from src.service.ee_index.calc.euel_index import Euel
+from src.service.ee_index.calc.edst import Edst
+from src.service.ee_index.calc.er import Er
+from src.service.ee_index.calc.euel import Euel
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Min, Sec
 from src.utils.date import convert_datetime

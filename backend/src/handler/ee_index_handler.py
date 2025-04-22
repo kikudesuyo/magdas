@@ -4,9 +4,9 @@ import numpy as np
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.er_value import Er
-from src.service.ee_index.calc.euel_index import Euel
+from src.service.ee_index.calc.edst import Edst
+from src.service.ee_index.calc.er import Er
+from src.service.ee_index.calc.euel import Euel
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Day
 from src.utils.date import convert_datetime

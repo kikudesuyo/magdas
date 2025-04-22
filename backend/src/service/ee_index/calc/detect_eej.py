@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.euel_index import EuelLt
+from src.service.ee_index.calc.edst import Edst
+from src.service.ee_index.calc.euel import EuelLt
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime

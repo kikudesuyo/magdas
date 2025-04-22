@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from src.service.dst import get_dst_values
-from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.er_value import Er
-from src.service.ee_index.calc.euel_index import create_euel
+from src.service.ee_index.calc.edst import Edst
+from src.service.ee_index.calc.er import Er
+from src.service.ee_index.calc.euel import create_euel
 from src.service.ee_index.calc.h_component_extraction import HComponent
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
