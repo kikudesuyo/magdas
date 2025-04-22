@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from src.service.ee_index.calc.detect_eej import calc_euel_for_eej_detection
 from src.service.ee_index.calc.euel_index import EuelLt
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
+from src.service.ee_index.calc.params import CalcParams, Period
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
 from src.service.ee_index.plot.config import PlotConfig
@@ -16,13 +17,16 @@ class EejDetectionPlotter:
             raise ValueError("start_lt must be less than end_lt.")
         self.start_lt = start_lt
         self.end_lt = end_lt
+        self.period = Period(start_lt, end_lt)
+
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
-        euel_lt = EuelLt(station, self.start_lt, self.end_lt)
+        p = CalcParams(station, self.period)
+        euel_lt = EuelLt(p)
         moving_avg = calc_moving_avg(euel_lt.euel_values, 120, 60)
         x_axis = np.arange(0, len(moving_avg), 1)
         self.ax.plot(x_axis, moving_avg, label=station.name)
@@ -43,7 +47,8 @@ class EejDetectionPlotter:
         self.ax.plot(x_axis, euel, label=station.name, color=color)
 
     def plot_pure(self, station: EeIndexStation, color):
-        euel_lt = EuelLt(station, self.start_lt, self.end_lt)
+        p = CalcParams(station, self.period)
+        euel_lt = EuelLt(p)
         x_axis = np.arange(0, len(euel_lt.euel_values), 1)
         self.ax.plot(x_axis, euel_lt.euel_values, label=station.name, color=color)
 

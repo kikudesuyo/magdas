@@ -1,10 +1,13 @@
 from datetime import date, datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.edst_index import Edst
 from src.service.ee_index.calc.euel_index import EuelLt
+from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
+
+# from src.service.ee_index.calc.edst_index import Edst
+from src.service.ee_index.calc.params import CalcParams, Period
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.kp import Kp
@@ -29,7 +32,8 @@ def calc_eej_peak_diff(
 def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     s_lt = datetime(local_date.year, local_date.month, local_date.day, 0, 0)
     e_lt = s_lt.replace(hour=23, minute=59)
-    euel_lt = EuelLt(station, s_lt, e_lt)
+    p = CalcParams(station, Period(s_lt, e_lt))
+    euel_lt = EuelLt(p)
     if not euel_lt.has_night_data():
         return euel_lt.euel_values
     euel_for_baseline = np.concatenate(
@@ -55,11 +59,12 @@ class EejDetection:
             raise ValueError("station is not in dip region")
         if not offdip_station.is_offdip():
             raise ValueError("station is not in dip region")
-        edst_val = Edst.compute_smoothed_edst(
+        ee = EeFactory(
+            dip_station,
             datetime(target_date.year, target_date.month, target_date.day, 0, 0),
             datetime(target_date.year, target_date.month, target_date.day, 23, 59),
         )
-        self.min_edst = np.min(edst_val)
+        self.min_edst = np.min(ee.edst.calc_edst())
         self.kp = Kp().get_max(
             datetime(target_date.year, target_date.month, target_date.day, 0, 0),
             datetime(target_date.year, target_date.month, target_date.day, 23, 59),

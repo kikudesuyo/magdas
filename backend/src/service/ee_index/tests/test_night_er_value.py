@@ -33,7 +33,7 @@ class TestERValue(unittest.TestCase):
         i = 0
         while current_time <= end_lt:
             # 1分ごとに時間を進める
-            if not n.is_nighttime_arr()[i]:
+            if not n.nighttime_mask()[i]:
                 err_msg = (
                     f"Error: 昼間側に値が存在します。index: {i}, 値: {night_er[i]}"
                 )

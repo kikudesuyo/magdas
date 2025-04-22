@@ -1,8 +1,8 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from glob import glob
 
 import numpy as np
-from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.calc.params import CalcParams
 from src.service.ee_index.constant.raw_data import MAX_H, MIN_H
 from src.service.ee_index.constant.time_relation import Min
 from src.service.ee_index.helper.raw_data_reader import read_raw_min_data
@@ -37,34 +37,39 @@ def get_h_for_a_day(station_code: str, ut_date: date):
 
 
 class HComponent:
-    @staticmethod
-    def get_h_component(station_code, start_ut: datetime, end_ut: datetime):
-        start_date, end_date = start_ut.date(), end_ut.date()
+    def __init__(self, params: CalcParams):
+        self.station = params.station
+        self.start_ut = params.period.start
+        self.end_ut = params.period.end
+
+    def get_h_component(self):
+        start_date, end_date = self.start_ut.date(), self.end_ut.date()
         if start_date == end_date:
-            start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
-            end_idx = end_ut.hour * Min.ONE_HOUR.const + end_ut.minute
-            day_h_data = get_h_for_a_day(station_code, start_date)[
+            start_idx = self.start_ut.hour * Min.ONE_HOUR.const + self.start_ut.minute
+            end_idx = self.end_ut.hour * Min.ONE_HOUR.const + self.end_ut.minute
+            day_h_data = get_h_for_a_day(self.station.code, start_date)[
                 start_idx : end_idx + 1
             ]
             return day_h_data
         h_values = np.array([], dtype=np.float32)
         for i in range((end_date - start_date).days + 1):
             current_date = start_date + timedelta(days=i)
-            day_h_data = get_h_for_a_day(station_code, current_date)
+            day_h_data = get_h_for_a_day(self.station.code, current_date)
             if current_date == start_date:
-                start_idx = start_ut.hour * Min.ONE_HOUR.const + start_ut.minute
+                start_idx = (
+                    self.start_ut.hour * Min.ONE_HOUR.const + self.start_ut.minute
+                )
                 h_values = np.concatenate((h_values, day_h_data[start_idx:]))
             elif current_date == end_date:
-                end_idx = end_ut.hour * Min.ONE_HOUR.const + end_ut.minute
+                end_idx = self.end_ut.hour * Min.ONE_HOUR.const + self.end_ut.minute
                 h_values = np.concatenate((h_values, day_h_data[: end_idx + 1]))
             else:
                 h_values = np.concatenate((h_values, day_h_data))
         return h_values
 
-    @staticmethod
-    def to_equatorial_h(station: EeIndexStation, start_ut: datetime, end_ut: datetime):
+    def to_equatorial_h(self):
         """指定された観測点のh成分を、磁気赤道（gm_lat=0）での値に換算"""
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
-        h_value = HComponent.get_h_component(station.code, start_ut, end_ut)
-        equational_h_component = h_value / np.cos(np.deg2rad(station.gm_lat))
+        h_value = self.get_h_component()
+        equational_h_component = h_value / np.cos(np.deg2rad(self.station.gm_lat))
         return equational_h_component
