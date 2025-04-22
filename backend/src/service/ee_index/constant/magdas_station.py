@@ -42,6 +42,12 @@ class EeIndexStation(MagdasStation, Enum):
     TIR = "TIR", 5.13, -0.37, 149.11
     YAP = "YAP", 9.205333333333333, 1.49, 209.06
 
+    def is_dip(self) -> bool:
+        return abs(self.gm_lat) < 3
+
+    def is_offdip(self) -> bool:
+        return 3 <= abs(self.gm_lat) <= 15
+
     @classmethod
     def is_included(cls, station_code: str) -> bool:
         return station_code in [station.code for station in EeIndexStation]

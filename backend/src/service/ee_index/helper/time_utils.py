@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.constant.time_relation import Day, Sec
+from src.service.ee_index.constant.time_relation import Sec
 
 
 class DateUtils:

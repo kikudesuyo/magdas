@@ -3,8 +3,8 @@ from datetime import datetime, time, timedelta
 import numpy as np
 from matplotlib import pyplot as plt
 from src.service.ee_index.calc.detect_eej import calc_euel_for_eej_detection
-from src.service.ee_index.calc.euel_index import get_local_euel
-from src.service.ee_index.calc.moving_ave import calc_moving_ave
+from src.service.ee_index.calc.euel_index import EuelLt
+from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
 from src.service.ee_index.plot.config import PlotConfig
@@ -22,8 +22,8 @@ class EejDetectionPlotter:
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
-        local_euel = get_local_euel(station, self.start_lt, self.end_lt)
-        moving_avg = calc_moving_ave(local_euel, 120, 60)
+        euel_lt = EuelLt(station, self.start_lt, self.end_lt)
+        moving_avg = calc_moving_avg(euel_lt.euel_values, 120, 60)
         x_axis = np.arange(0, len(moving_avg), 1)
         self.ax.plot(x_axis, moving_avg, label=station.name)
 
@@ -43,9 +43,9 @@ class EejDetectionPlotter:
         self.ax.plot(x_axis, euel, label=station.name, color=color)
 
     def plot_pure(self, station: EeIndexStation, color):
-        local_euel = get_local_euel(station, self.start_lt, self.end_lt)
-        x_axis = np.arange(0, len(local_euel), 1)
-        self.ax.plot(x_axis, local_euel, label=station.name, color=color)
+        euel_lt = EuelLt(station, self.start_lt, self.end_lt)
+        x_axis = np.arange(0, len(euel_lt.euel_values), 1)
+        self.ax.plot(x_axis, euel_lt.euel_values, label=station.name, color=color)
 
     def _set_axis_labels(self):
         data_length = (
@@ -83,9 +83,11 @@ class EejDetectionPlotter:
 
 
 if __name__ == "__main__":
-    start_date = datetime(2014, 1, 1, 0, 0)
-    end_date = datetime(2014, 1, 31, 23, 59)
+    start_date = datetime(2018, 1, 10, 0, 0)
+    end_date = datetime(2018, 1, 20, 23, 59)
     detection = EejDetectionPlotter(start_date, end_date)
     detection.plot_local_euel(EeIndexStation.ANC)
     detection.plot_local_euel(EeIndexStation.EUS)
+    # detection.plot_euel_to_detect_eej(EeIndexStation.ANC, "red")
+    # detection.plot_euel_to_detect_eej(EeIndexStation.EUS, "purple")
     detection.show()
