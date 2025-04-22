@@ -87,8 +87,8 @@ class EejDetection:
 if __name__ == "__main__":
     anc = EeIndexStation.ANC
     eus = EeIndexStation.EUS
-    d = date(2018, 1, 14)
-    while d <= date(2018, 1, 25):
+    d = date(2018, 1, 1)
+    while d <= date(2018, 1, 31):
         eej = EejDetection(anc, eus, d)
         if eej.is_singular_eej():
             print(d)
