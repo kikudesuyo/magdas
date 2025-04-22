@@ -11,9 +11,11 @@ from src.service.downloads.zip_create import create_zip_buffer
 from src.service.ee_index.calc.edst import Edst
 from src.service.ee_index.calc.er import Er
 from src.service.ee_index.calc.euel import Euel
+from src.service.ee_index.calc.h_component_extraction import HComponent
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Min, Sec
-from src.utils.date import convert_datetime
+from src.service.ee_index.helper.params import CalcParams, Period
+from src.utils.date import to_datetime
 from src.utils.path import generate_abs_path
 
 
@@ -42,23 +44,31 @@ def handle_get_ee_index_zip_file(
         request.station_code,
     )
     station = EeIndexStation[station]
-    start_date, end_date = convert_datetime(start_date), convert_datetime(end_date)
-    start_ut = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_ut = end_date.replace(hour=23, minute=59, second=59, microsecond=0)
-    er = Er(station, start_ut, end_ut).calc_er()
-    edst = Edst.compute_smoothed_edst(start_ut, end_ut)
-    euel = Euel.calc_euel(station, start_ut, end_ut)
+    start_dt, end_dt = to_datetime(start_date), to_datetime(end_date)
+    start_ut = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_ut = end_dt.replace(hour=23, minute=59, second=59, microsecond=0)
+
+    period = Period(start_ut, end_ut)
+    params = CalcParams(station, period)
+    h = HComponent(params)
+    er = Er(h)
+    edst = Edst(period)
+    euel = Euel(er, edst)
+    er_values = er.calc_er()
+    edst_values = edst.compute_smoothed_edst()
+    euel_values = euel.calc_euel()
+
     # 修正するべき項目(IAGAコード、標高は未定)
     meta_data = get_meta_data(
         station,
         "",
         8888.88,
     )
-    days = (end_date - start_date).days + 1
-    start_day_of_year = start_date.timetuple().tm_yday
+    days = (end_dt - start_dt).days + 1
+    start_day_of_year = start_dt.timetuple().tm_yday
     data = {
         "DATE": [
-            (start_date + timedelta(days=j)).strftime("%Y-%m-%d")
+            (start_dt + timedelta(days=j)).strftime("%Y-%m-%d")
             for j in range(days)
             for _ in range(Min.ONE_DAY.const)
         ],
@@ -69,11 +79,11 @@ def handle_get_ee_index_zip_file(
         "DOY": [
             start_day_of_year + i for i in range(days) for _ in range(Min.ONE_DAY.const)
         ],
-        "EDst1h": edst,
+        "EDst1h": edst_values,
         # 未作成
         "EDst6h": [0.0] * Min.ONE_DAY.const * days,
-        "ER": er,
-        "EUEL": euel,
+        "ER": er_values,
+        "EUEL": euel_values,
     }
     save_iaga_format(meta_data, data, generate_abs_path("/tmp/iaga_format.txt"))
     zip_buffer = create_zip_buffer()

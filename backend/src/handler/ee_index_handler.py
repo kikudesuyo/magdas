@@ -7,9 +7,11 @@ from pydantic import BaseModel
 from src.service.ee_index.calc.edst import Edst
 from src.service.ee_index.calc.er import Er
 from src.service.ee_index.calc.euel import Euel
+from src.service.ee_index.calc.h_component_extraction import HComponent
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Day
-from src.utils.date import convert_datetime
+from src.service.ee_index.helper.params import CalcParams, Period
+from src.utils.date import to_datetime
 
 
 class DailyEeIndexReq(BaseModel):
@@ -37,14 +39,21 @@ def handle_get_daily_ee_index(
     )
     print(f"date: {date}, station_code: {station_code}, data_kind: {data_kind}")
     station = EeIndexStation[station_code]
-    start_ut = convert_datetime(date)
+    start_ut = to_datetime(date)
     end_ut = start_ut + timedelta(days=Day.ONE.const, minutes=-1)
-    er = Er(station, start_ut, end_ut).calc_er()
-    edst = Edst.compute_smoothed_edst(start_ut, end_ut)
-    euel = Euel.calc_euel(station, start_ut, end_ut)
-    er_with_none = [float(x) if not np.isnan(x) else None for x in er]
-    edst_with_none = [float(x) if not np.isnan(x) else None for x in edst]
-    euel_with_none = [float(x) if not np.isnan(x) else None for x in euel]
+
+    period = Period(start_ut, end_ut)
+    params = CalcParams(station=station, period=period)
+    h = HComponent(params)
+    er = Er(h)
+    edst = Edst(period)
+    euel = Euel(er, edst)
+    er_values = er.calc_er()
+    edst_values = edst.compute_smoothed_edst()
+    euel_values = euel.calc_euel()
+    er_with_none = [float(x) if not np.isnan(x) else None for x in er_values]
+    edst_with_none = [float(x) if not np.isnan(x) else None for x in edst_values]
+    euel_with_none = [float(x) if not np.isnan(x) else None for x in euel_values]
     return JSONResponse(
         content={
             "values": {
