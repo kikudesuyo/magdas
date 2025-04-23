@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 
 import numpy as np
 from src.service.ee_index.calc.edst import Edst
-from src.service.ee_index.calc.euel import EuelLt
+from src.service.ee_index.calc.euel import create_euel, has_night_data
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
@@ -30,19 +30,21 @@ def calc_eej_peak_diff(
 def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     s_lt = datetime(local_date.year, local_date.month, local_date.day, 0, 0)
     e_lt = s_lt.replace(hour=23, minute=59)
-    p = CalcParams(station, Period(s_lt, e_lt))
-    euel_lt = EuelLt(p)
-    if not euel_lt.has_night_data():
-        return euel_lt.euel_values
+    lt_params = CalcParams(station, Period(s_lt, e_lt))
+    ut_params = lt_params.to_ut_params()
+    euel = create_euel(ut_params)
+    euel_values = euel.calc_euel()
+    if not has_night_data(euel_values):
+        return euel_values
     euel_for_baseline = np.concatenate(
         (
-            euel_lt.euel_values[0 : 5 * 60],
+            euel_values[0 : 5 * 60],
             np.nan * np.ones(14 * 60),
-            euel_lt.euel_values[19 * 60 : 24 * 60],
+            euel_values[19 * 60 : 24 * 60],
         )
     )
     y_filled = interpolate_nan(euel_for_baseline)
-    euel_for_eej_detection = euel_lt.euel_values - y_filled
+    euel_for_eej_detection = euel_values - y_filled
     return calc_moving_avg(euel_for_eej_detection, 60, 30)
 
 

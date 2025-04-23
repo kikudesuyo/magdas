@@ -5,7 +5,6 @@ from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Min
 from src.service.ee_index.helper.nan_calculator import NanCalculator
 from src.service.ee_index.helper.params import CalcParams, Period
-from src.service.ee_index.helper.time_utils import DateUtils
 
 
 class Edst:
@@ -16,7 +15,7 @@ class Edst:
         self.period = period
 
     def calc_edst(self) -> np.ndarray:
-        days, hours, minutes = DateUtils.time_diff(self.period)
+        days, hours, minutes = self.period.time_diff()
         length = days * Min.ONE_DAY.const + hours * Min.ONE_HOUR.const + minutes + 1
         night_er_list = np.empty((0, length), dtype=float)
         for station in EeIndexStation:

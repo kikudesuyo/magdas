@@ -3,7 +3,7 @@ from datetime import datetime, time, timedelta
 import numpy as np
 from matplotlib import pyplot as plt
 from src.service.ee_index.calc.detect_eej import calc_euel_for_eej_detection
-from src.service.ee_index.calc.euel import EuelLt
+from src.service.ee_index.calc.euel import create_euel
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
@@ -17,7 +17,7 @@ class EejDetectionPlotter:
             raise ValueError("start_lt must be less than end_lt.")
         self.start_lt = start_lt
         self.end_lt = end_lt
-        self.period = Period(start_lt, end_lt)
+        self.lt_period = Period(start_lt, end_lt)
 
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
@@ -25,9 +25,11 @@ class EejDetectionPlotter:
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
-        p = CalcParams(station, self.period)
-        euel_lt = EuelLt(p)
-        moving_avg = calc_moving_avg(euel_lt.euel_values, 120, 60)
+        params = CalcParams(station, self.lt_period)
+        ut_params = params.to_ut_params()
+        euel = create_euel(ut_params)
+        euel_values = euel.calc_euel()
+        moving_avg = calc_moving_avg(euel_values, 120, 60)
         x_axis = np.arange(0, len(moving_avg), 1)
         self.ax.plot(x_axis, moving_avg, label=station.name)
 
@@ -47,10 +49,12 @@ class EejDetectionPlotter:
         self.ax.plot(x_axis, euel, label=station.name, color=color)
 
     def plot_pure(self, station: EeIndexStation, color):
-        p = CalcParams(station, self.period)
-        euel_lt = EuelLt(p)
-        x_axis = np.arange(0, len(euel_lt.euel_values), 1)
-        self.ax.plot(x_axis, euel_lt.euel_values, label=station.name, color=color)
+        lt_params = CalcParams(station, self.lt_period)
+        ut_params = lt_params.to_ut_params()
+        euel = create_euel(ut_params)
+        euel_values = euel.calc_euel()
+        x_axis = np.arange(0, len(euel_values), 1)
+        self.ax.plot(x_axis, euel_values, label=station.name, color=color)
 
     def _set_axis_labels(self):
         data_length = (
