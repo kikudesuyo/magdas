@@ -1,12 +1,12 @@
 from datetime import date, datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.euel_index import EuelLt
+from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
 from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.helper.params import CalcParams, Period
 from src.service.kp import Kp
 
 
@@ -29,19 +29,34 @@ def calc_eej_peak_diff(
 def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     s_lt = datetime(local_date.year, local_date.month, local_date.day, 0, 0)
     e_lt = s_lt.replace(hour=23, minute=59)
-    euel_lt = EuelLt(station, s_lt, e_lt)
-    if not euel_lt.has_night_data():
-        return euel_lt.euel_values
+    lt_params = CalcParams(station, Period(s_lt, e_lt))
+    ut_params = lt_params.to_ut_params()
+
+    factory = EeFactory()
+    euel = factory.create_euel(ut_params)
+    euel_values = euel.calc_euel()
+
+    if not has_night_data(euel_values):
+        return euel_values
     euel_for_baseline = np.concatenate(
         (
-            euel_lt.euel_values[0 : 5 * 60],
+            euel_values[0 : 5 * 60],
             np.nan * np.ones(14 * 60),
-            euel_lt.euel_values[19 * 60 : 24 * 60],
+            euel_values[19 * 60 : 24 * 60],
         )
     )
     y_filled = interpolate_nan(euel_for_baseline)
-    euel_for_eej_detection = euel_lt.euel_values - y_filled
+    euel_for_eej_detection = euel_values - y_filled
     return calc_moving_avg(euel_for_eej_detection, 60, 30)
+
+
+def has_night_data(local_daily_data: np.ndarray) -> bool:
+    """一日の夜間データが存在するかどうかを判定する"""
+    if len(local_daily_data) != 1440:
+        raise ValueError("daily_data must have 1440 elements.")
+    dawn_e = local_daily_data[0 : 5 * 60]
+    dusk_e = local_daily_data[19 * 60 : 24 * 60]
+    return not (np.all(np.isnan(dawn_e)) and np.all(np.isnan(dusk_e)))
 
 
 class EejDetection:
@@ -55,11 +70,14 @@ class EejDetection:
             raise ValueError("station is not in dip region")
         if not offdip_station.is_offdip():
             raise ValueError("station is not in dip region")
-        edst_val = Edst.compute_smoothed_edst(
+
+        factory = EeFactory()
+        period = Period(
             datetime(target_date.year, target_date.month, target_date.day, 0, 0),
             datetime(target_date.year, target_date.month, target_date.day, 23, 59),
         )
-        self.min_edst = np.min(edst_val)
+        edst = factory.create_edst(period)
+        self.min_edst = np.min(edst.calc_edst())
         self.kp = Kp().get_max(
             datetime(target_date.year, target_date.month, target_date.day, 0, 0),
             datetime(target_date.year, target_date.month, target_date.day, 23, 59),
@@ -85,6 +103,10 @@ class EejDetection:
 
 
 if __name__ == "__main__":
+    import time
+
+    log_s = time.time()
+
     anc = EeIndexStation.ANC
     eus = EeIndexStation.EUS
     d = date(2018, 1, 1)
@@ -94,3 +116,5 @@ if __name__ == "__main__":
             print(d)
             print(eej.eej_peak_diff)
         d += timedelta(days=1)
+    log_e = time.time()
+    print("log time: ", log_e - log_s)

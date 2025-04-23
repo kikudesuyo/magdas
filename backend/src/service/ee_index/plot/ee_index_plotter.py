@@ -3,12 +3,11 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from src.service.dst import get_dst_values
-from src.service.ee_index.calc.edst_index import Edst
-from src.service.ee_index.calc.er_value import Er
-from src.service.ee_index.calc.euel_index import Euel
+from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
+from src.service.ee_index.helper.params import CalcParams, Period
 from src.service.ee_index.plot.config import PlotConfig
 
 
@@ -16,6 +15,7 @@ class EeIndexPlotter:
     def __init__(self, start_ut: datetime, end_ut: datetime):
         self.start_ut = start_ut
         self.end_ut = end_ut
+        self.period = Period(start_ut, end_ut)
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
@@ -31,19 +31,26 @@ class EeIndexPlotter:
             color="black",
         )
 
-    def plot_er(self, station, color):
-        er = Er(station, self.start_ut, self.end_ut).calc_er()
-        x_axis, y_axis = np.arange(0, len(er), 1), er
+    def plot_er(self, station: EeIndexStation, color):
+        factory = EeFactory()
+        er = factory.create_er(CalcParams(station, self.period))
+        er_values = er.calc_er()
+        x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label="ER", color=color)
 
     def plot_edst(self):
-        edst = Edst.compute_smoothed_edst(self.start_ut, self.end_ut)
-        x_axis, y_axis = np.arange(0, len(edst), 1), edst
+        factory = EeFactory()
+        edst = factory.create_edst(self.period)
+        edst_values = edst.compute_smoothed_edst()
+        x_axis, y_axis = np.arange(0, len(edst_values), 1), edst_values
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
-    def plot_euel(self, station, color):
-        euel = Euel.calc_euel(station, self.start_ut, self.end_ut)
-        smoothed_euel = calc_moving_avg(euel, 120, 60)
+    def plot_euel(self, station: EeIndexStation, color):
+        p = CalcParams(station, self.period)
+        factoy = EeFactory()
+        euel = factoy.create_euel(p)
+        euel_values = euel.calc_euel()
+        smoothed_euel = calc_moving_avg(euel_values, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
 
@@ -53,13 +60,18 @@ class EeIndexPlotter:
     #     x_axis = np.arange(0, len(dst_interpolated), 1)
     #     self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
-    def plot_ee(self, station):
-        er = Er(station, self.start_ut, self.end_ut).calc_er()
-        edst = Edst.compute_smoothed_edst(self.start_ut, self.end_ut)
-        euel = Euel.calc_euel(station, self.start_ut, self.end_ut)
-        if len(er) != len(edst) or len(er) != len(euel):
+    def plot_ee(self, station: EeIndexStation):
+        params = CalcParams(station, self.period)
+        factory = EeFactory()
+        er = factory.create_er(params)
+        edst = factory.create_edst(self.period)
+        euel = factory.create_euel(params)
+        er_values = er.calc_er()
+        edst_values = edst.compute_smoothed_edst()
+        euel_values = euel.calc_euel()
+        if len(er_values) != len(edst_values) or len(er_values) != len(euel_values):
             raise ValueError("The length of the arrays must be the same")
-        x_axis = np.arange(0, len(er), 1)
+        x_axis = np.arange(0, len(er_values), 1)
         self.ax.plot(x_axis, er, label="ER", color="black", lw=0.5)
         self.ax.plot(x_axis, edst, label="EDst", color="green", lw=0.5)
         self.ax.plot(x_axis, euel, label="EUEL", color="red", lw=0.5)

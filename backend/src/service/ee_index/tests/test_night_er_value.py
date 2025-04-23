@@ -3,8 +3,10 @@ import warnings
 from datetime import datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.er_value import Er, NightEr
+from src.service.ee_index.calc.er import Er
+from src.service.ee_index.calc.h_component import HComponent
 from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.service.ee_index.helper.params import CalcParams, Period
 from src.service.ee_index.helper.time_utils import DateUtils
 
 
@@ -26,14 +28,17 @@ class TestERValue(unittest.TestCase):
         """This function is a test code that checks whether the daytime values are set to np.NaN."""
         start_lt = DateUtils.to_lt(self.station, self.start_ut)
         end_lt = DateUtils.to_lt(self.station, self.end_ut)
-        n = NightEr(self.station, start_lt, end_lt)
-        night_er = n.extract_night_er()
+        period = Period(start_lt, end_lt)
+        p = CalcParams(self.station, period)
+        h = HComponent(p)
+        er = Er(h)
+        night_er = er.extract_night_er()
 
         current_time = start_lt
         i = 0
         while current_time <= end_lt:
             # 1分ごとに時間を進める
-            if n.is_daytime()[i]:
+            if not er.nighttime_mask()[i]:
                 err_msg = (
                     f"Error: 昼間側に値が存在します。index: {i}, 値: {night_er[i]}"
                 )
