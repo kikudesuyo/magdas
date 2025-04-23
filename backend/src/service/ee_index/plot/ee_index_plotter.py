@@ -3,10 +3,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from src.service.dst import get_dst_values
-from src.service.ee_index.calc.edst import Edst
-from src.service.ee_index.calc.er import Er
-from src.service.ee_index.calc.euel import create_euel
-from src.service.ee_index.calc.h_component import HComponent
+from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
@@ -34,21 +31,24 @@ class EeIndexPlotter:
             color="black",
         )
 
-    def plot_er(self, station, color):
-        params = CalcParams(station, self.period)
-        h = HComponent(params)
-        er_values = Er(h).calc_er()
+    def plot_er(self, station: EeIndexStation, color):
+        factory = EeFactory()
+        er = factory.create_er(CalcParams(station, self.period))
+        er_values = er.calc_er()
         x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label="ER", color=color)
 
     def plot_edst(self):
-        edst = Edst(self.period).compute_smoothed_edst()
-        x_axis, y_axis = np.arange(0, len(edst), 1), edst
+        factory = EeFactory()
+        edst = factory.create_edst(self.period)
+        edst_values = edst.compute_smoothed_edst()
+        x_axis, y_axis = np.arange(0, len(edst_values), 1), edst_values
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
-    def plot_euel(self, station, color):
+    def plot_euel(self, station: EeIndexStation, color):
         p = CalcParams(station, self.period)
-        euel = create_euel(p)
+        factoy = EeFactory()
+        euel = factoy.create_euel(p)
         euel_values = euel.calc_euel()
         smoothed_euel = calc_moving_avg(euel_values, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
@@ -60,13 +60,12 @@ class EeIndexPlotter:
     #     x_axis = np.arange(0, len(dst_interpolated), 1)
     #     self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
-    def plot_ee(self, station):
-        # TODO: 各インデックスの宣言においてパフォーマンス改善の余地あり
+    def plot_ee(self, station: EeIndexStation):
         params = CalcParams(station, self.period)
-        h = HComponent(params)
-        er = Er(h)
-        edst = Edst(self.period)
-        euel = create_euel(params)
+        factory = EeFactory()
+        er = factory.create_er(params)
+        edst = factory.create_edst(self.period)
+        euel = factory.create_euel(params)
         er_values = er.calc_er()
         edst_values = edst.compute_smoothed_edst()
         euel_values = euel.calc_euel()

@@ -1,8 +1,7 @@
 from datetime import date, datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.edst import Edst
-from src.service.ee_index.calc.euel import create_euel, has_night_data
+from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.linear_completion import interpolate_nan
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
@@ -32,8 +31,11 @@ def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     e_lt = s_lt.replace(hour=23, minute=59)
     lt_params = CalcParams(station, Period(s_lt, e_lt))
     ut_params = lt_params.to_ut_params()
-    euel = create_euel(ut_params)
+
+    factory = EeFactory()
+    euel = factory.create_euel(ut_params)
     euel_values = euel.calc_euel()
+
     if not has_night_data(euel_values):
         return euel_values
     euel_for_baseline = np.concatenate(
@@ -48,6 +50,15 @@ def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     return calc_moving_avg(euel_for_eej_detection, 60, 30)
 
 
+def has_night_data(local_daily_data: np.ndarray) -> bool:
+    """一日の夜間データが存在するかどうかを判定する"""
+    if len(local_daily_data) != 1440:
+        raise ValueError("daily_data must have 1440 elements.")
+    dawn_e = local_daily_data[0 : 5 * 60]
+    dusk_e = local_daily_data[19 * 60 : 24 * 60]
+    return not (np.all(np.isnan(dawn_e)) and np.all(np.isnan(dusk_e)))
+
+
 class EejDetection:
     def __init__(
         self,
@@ -60,12 +71,12 @@ class EejDetection:
         if not offdip_station.is_offdip():
             raise ValueError("station is not in dip region")
 
-        edst = Edst(
-            Period(
-                datetime(target_date.year, target_date.month, target_date.day, 0, 0),
-                datetime(target_date.year, target_date.month, target_date.day, 23, 59),
-            )
+        factory = EeFactory()
+        period = Period(
+            datetime(target_date.year, target_date.month, target_date.day, 0, 0),
+            datetime(target_date.year, target_date.month, target_date.day, 23, 59),
         )
+        edst = factory.create_edst(period)
         self.min_edst = np.min(edst.calc_edst())
         self.kp = Kp().get_max(
             datetime(target_date.year, target_date.month, target_date.day, 0, 0),

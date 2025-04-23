@@ -3,7 +3,7 @@ from datetime import datetime, time, timedelta
 import numpy as np
 from matplotlib import pyplot as plt
 from src.service.ee_index.calc.detect_eej import calc_euel_for_eej_detection
-from src.service.ee_index.calc.euel import create_euel
+from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
@@ -27,7 +27,8 @@ class EejDetectionPlotter:
     def plot_local_euel(self, station: EeIndexStation):
         params = CalcParams(station, self.lt_period)
         ut_params = params.to_ut_params()
-        euel = create_euel(ut_params)
+        factory = EeFactory()
+        euel = factory.create_euel(ut_params)
         euel_values = euel.calc_euel()
         moving_avg = calc_moving_avg(euel_values, 120, 60)
         x_axis = np.arange(0, len(moving_avg), 1)
@@ -51,7 +52,8 @@ class EejDetectionPlotter:
     def plot_pure(self, station: EeIndexStation, color):
         lt_params = CalcParams(station, self.lt_period)
         ut_params = lt_params.to_ut_params()
-        euel = create_euel(ut_params)
+        factory = EeFactory()
+        euel = factory.create_euel(ut_params)
         euel_values = euel.calc_euel()
         x_axis = np.arange(0, len(euel_values), 1)
         self.ax.plot(x_axis, euel_values, label=station.name, color=color)
