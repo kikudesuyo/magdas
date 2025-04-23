@@ -24,9 +24,9 @@ class DateUtils:
         """Convert to UT time
         Args:
           station (str):
-          local_time (datetime.datetime):
+          lt(datetime.datetime): local time
         Return:
-          ut_time (datetime.datetime): UT time
+          ut (datetime.datetime): universal time
         """
         time_diff = timedelta(hours=station.time_diff)
         return lt - time_diff
