@@ -20,7 +20,7 @@ class DateUtils:
         return ut + time_diff
 
     @staticmethod
-    def to_ut(station, local_time: datetime) -> datetime:
+    def to_ut(station: EeIndexStation, lt: datetime) -> datetime:
         """Convert to UT time
         Args:
           station (str):
@@ -28,8 +28,8 @@ class DateUtils:
         Return:
           ut_time (datetime.datetime): UT time
         """
-        time_diff = timedelta(hours=EeIndexStation[station].time_diff)
-        return local_time - time_diff
+        time_diff = timedelta(hours=station.time_diff)
+        return lt - time_diff
 
     @staticmethod
     def time_diff(period: Period) -> tuple:

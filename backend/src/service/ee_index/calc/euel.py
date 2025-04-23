@@ -5,6 +5,7 @@ from src.service.ee_index.calc.edst import Edst
 from src.service.ee_index.calc.er import Er
 from src.service.ee_index.calc.h_component import HComponent
 from src.service.ee_index.helper.params import CalcParams, Period
+from src.service.ee_index.helper.time_utils import DateUtils
 
 
 class Euel:
@@ -34,9 +35,12 @@ class EuelLt:
         self.euel_values = self.euel.calc_euel()
 
     def __set_ut_params(self) -> CalcParams:
-        utc_offset = timedelta(hours=self.p.station.time_diff)
-        start_ut = (self.start_lt - utc_offset).replace(second=0, microsecond=0)
-        end_ut = (self.end_lt - utc_offset).replace(second=0, microsecond=0)
+        start_ut = DateUtils.to_ut(self.p.station, self.start_lt).replace(
+            second=0, microsecond=0
+        )
+        end_ut = DateUtils.to_ut(self.p.station, self.end_lt).replace(
+            second=0, microsecond=0
+        )
         return CalcParams(self.p.station, Period(start_ut, end_ut))
 
     def has_night_data(self) -> bool:
