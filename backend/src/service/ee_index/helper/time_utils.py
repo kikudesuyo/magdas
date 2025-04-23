@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
 
 from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.constant.time_relation import Sec
-from src.service.ee_index.helper.params import Period
 
 
 class DateUtils:
@@ -30,19 +28,3 @@ class DateUtils:
         """
         time_diff = timedelta(hours=station.time_diff)
         return lt - time_diff
-
-    @staticmethod
-    def time_diff(period: Period) -> tuple:
-        """Calculate the time difference
-
-        Args:
-          start_time (datetime.datetime):
-          end_time (datetime.datetime):
-        Return:
-          (days, hours, minutes) (tuple(int)): time difference
-        """
-        time_diff = period.end - period.start
-        days = time_diff.days
-        hours = time_diff.seconds // Sec.ONE_HOUR.const
-        minutes = time_diff.seconds % Sec.ONE_HOUR.const // Sec.ONE_MINUTE.const
-        return days, hours, minutes
