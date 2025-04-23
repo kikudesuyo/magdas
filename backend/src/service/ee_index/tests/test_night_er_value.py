@@ -3,7 +3,8 @@ import warnings
 from datetime import datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.er import NightEr
+from src.service.ee_index.calc.er import Er, NightEr
+from src.service.ee_index.calc.h_component import HComponent
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.helper.params import CalcParams, Period
 from src.service.ee_index.helper.time_utils import DateUtils
@@ -29,7 +30,9 @@ class TestERValue(unittest.TestCase):
         end_lt = DateUtils.to_lt(self.station, self.end_ut)
         period = Period(start_lt, end_lt)
         p = CalcParams(self.station, period)
-        n = NightEr(p)
+        h = HComponent(p)
+        er = Er(h)
+        n = NightEr(er)
         night_er = n.extract_night_er()
 
         current_time = start_lt
