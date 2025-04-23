@@ -1,5 +1,5 @@
 import numpy as np
-from src.service.ee_index.calc.er import Er, NightEr
+from src.service.ee_index.calc.er import Er
 from src.service.ee_index.calc.h_component import HComponent
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Min
@@ -23,8 +23,7 @@ class Edst:
             params = CalcParams(station, self.period)
             h = HComponent(params)
             er = Er(h)
-            night_er = NightEr(er)
-            night_er_val = night_er.extract_night_er()
+            night_er_val = er.extract_night_er()
             night_er_list = np.vstack((night_er_list, night_er_val))
         edst = NanCalculator.nanmean(night_er_list)
         return edst
