@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-from src.service.dst import get_dst_values
 from src.service.ee_index.calc.factory import EeFactory
 from src.service.ee_index.calc.moving_ave import calc_moving_avg
 from src.service.ee_index.constant.magdas_station import EeIndexStation
@@ -53,12 +52,6 @@ class EeIndexPlotter:
         smoothed_euel = calc_moving_avg(euel_values, 120, 60)
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
-
-    # def plot_dst(self, color):
-    #     dst = get_dst_values(self.start_date, self.end_date)
-    #     dst_interpolated = np.repeat(dst, 60)
-    #     x_axis = np.arange(0, len(dst_interpolated), 1)
-    #     self.ax.plot(x_axis, dst_interpolated, label="Dst", color=color, lw=1.3)
 
     def plot_ee(self, station: EeIndexStation):
         params = CalcParams(station, self.period)
