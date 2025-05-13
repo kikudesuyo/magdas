@@ -1,9 +1,9 @@
 import numpy as np
 from src.service.ee_index.calc.er import Er
 from src.service.ee_index.calc.h_component import HComponent
+from src.service.ee_index.calc.nan_calculator import NanCalculator
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Min
-from src.service.ee_index.helper.nan_calculator import NanCalculator
 from src.service.ee_index.helper.params import CalcParams, Period
 
 
