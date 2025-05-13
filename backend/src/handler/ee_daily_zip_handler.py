@@ -84,5 +84,5 @@ def handle_get_daily_ee_index_zip_file(
     save_iaga_format(meta_data, data, generate_parent_abs_path("/tmp/iaga_format.txt"))
     zip_buffer = create_zip_buffer()
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
-    # remove_files()
+    remove_files()
     return JSONResponse(content={"file": zip_base64})
