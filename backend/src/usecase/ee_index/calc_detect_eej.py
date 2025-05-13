@@ -1,13 +1,22 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.factory import EeFactory
-from src.service.ee_index.calc.linear_completion import interpolate_nan
-from src.service.ee_index.calc.moving_ave import calc_moving_avg
-from src.service.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
-from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.helper.params import CalcParams, Period
-from src.service.kp import Kp
+from src.constants.ee_index import EEJ_THRESHOLD
+from src.domain.magdas_station import EeIndexStation
+from src.domain.station_params import Period, StationParams
+from src.usecase.ee_index.calc_linear_completion import interpolate_nan
+from src.usecase.ee_index.calc_moving_ave import calc_moving_avg
+from src.usecase.ee_index.factory_ee import EeFactory
+from src.usecase.kp import Kp
+
+
+class EejDetectionTime:
+    START = time(10, 0)
+    END = time(13, 59)
+
+    @classmethod
+    def contains(cls, t: time) -> bool:
+        return cls.START <= t <= cls.END
 
 
 def calc_eej_peak_diff(
@@ -29,7 +38,7 @@ def calc_eej_peak_diff(
 def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     s_lt = datetime(local_date.year, local_date.month, local_date.day, 0, 0)
     e_lt = s_lt.replace(hour=23, minute=59)
-    lt_params = CalcParams(station, Period(s_lt, e_lt))
+    lt_params = StationParams(station, Period(s_lt, e_lt))
     ut_params = lt_params.to_ut_params()
 
     factory = EeFactory()

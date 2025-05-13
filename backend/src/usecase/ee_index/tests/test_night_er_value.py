@@ -3,11 +3,11 @@ import warnings
 from datetime import datetime, timedelta
 
 import numpy as np
-from src.service.ee_index.calc.er import Er
-from src.service.ee_index.calc.h_component import HComponent
-from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.helper.params import CalcParams, Period
-from src.service.ee_index.helper.time_utils import DateUtils
+from src.domain.magdas_station import EeIndexStation
+from src.domain.station_params import Period, StationParams
+from src.usecase.ee_index.calc_er import Er
+from src.usecase.ee_index.calc_h_component import HComponent
+from src.utils.date import DateUtils
 
 
 class TestERValue(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestERValue(unittest.TestCase):
         start_lt = DateUtils.to_lt(self.station, self.start_ut)
         end_lt = DateUtils.to_lt(self.station, self.end_ut)
         period = Period(start_lt, end_lt)
-        p = CalcParams(self.station, period)
+        p = StationParams(self.station, period)
         h = HComponent(p)
         er = Er(h)
         night_er = er.extract_night_er()

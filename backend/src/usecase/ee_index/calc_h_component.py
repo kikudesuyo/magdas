@@ -2,10 +2,10 @@ from datetime import date, timedelta
 from glob import glob
 
 import numpy as np
-from src.service.ee_index.constant.raw_data import MAX_H, MIN_H
-from src.service.ee_index.constant.time_relation import Min
-from src.service.ee_index.helper.params import CalcParams
-from src.service.ee_index.helper.raw_data_reader import read_raw_min_data
+from src.constants.ee_index import MAX_RAW_H, MIN_RAW_H
+from src.constants.time_relation import Min
+from src.domain.station_params import StationParams
+from src.usecase.raw_data_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 
 
@@ -28,7 +28,7 @@ def get_h_for_a_day(station_code: str, ut_date: date):
     try:
         h_for_day = read_raw_min_data(filenames[0])[:, 0]
         for i in range(Min.ONE_DAY.const):
-            if h_for_day[i] <= MIN_H or h_for_day[i] >= MAX_H:
+            if h_for_day[i] <= MIN_RAW_H or h_for_day[i] >= MAX_RAW_H:
                 h_for_day[i] = np.NaN
         return h_for_day
     except ValueError as e:  # ファイルのデータ形式によるエラーが発生する場合がある
@@ -37,7 +37,7 @@ def get_h_for_a_day(station_code: str, ut_date: date):
 
 
 class HComponent:
-    def __init__(self, params: CalcParams):
+    def __init__(self, params: StationParams):
         self.station = params.station
         self.start_ut = params.period.start
         self.end_ut = params.period.end

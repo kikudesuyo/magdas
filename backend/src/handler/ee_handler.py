@@ -4,13 +4,13 @@ import numpy as np
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from src.service.ee_index.calc.edst import Edst
-from src.service.ee_index.calc.er import Er
-from src.service.ee_index.calc.euel import Euel
-from src.service.ee_index.calc.h_component import HComponent
-from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.constant.time_relation import Day
-from src.service.ee_index.helper.params import CalcParams, Period
+from src.constants.time_relation import Day
+from src.domain.magdas_station import EeIndexStation
+from src.domain.station_params import Period, StationParams
+from src.usecase.ee_index.calc_edst import Edst
+from src.usecase.ee_index.calc_er import Er
+from src.usecase.ee_index.calc_euel import Euel
+from src.usecase.ee_index.calc_h_component import HComponent
 from src.utils.date import to_datetime
 
 
@@ -43,7 +43,7 @@ def handle_get_daily_ee_index(
     end_ut = start_ut + timedelta(days=Day.ONE.const, minutes=-1)
 
     period = Period(start_ut, end_ut)
-    params = CalcParams(station=station, period=period)
+    params = StationParams(station=station, period=period)
     h = HComponent(params)
     er = Er(h)
     edst = Edst(period)

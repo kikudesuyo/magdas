@@ -1,10 +1,6 @@
 import numpy as np
-from src.service.ee_index.constant.raw_data import (
-    EIGHT_COMPONENTS,
-    FOUR_COMPONENTS,
-    SEVEN_COMPONENTS,
-)
-from src.service.ee_index.constant.time_relation import Min, Sec
+from src.constants.raw_data import EIGHT_COMPONENTS, FOUR_COMPONENTS, SEVEN_COMPONENTS
+from src.constants.time_relation import Min, Sec
 
 
 def read_raw_min_data(path):

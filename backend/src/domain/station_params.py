@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.constant.time_relation import Sec
-from src.service.ee_index.helper.time_utils import DateUtils
+from src.constants.time_relation import Sec
+from src.domain.magdas_station import EeIndexStation
+from src.utils.date import DateUtils
 
 
 @dataclass
@@ -32,7 +32,7 @@ class Period:
 
 
 @dataclass
-class CalcParams:
+class StationParams:
     station: EeIndexStation
     period: Period
 
@@ -44,4 +44,4 @@ class CalcParams:
         end_ut = DateUtils.to_ut(self.station, self.period.end).replace(
             second=0, microsecond=0
         )
-        return CalcParams(self.station, Period(start_ut, end_ut))
+        return StationParams(self.station, Period(start_ut, end_ut))

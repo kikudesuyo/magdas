@@ -2,13 +2,13 @@ from datetime import datetime, time, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from src.service.ee_index.calc.detect_eej import calc_euel_for_eej_detection
-from src.service.ee_index.calc.factory import EeFactory
-from src.service.ee_index.calc.moving_ave import calc_moving_avg
-from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.constant.time_relation import Sec
-from src.service.ee_index.helper.params import CalcParams, Period
-from src.service.ee_index.plot.config import PlotConfig
+from src.constants.time_relation import Sec
+from src.domain.magdas_station import EeIndexStation
+from src.domain.station_params import Period, StationParams
+from src.usecase.ee_index.calc_detect_eej import calc_euel_for_eej_detection
+from src.usecase.ee_index.calc_moving_ave import calc_moving_avg
+from src.usecase.ee_index.factory_ee import EeFactory
+from src.usecase.ee_index.plot_config import PlotConfig
 
 
 class EejDetectionPlotter:
@@ -25,7 +25,7 @@ class EejDetectionPlotter:
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
-        params = CalcParams(station, self.lt_period)
+        params = StationParams(station, self.lt_period)
         ut_params = params.to_ut_params()
         factory = EeFactory()
         euel = factory.create_euel(ut_params)
@@ -50,7 +50,7 @@ class EejDetectionPlotter:
         self.ax.plot(x_axis, euel, label=station.name, color=color)
 
     def plot_pure(self, station: EeIndexStation, color):
-        lt_params = CalcParams(station, self.lt_period)
+        lt_params = StationParams(station, self.lt_period)
         ut_params = lt_params.to_ut_params()
         factory = EeFactory()
         euel = factory.create_euel(ut_params)
