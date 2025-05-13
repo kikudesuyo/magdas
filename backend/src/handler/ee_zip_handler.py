@@ -16,7 +16,7 @@ from src.usecase.ee_index.calc_er import Er
 from src.usecase.ee_index.calc_euel import Euel
 from src.usecase.ee_index.calc_h_component import HComponent
 from src.utils.date import to_datetime
-from src.utils.path import generate_abs_path, generate_parent_abs_path
+from src.utils.path import generate_parent_abs_path
 
 
 class DownloadEeIndexReq(BaseModel):
@@ -47,6 +47,8 @@ def handle_get_ee_index_zip_file(
     start_dt, end_dt = to_datetime(start_date), to_datetime(end_date)
     start_ut = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
     end_ut = end_dt.replace(hour=23, minute=59, second=59, microsecond=0)
+
+    print(f"start_date: {start_date}, end_date: {end_date}, station_code: {station}")
 
     period = Period(start_ut, end_ut)
     params = StationParams(station, period)
