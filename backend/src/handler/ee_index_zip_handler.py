@@ -4,6 +4,8 @@ from datetime import timedelta
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from src.constants.magdas_station import EeIndexStation
+from src.constants.time_relation import Min, Sec
 from src.domain.station_params import Period, StationParams
 from src.usecase.downloads.iaga_meta_data import get_meta_data
 from src.usecase.downloads.iaga_save_file import save_iaga_format
@@ -13,8 +15,6 @@ from src.usecase.ee_index.calc_edst import Edst
 from src.usecase.ee_index.calc_er import Er
 from src.usecase.ee_index.calc_euel import Euel
 from src.usecase.ee_index.calc_h_component import HComponent
-from src.usecase.ee_index.constant.magdas_station import EeIndexStation
-from src.usecase.ee_index.constant.time_relation import Min, Sec
 from src.utils.date import to_datetime
 from src.utils.path import generate_abs_path
 

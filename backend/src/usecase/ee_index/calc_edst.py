@@ -1,9 +1,9 @@
 import numpy as np
+from src.constants.magdas_station import EeIndexStation
+from src.constants.time_relation import Min
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_er import Er
 from src.usecase.ee_index.calc_h_component import HComponent
-from src.usecase.ee_index.constant.magdas_station import EeIndexStation
-from src.usecase.ee_index.constant.time_relation import Min
 from src.usecase.ee_index.nan_calculator import NanCalculator
 
 

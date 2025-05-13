@@ -2,9 +2,9 @@ from datetime import date, timedelta
 from glob import glob
 
 import numpy as np
+from src.constants.raw_data import MAX_H, MIN_H
+from src.constants.time_relation import Min
 from src.domain.station_params import StationParams
-from src.usecase.ee_index.constant.raw_data import MAX_H, MIN_H
-from src.usecase.ee_index.constant.time_relation import Min
 from src.usecase.raw_data_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 
