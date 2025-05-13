@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.router.routes import r
+from src.routes import r
 
 app = FastAPI()
 app.add_middleware(
