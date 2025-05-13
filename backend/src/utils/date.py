@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from src.constants.ee_index import EeIndexStation
+from src.domain.magdas_station import EeIndexStation
 
 
 def to_datetime(date: str) -> datetime:

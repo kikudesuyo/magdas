@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from src.constants.ee_index import EeIndexStation
 from src.constants.time_relation import Sec
+from src.domain.magdas_station import EeIndexStation
 from src.utils.date import DateUtils
 
 

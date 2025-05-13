@@ -3,7 +3,7 @@ import warnings
 from datetime import datetime, timedelta
 
 import numpy as np
-from src.constants.ee_index import EeIndexStation
+from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_er import Er
 from src.usecase.ee_index.calc_h_component import HComponent
