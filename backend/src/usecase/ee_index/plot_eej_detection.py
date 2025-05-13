@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from src.constants.magdas_station import EeIndexStation
+from src.constants.ee_index import EeIndexStation
 from src.constants.time_relation import Sec
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_detect_eej import calc_euel_for_eej_detection

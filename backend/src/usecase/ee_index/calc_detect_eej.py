@@ -1,8 +1,7 @@
 from datetime import date, datetime, time, timedelta
 
 import numpy as np
-from src.constants.eej import EEJ_THRESHOLD
-from src.constants.magdas_station import EeIndexStation
+from src.constants.ee_index import EEJ_THRESHOLD, EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_linear_completion import interpolate_nan
 from src.usecase.ee_index.calc_moving_ave import calc_moving_avg

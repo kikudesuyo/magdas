@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 import numpy as np
-from src.constants.er_threshold import MAX_ER_VALUE, MIN_ER_VALUE
+from src.constants.ee_index import MAX_ER_VALUE, MIN_ER_VALUE
 from src.constants.time_relation import DawnAndDusk
 from src.usecase.ee_index.calc_h_component import HComponent
 from src.usecase.ee_index.nan_calculator import NanCalculator

@@ -1,13 +1,12 @@
-from dataclasses import dataclass
 from enum import Enum
 
+from src.domain.magdas_station import MagdasStation
 
-@dataclass
-class MagdasStation:
-    code: str
-    time_diff: float
-    gm_lat: float
-    gm_lon: float
+EEJ_THRESHOLD = 10
+
+# ER value threshold
+MAX_ER_VALUE = 300
+MIN_ER_VALUE = -300
 
 
 class EeIndexStation(MagdasStation, Enum):

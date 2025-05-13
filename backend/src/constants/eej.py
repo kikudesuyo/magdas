@@ -1,1 +1,0 @@
-EEJ_THRESHOLD = 10

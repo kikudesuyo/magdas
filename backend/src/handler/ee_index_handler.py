@@ -4,7 +4,7 @@ import numpy as np
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from src.constants.magdas_station import EeIndexStation
+from src.constants.ee_index import EeIndexStation
 from src.constants.time_relation import Day
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_edst import Edst
