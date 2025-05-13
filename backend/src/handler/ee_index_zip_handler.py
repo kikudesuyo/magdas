@@ -14,7 +14,7 @@ from src.usecase.ee_index.calc.euel import Euel
 from src.usecase.ee_index.calc.h_component import HComponent
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 from src.usecase.ee_index.constant.time_relation import Min, Sec
-from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.helper.params import Period, StationParams
 from src.utils.date import to_datetime
 from src.utils.path import generate_abs_path
 
@@ -49,7 +49,7 @@ def handle_get_ee_index_zip_file(
     end_ut = end_dt.replace(hour=23, minute=59, second=59, microsecond=0)
 
     period = Period(start_ut, end_ut)
-    params = CalcParams(station, period)
+    params = StationParams(station, period)
     h = HComponent(params)
     er = Er(h)
     edst = Edst(period)

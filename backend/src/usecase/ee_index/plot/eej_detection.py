@@ -7,7 +7,7 @@ from src.usecase.ee_index.calc.factory import EeFactory
 from src.usecase.ee_index.calc.moving_ave import calc_moving_avg
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 from src.usecase.ee_index.constant.time_relation import Sec
-from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.helper.params import Period, StationParams
 from src.usecase.ee_index.plot.config import PlotConfig
 
 
@@ -25,7 +25,7 @@ class EejDetectionPlotter:
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
     def plot_local_euel(self, station: EeIndexStation):
-        params = CalcParams(station, self.lt_period)
+        params = StationParams(station, self.lt_period)
         ut_params = params.to_ut_params()
         factory = EeFactory()
         euel = factory.create_euel(ut_params)
@@ -50,7 +50,7 @@ class EejDetectionPlotter:
         self.ax.plot(x_axis, euel, label=station.name, color=color)
 
     def plot_pure(self, station: EeIndexStation, color):
-        lt_params = CalcParams(station, self.lt_period)
+        lt_params = StationParams(station, self.lt_period)
         ut_params = lt_params.to_ut_params()
         factory = EeFactory()
         euel = factory.create_euel(ut_params)

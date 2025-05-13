@@ -6,7 +6,7 @@ from src.usecase.ee_index.calc.linear_completion import interpolate_nan
 from src.usecase.ee_index.calc.moving_ave import calc_moving_avg
 from src.usecase.ee_index.constant.eej import EEJ_THRESHOLD, EejDetectionTime
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
-from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.helper.params import Period, StationParams
 from src.usecase.kp import Kp
 
 
@@ -29,7 +29,7 @@ def calc_eej_peak_diff(
 def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     s_lt = datetime(local_date.year, local_date.month, local_date.day, 0, 0)
     e_lt = s_lt.replace(hour=23, minute=59)
-    lt_params = CalcParams(station, Period(s_lt, e_lt))
+    lt_params = StationParams(station, Period(s_lt, e_lt))
     ut_params = lt_params.to_ut_params()
 
     factory = EeFactory()

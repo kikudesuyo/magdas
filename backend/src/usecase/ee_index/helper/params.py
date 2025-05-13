@@ -32,7 +32,7 @@ class Period:
 
 
 @dataclass
-class CalcParams:
+class StationParams:
     station: EeIndexStation
     period: Period
 
@@ -44,4 +44,4 @@ class CalcParams:
         end_ut = DateUtils.to_ut(self.station, self.period.end).replace(
             second=0, microsecond=0
         )
-        return CalcParams(self.station, Period(start_ut, end_ut))
+        return StationParams(self.station, Period(start_ut, end_ut))

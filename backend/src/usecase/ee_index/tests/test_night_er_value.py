@@ -6,7 +6,7 @@ import numpy as np
 from src.usecase.ee_index.calc.er import Er
 from src.usecase.ee_index.calc.h_component import HComponent
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
-from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.helper.params import Period, StationParams
 from src.utils.date import DateUtils
 
 
@@ -29,7 +29,7 @@ class TestERValue(unittest.TestCase):
         start_lt = DateUtils.to_lt(self.station, self.start_ut)
         end_lt = DateUtils.to_lt(self.station, self.end_ut)
         period = Period(start_lt, end_lt)
-        p = CalcParams(self.station, period)
+        p = StationParams(self.station, period)
         h = HComponent(p)
         er = Er(h)
         night_er = er.extract_night_er()

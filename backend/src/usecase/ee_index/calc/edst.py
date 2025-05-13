@@ -4,7 +4,7 @@ from src.usecase.ee_index.calc.h_component import HComponent
 from src.usecase.ee_index.calc.nan_calculator import NanCalculator
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 from src.usecase.ee_index.constant.time_relation import Min
-from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.helper.params import Period, StationParams
 
 
 class Edst:
@@ -19,7 +19,7 @@ class Edst:
         length = days * Min.ONE_DAY.const + hours * Min.ONE_HOUR.const + minutes + 1
         night_er_list = np.empty((0, length), dtype=float)
         for station in EeIndexStation:
-            params = CalcParams(station, self.period)
+            params = StationParams(station, self.period)
             h = HComponent(params)
             er = Er(h)
             night_er_val = er.extract_night_er()

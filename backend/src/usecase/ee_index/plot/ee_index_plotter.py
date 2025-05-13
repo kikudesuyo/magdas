@@ -6,7 +6,7 @@ from src.usecase.ee_index.calc.factory import EeFactory
 from src.usecase.ee_index.calc.moving_ave import calc_moving_avg
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 from src.usecase.ee_index.constant.time_relation import Sec
-from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.helper.params import Period, StationParams
 from src.usecase.ee_index.plot.config import PlotConfig
 
 
@@ -32,7 +32,7 @@ class EeIndexPlotter:
 
     def plot_er(self, station: EeIndexStation, color):
         factory = EeFactory()
-        er = factory.create_er(CalcParams(station, self.period))
+        er = factory.create_er(StationParams(station, self.period))
         er_values = er.calc_er()
         x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label="ER", color=color)
@@ -45,7 +45,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
     def plot_euel(self, station: EeIndexStation, color):
-        p = CalcParams(station, self.period)
+        p = StationParams(station, self.period)
         factoy = EeFactory()
         euel = factoy.create_euel(p)
         euel_values = euel.calc_euel()
@@ -54,7 +54,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
 
     def plot_ee(self, station: EeIndexStation):
-        params = CalcParams(station, self.period)
+        params = StationParams(station, self.period)
         factory = EeFactory()
         er = factory.create_er(params)
         edst = factory.create_edst(self.period)

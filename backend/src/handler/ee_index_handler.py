@@ -10,7 +10,7 @@ from src.usecase.ee_index.calc.euel import Euel
 from src.usecase.ee_index.calc.h_component import HComponent
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 from src.usecase.ee_index.constant.time_relation import Day
-from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.helper.params import Period, StationParams
 from src.utils.date import to_datetime
 
 
@@ -43,7 +43,7 @@ def handle_get_daily_ee_index(
     end_ut = start_ut + timedelta(days=Day.ONE.const, minutes=-1)
 
     period = Period(start_ut, end_ut)
-    params = CalcParams(station=station, period=period)
+    params = StationParams(station=station, period=period)
     h = HComponent(params)
     er = Er(h)
     edst = Edst(period)

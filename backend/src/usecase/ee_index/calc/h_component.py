@@ -4,7 +4,7 @@ from glob import glob
 import numpy as np
 from src.usecase.ee_index.constant.raw_data import MAX_H, MIN_H
 from src.usecase.ee_index.constant.time_relation import Min
-from src.usecase.ee_index.helper.params import CalcParams
+from src.usecase.ee_index.helper.params import StationParams
 from src.usecase.raw_data_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 
@@ -37,7 +37,7 @@ def get_h_for_a_day(station_code: str, ut_date: date):
 
 
 class HComponent:
-    def __init__(self, params: CalcParams):
+    def __init__(self, params: StationParams):
         self.station = params.station
         self.start_ut = params.period.start
         self.end_ut = params.period.end
