@@ -3,12 +3,12 @@ from datetime import datetime, time, timedelta
 import numpy as np
 from matplotlib import pyplot as plt
 from src.domain.station_params import Period, StationParams
-from src.usecase.ee_index.calc.detect_eej import calc_euel_for_eej_detection
-from src.usecase.ee_index.calc.factory import EeFactory
-from src.usecase.ee_index.calc.moving_ave import calc_moving_avg
+from src.usecase.ee_index.calc_detect_eej import calc_euel_for_eej_detection
+from src.usecase.ee_index.calc_moving_ave import calc_moving_avg
 from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 from src.usecase.ee_index.constant.time_relation import Sec
-from src.usecase.ee_index.plot.config import PlotConfig
+from src.usecase.ee_index.factory_ee import EeFactory
+from src.usecase.ee_index.plot_config import PlotConfig
 
 
 class EejDetectionPlotter:

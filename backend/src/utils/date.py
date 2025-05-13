@@ -1,14 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 
 
 def to_datetime(date: str) -> datetime:
     """Converts a string to a date object"""
     return datetime.strptime(date, "%Y-%m-%d")
-
-
-from datetime import datetime, timedelta
-
-from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 
 
 class DateUtils:
