@@ -16,7 +16,7 @@ from src.usecase.ee_index.calc_er import Er
 from src.usecase.ee_index.calc_euel import Euel
 from src.usecase.ee_index.calc_h_component import HComponent
 from src.utils.date import to_datetime
-from src.utils.path import generate_abs_path
+from src.utils.path import generate_abs_path, generate_parent_abs_path
 
 
 class DownloadEeIndexReq(BaseModel):
@@ -85,7 +85,7 @@ def handle_get_ee_index_zip_file(
         "ER": er_values,
         "EUEL": euel_values,
     }
-    save_iaga_format(meta_data, data, generate_abs_path("/tmp/iaga_format.txt"))
+    save_iaga_format(meta_data, data, generate_parent_abs_path("/tmp/iaga_format.txt"))
     zip_buffer = create_zip_buffer()
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     remove_files()

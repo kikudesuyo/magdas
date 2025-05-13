@@ -5,7 +5,7 @@ def generate_abs_path(path):
     """絶対パスを生成
 
     Arg:
-      path (str): ee-index/からの相対パス
+      path (str): src/からの相対パス
 
     Return:
       str: 引数pathへの絶対パス
@@ -17,10 +17,10 @@ def generate_parent_abs_path(path):
     """親ディレクトリの絶対パスを生成
 
     Description:
-        ee-indexディレクトリよりも上のディレクトリを参照するための関数
+        srcディレクトリよりも上のディレクトリを参照するための関数
         MAGDASデータを参照する際に使用
     Arg:
-        path (str): ../ee-index/からの相対パス
+        path (str): backend/からの相対パス
     Return:
         str: 引数pathへの絶対パス
     """
