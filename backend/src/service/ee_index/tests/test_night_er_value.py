@@ -7,7 +7,7 @@ from src.service.ee_index.calc.er import Er
 from src.service.ee_index.calc.h_component import HComponent
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.helper.params import CalcParams, Period
-from src.service.ee_index.helper.time_utils import DateUtils
+from src.utils.date import DateUtils
 
 
 class TestERValue(unittest.TestCase):

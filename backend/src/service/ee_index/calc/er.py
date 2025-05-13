@@ -5,7 +5,7 @@ from src.service.ee_index.calc.h_component import HComponent
 from src.service.ee_index.calc.nan_calculator import NanCalculator
 from src.service.ee_index.constant.er_threshold import MAX_ER_VALUE, MIN_ER_VALUE
 from src.service.ee_index.constant.time_relation import DawnAndDusk
-from src.service.ee_index.helper.time_utils import DateUtils
+from src.utils.date import DateUtils
 
 
 class Er:

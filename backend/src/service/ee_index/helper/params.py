@@ -3,7 +3,7 @@ from datetime import datetime
 
 from src.service.ee_index.constant.magdas_station import EeIndexStation
 from src.service.ee_index.constant.time_relation import Sec
-from src.service.ee_index.helper.time_utils import DateUtils
+from src.utils.date import DateUtils
 
 
 @dataclass
