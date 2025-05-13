@@ -1,13 +1,22 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 import numpy as np
-from src.constants.eej import EEJ_THRESHOLD, EejDetectionTime
+from src.constants.eej import EEJ_THRESHOLD
 from src.constants.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_linear_completion import interpolate_nan
 from src.usecase.ee_index.calc_moving_ave import calc_moving_avg
 from src.usecase.ee_index.factory_ee import EeFactory
 from src.usecase.kp import Kp
+
+
+class EejDetectionTime:
+    START = time(10, 0)
+    END = time(13, 59)
+
+    @classmethod
+    def contains(cls, t: time) -> bool:
+        return cls.START <= t <= cls.END
 
 
 def calc_eej_peak_diff(

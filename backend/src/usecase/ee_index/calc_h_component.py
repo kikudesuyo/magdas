@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from glob import glob
 
 import numpy as np
-from src.constants.raw_data import MAX_H, MIN_H
+from src.constants.raw_data import RAW_MAX_H, RAW_MIN_H
 from src.constants.time_relation import Min
 from src.domain.station_params import StationParams
 from src.usecase.raw_data_reader import read_raw_min_data
@@ -28,7 +28,7 @@ def get_h_for_a_day(station_code: str, ut_date: date):
     try:
         h_for_day = read_raw_min_data(filenames[0])[:, 0]
         for i in range(Min.ONE_DAY.const):
-            if h_for_day[i] <= MIN_H or h_for_day[i] >= MAX_H:
+            if h_for_day[i] <= RAW_MIN_H or h_for_day[i] >= RAW_MAX_H:
                 h_for_day[i] = np.NaN
         return h_for_day
     except ValueError as e:  # ファイルのデータ形式によるエラーが発生する場合がある

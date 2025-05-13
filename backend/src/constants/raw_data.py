@@ -4,5 +4,5 @@ SEVEN_COMPONENTS = 7
 EIGHT_COMPONENTS = 8
 
 # raw data threshold
-MIN_H = 0
-MAX_H = 64000
+RAW_MIN_H = 0
+RAW_MAX_H = 64000
