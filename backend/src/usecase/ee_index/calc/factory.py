@@ -1,8 +1,8 @@
-from src.service.ee_index.calc.edst import Edst
-from src.service.ee_index.calc.er import Er
-from src.service.ee_index.calc.euel import Euel
-from src.service.ee_index.calc.h_component import HComponent
-from src.service.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.calc.edst import Edst
+from src.usecase.ee_index.calc.er import Er
+from src.usecase.ee_index.calc.euel import Euel
+from src.usecase.ee_index.calc.h_component import HComponent
+from src.usecase.ee_index.helper.params import CalcParams, Period
 
 
 class EeFactory:

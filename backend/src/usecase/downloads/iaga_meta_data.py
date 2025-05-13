@@ -1,4 +1,4 @@
-from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 
 
 def get_meta_data(station: EeIndexStation, iaga_code, elevation):

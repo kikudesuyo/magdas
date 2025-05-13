@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-from src.service.ee_index.calc.factory import EeFactory
-from src.service.ee_index.calc.moving_ave import calc_moving_avg
-from src.service.ee_index.constant.magdas_station import EeIndexStation
-from src.service.ee_index.constant.time_relation import Sec
-from src.service.ee_index.helper.params import CalcParams, Period
-from src.service.ee_index.plot.config import PlotConfig
+from src.usecase.ee_index.calc.factory import EeFactory
+from src.usecase.ee_index.calc.moving_ave import calc_moving_avg
+from src.usecase.ee_index.constant.magdas_station import EeIndexStation
+from src.usecase.ee_index.constant.time_relation import Sec
+from src.usecase.ee_index.helper.params import CalcParams, Period
+from src.usecase.ee_index.plot.config import PlotConfig
 
 
 class EeIndexPlotter:

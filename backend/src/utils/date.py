@@ -8,7 +8,7 @@ def to_datetime(date: str) -> datetime:
 
 from datetime import datetime, timedelta
 
-from src.service.ee_index.constant.magdas_station import EeIndexStation
+from src.usecase.ee_index.constant.magdas_station import EeIndexStation
 
 
 class DateUtils:
