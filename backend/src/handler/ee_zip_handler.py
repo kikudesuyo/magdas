@@ -1,4 +1,5 @@
 import base64
+import os
 from datetime import timedelta
 
 from fastapi import Depends, Query
@@ -11,6 +12,7 @@ from src.usecase.downloads.iaga_meta_data import get_meta_data
 from src.usecase.downloads.iaga_save_file import save_iaga_format
 from src.usecase.downloads.remove_files import remove_files
 from src.usecase.downloads.zip_create import create_zip_buffer
+from src.usecase.downloads.tmp_path import get_unique_tmp_dir
 from src.usecase.ee_index.calc_edst import Edst
 from src.usecase.ee_index.calc_er import Er
 from src.usecase.ee_index.calc_euel import Euel
@@ -83,8 +85,19 @@ def handle_get_ee_index_zip_file(
         "ER": er_values,
         "EUEL": euel_values,
     }
-    save_iaga_format(meta_data, data, generate_parent_abs_path("/tmp/iaga_format.txt"))
-    zip_buffer = create_zip_buffer()
-    zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
-    remove_files()
-    return JSONResponse(content={"file": zip_base64})
+    # Create a unique temporary directory for this request
+    tmp_dir = get_unique_tmp_dir()
+    iaga_file_path = os.path.join(tmp_dir, "iaga_format.txt")
+    
+    try:
+        # Save the file to the unique temporary directory
+        save_iaga_format(meta_data, data, iaga_file_path)
+        
+        # Create zip file from the unique temporary directory
+        zip_buffer = create_zip_buffer(tmp_dir)
+        zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
+        
+        return JSONResponse(content={"file": zip_base64})
+    finally:
+        # Always clean up the temporary directory, even if an error occurs
+        remove_files(tmp_dir)
