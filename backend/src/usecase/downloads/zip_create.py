@@ -14,7 +14,6 @@ def create_zip_buffer():
         files = glob.glob(os.path.join(tmp_dir_path, "**"))
         for file in files:
             if os.path.isfile(file):
-                arcname = os.path.relpath(file, TMP_DIR_PATH)
-                zipf.write(file, arcname)
+                zipf.write(file, arcname=os.path.basename(file))
     zip_buffer.seek(0)
     return zip_buffer
