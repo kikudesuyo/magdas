@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { downloadFile } from "../helper/fileDownload";
 import { STATIONS } from "@/utils/constant";
@@ -18,7 +18,24 @@ const PeriodSelectionForm: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm<FormData>();
+  
+  // Watch for changes in start date fields
+  const startYear = watch("startYear");
+  const startMonth = watch("startMonth");
+  const startDay = watch("startDay");
+
+  // Update end date when start date changes
+  useEffect(() => {
+    // Only update if all start date fields have values
+    if (startYear && startMonth && startDay) {
+      setValue("endYear", startYear);
+      setValue("endMonth", startMonth);
+      setValue("endDay", startDay);
+    }
+  }, [startYear, startMonth, startDay, setValue]);
 
   const years = Array.from({ length: 50 }, (_, i) => String(1970 + i)); // 1970年から50年分
   const months = Array.from({ length: 12 }, (_, i) =>
