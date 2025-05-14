@@ -40,15 +40,11 @@ def handle_get_ee_index_zip_file(
     # TODO 現在のファイルははIAGA形式、もし他の形式を実装する場合は、クエリパラメータでフォーマットを指定させる
     start_date = request.start_date
     end_date = request.end_date
-    station_code = request.station_code
-    
-    station = EeIndexStation[station_code]
-    start_dt = to_datetime(start_date)
-    end_dt = to_datetime(end_date)
-    start_ut = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_ut = end_dt.replace(hour=23, minute=59, second=59, microsecond=0)
-
-    print(f"start_date: {start_date}, end_date: {end_date}, station_code: {station}")
+    station = EeIndexStation[request.station_code]
+    start_ut = to_datetime(start_date).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    end_ut = to_datetime(end_date).replace(hour=23, minute=59, second=59, microsecond=0)
 
     period = Period(start_ut, end_ut)
     params = StationParams(station, period)
