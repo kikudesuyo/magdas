@@ -21,11 +21,18 @@ const PeriodSelectionForm: React.FC = () => {
     watch,
     setValue,
   } = useForm<FormData>();
-  
+
   // Watch for changes in start date fields
   const startYear = watch("startYear");
   const startMonth = watch("startMonth");
   const startDay = watch("startDay");
+
+  const requiredField = (label: string) => ({
+    required: `${label}は必須です`,
+  });
+
+  // 使用例
+  // {...register("startYear", requiredField("開始年"))}
 
   // Update end date when start date changes
   useEffect(() => {
@@ -46,7 +53,6 @@ const PeriodSelectionForm: React.FC = () => {
   ); // 1~31日
 
   const onSubmit = async (data: FormData) => {
-    data;
     const startDate = `${data.startYear}-${data.startMonth}-${data.startDay}`;
     const endDate = `${data.endYear}-${data.endMonth}-${data.endDay}`;
     const props = { startDate, endDate, stationCode };
@@ -84,7 +90,7 @@ const PeriodSelectionForm: React.FC = () => {
           <label className="block text-gray-700  mb-2 font-bold">開始日</label>
           <div className="flex space-x-2">
             <select
-              {...register("startYear", { required: "開始年は必須です" })}
+              {...register("startYear", requiredField("開始年"))}
               className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             >
               <option value="">年</option>
@@ -95,7 +101,7 @@ const PeriodSelectionForm: React.FC = () => {
               ))}
             </select>
             <select
-              {...register("startMonth", { required: "開始月は必須です" })}
+              {...register("startMonth", requiredField("開始月"))}
               className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             >
               <option value="">月</option>
@@ -106,7 +112,7 @@ const PeriodSelectionForm: React.FC = () => {
               ))}
             </select>
             <select
-              {...register("startDay", { required: "開始日は必須です" })}
+              {...register("startDay", requiredField("開始日"))}
               className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             >
               <option value="">日</option>
@@ -128,7 +134,7 @@ const PeriodSelectionForm: React.FC = () => {
           <label className="block text-gray-700 font-bold mb-2">終了日</label>
           <div className="flex space-x-2">
             <select
-              {...register("endYear", { required: "終了年は必須です" })}
+              {...register("endYear", requiredField("終了年"))}
               className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             >
               <option value="">年</option>
@@ -139,7 +145,7 @@ const PeriodSelectionForm: React.FC = () => {
               ))}
             </select>
             <select
-              {...register("endMonth", { required: "終了月は必須です" })}
+              {...register("endMonth", requiredField("終了月"))}
               className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             >
               <option value="">月</option>
@@ -150,7 +156,7 @@ const PeriodSelectionForm: React.FC = () => {
               ))}
             </select>
             <select
-              {...register("endDay", { required: "終了日は必須です" })}
+              {...register("endDay", requiredField("終了日"))}
               className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             >
               <option value="">日</option>
