@@ -38,17 +38,13 @@ def handle_get_ee_index_zip_file(
     request: DownloadEeIndexReq = Depends(DownloadEeIndexReq.from_query),
 ):
     # TODO 現在のファイルははIAGA形式、もし他の形式を実装する場合は、クエリパラメータでフォーマットを指定させる
-    start_date, end_date, station = (
-        request.start_date,
-        request.end_date,
-        request.station_code,
+    start_date = request.start_date
+    end_date = request.end_date
+    station = EeIndexStation[request.station_code]
+    start_ut = to_datetime(start_date).replace(
+        hour=0, minute=0, second=0, microsecond=0
     )
-    station = EeIndexStation[station]
-    start_dt, end_dt = to_datetime(start_date), to_datetime(end_date)
-    start_ut = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_ut = end_dt.replace(hour=23, minute=59, second=59, microsecond=0)
-
-    print(f"start_date: {start_date}, end_date: {end_date}, station_code: {station}")
+    end_ut = to_datetime(end_date).replace(hour=23, minute=59, second=59, microsecond=0)
 
     period = Period(start_ut, end_ut)
     params = StationParams(station, period)
@@ -66,11 +62,11 @@ def handle_get_ee_index_zip_file(
         "",
         8888.88,
     )
-    days = (end_dt - start_dt).days + 1
-    start_day_of_year = start_dt.timetuple().tm_yday
+    days = (end_ut - start_ut).days + 1
+    start_day_of_year = start_ut.timetuple().tm_yday
     data = {
         "DATE": [
-            (start_dt + timedelta(days=j)).strftime("%Y-%m-%d")
+            (start_ut + timedelta(days=j)).strftime("%Y-%m-%d")
             for j in range(days)
             for _ in range(Min.ONE_DAY.const)
         ],
