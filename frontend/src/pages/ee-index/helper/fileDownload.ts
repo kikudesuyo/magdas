@@ -3,20 +3,8 @@ import {
   type DownloadByDateRangeReq,
 } from "@/api";
 
-export const downloadFile = async (fileParams: {
-  startDate: string;
-  days: number;
-  stationCode: string;
-}) => {
-  const { startDate, days, stationCode } = fileParams;
-
-  const req: DownloadByDateRangeReq = {
-    startDate,
-    days,
-    stationCode,
-  };
-
-  const responseData = await fetchEeIndexFromDateWithDays(req);
+export const downloadFile = async (fileParams: DownloadByDateRangeReq) => {
+  const responseData = await fetchEeIndexFromDateWithDays(fileParams);
   const byteCharacters = atob(responseData.base64Zip);
   const byteNumbers = new Uint8Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
