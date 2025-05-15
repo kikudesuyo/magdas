@@ -8,7 +8,7 @@ from src.usecase.downloads.build_iaga import (
     build_iaga_meta_data,
     save_as_iaga,
 )
-from src.usecase.downloads.remove_files import remove_files
+from src.usecase.downloads.remove_files import TMP_DIR_PATH, remove_tmp_files
 from src.usecase.downloads.zip_create import create_zip_buffer
 from src.usecase.ee_index.calc_edst import Edst
 from src.usecase.ee_index.calc_er import Er
@@ -56,8 +56,8 @@ def download_ee_index_data(
     save_as_iaga(
         iaga_meta_data, iaga_data, generate_parent_abs_path("/tmp/iaga_format.txt")
     )
-    zip_buffer = create_zip_buffer()
+    zip_buffer = create_zip_buffer(TMP_DIR_PATH)
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
-    remove_files()
+    remove_tmp_files()
 
     return zip_base64
