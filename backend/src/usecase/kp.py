@@ -8,7 +8,7 @@ class Kp:
     """2000~2022年のKP指数を取得するクラス"""
 
     def __init__(self):
-        path = generate_parent_abs_path("/kpdata.csv")
+        path = generate_parent_abs_path("/Storage/kpdata.csv")
         self.df = pd.read_csv(path, parse_dates=["DATETIME_UT"])
 
     def get_max(self, start_date: datetime, end_date: datetime) -> float:
