@@ -1,21 +1,21 @@
 import { apiClient } from "./config";
 
-export type DownloadCustomDateEeIndexReq = {
+export type DownloadEeIndexByRangeReq = {
   startDate: string;
   endDate: string;
   stationCode: string;
 };
 
-export type DownloadCustomDateEeIndexResp = {
+export type DownloadEeIndexByRangeResp = {
   base64Zip: string;
   fileName: string;
   contentType: string;
 };
 
 export const fetchCustomDateFile = async (
-  req: DownloadCustomDateEeIndexReq
-): Promise<DownloadCustomDateEeIndexResp> => {
-  const resp = await apiClient.get("/download/ee-index", {
+  req: DownloadEeIndexByRangeReq
+): Promise<DownloadEeIndexByRangeResp> => {
+  const resp = await apiClient.get("/download/ee-index/by-range", {
     params: req,
   });
   return resp.data;

@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { downloadFile } from "@/pages/ee-index/helper/fileDownload";
 
-type DailyDownloadData = {
+export type DownloadButtonProps = {
   startDate: string;
   days: number;
   stationCode: string;
 };
+
 const DownloadButton = ({
   startDate,
   days,
   stationCode,
-}: DailyDownloadData) => {
+}: DownloadButtonProps) => {
   const [loading, setLoading] = useState(false);
   const handleDownload = async () => {
     setLoading(true);

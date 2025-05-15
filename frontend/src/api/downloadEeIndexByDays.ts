@@ -15,7 +15,7 @@ export type EeIndexDownloadByDateRangeResp = {
 export const fetchEeIndexFromDateWithDays = async (
   data: DownloadByDateRangeReq
 ): Promise<EeIndexDownloadByDateRangeResp> => {
-  const response = await apiClient.get("/download/ee-index/daily", {
+  const response = await apiClient.get("/download/ee-index/by-days", {
     params: data,
   });
   return response.data;

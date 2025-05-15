@@ -1,11 +1,11 @@
 export { fetchEeIndexData, type EeIndexResp, type EeIndexReq } from "./eeIndex";
 export {
   fetchCustomDateFile,
-  type DownloadCustomDateEeIndexReq,
-  type DownloadCustomDateEeIndexResp,
-} from "./downloadCustomDate";
+  type DownloadEeIndexByRangeReq as DownloadCustomDateEeIndexReq,
+  type DownloadEeIndexByRangeResp as DownloadCustomDateEeIndexResp,
+} from "./downloadEeIndexByRange";
 export {
   fetchEeIndexFromDateWithDays,
-  type DownloadByDateRangeReq as DownloadDailyDateEeIndexReq,
-  type EeIndexDownloadByDateRangeResp as DownloadDailyDateEeIndexResp,
-} from "./downloadEeIndexFromDateWithDays";
+  type DownloadByDateRangeReq,
+  type EeIndexDownloadByDateRangeResp,
+} from "./downloadEeIndexByDays";

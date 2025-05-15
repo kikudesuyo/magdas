@@ -1,6 +1,6 @@
 import {
   fetchEeIndexFromDateWithDays,
-  type DownloadDailyDateEeIndexReq,
+  type DownloadByDateRangeReq,
 } from "@/api";
 
 export const downloadFile = async (fileParams: {
@@ -10,7 +10,7 @@ export const downloadFile = async (fileParams: {
 }) => {
   const { startDate, days, stationCode } = fileParams;
 
-  const req: DownloadDailyDateEeIndexReq = {
+  const req: DownloadByDateRangeReq = {
     startDate,
     days,
     stationCode,
