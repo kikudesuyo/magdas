@@ -1,8 +1,13 @@
+from datetime import timedelta
+from typing import Iterable
+
+import numpy as np
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from src.domain.magdas_station import EeIndexStation
-from src.usecase.ee_index.ee_index_retrieval import get_ee_index_data
+from src.domain.station_params import Period, StationParams
+from src.usecase.ee_index.factory_ee import EeFactory
 from src.utils.date import to_datetime
 
 
@@ -36,17 +41,35 @@ def handle_get_ee_by_range(
     station = EeIndexStation[station_code]
     start_ut = to_datetime(date)
 
-    er_values, edst_values, euel_values, minute_labels = get_ee_index_data(
-        station, start_ut, days
-    )
+    period = Period(start_ut, start_ut + timedelta(days=days))
+    params = StationParams(station=station, period=period)
+
+    factory = EeFactory()
+    er = factory.create_er(params)
+    edst = factory.create_edst(period)
+    euel = factory.create_euel(params)
+
+    # for JSON serialization
+    er_with_none = nan_to_none(er.calc_er())
+    edst_with_none = nan_to_none(edst.compute_smoothed_edst())
+    euel_with_none = nan_to_none(euel.calc_euel())
+
+    minute_labels = [
+        (start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
+        for i in range(days * 24 * 60)
+    ]
 
     return JSONResponse(
         content={
             "values": {
-                "er": er_values,
-                "edst": edst_values,
-                "euel": euel_values,
+                "er": er_with_none,
+                "edst": edst_with_none,
+                "euel": euel_with_none,
             },
             "minuteLabels": minute_labels,
         }
     )
+
+
+def nan_to_none(values: Iterable[float] | np.ndarray):
+    return [None if np.isnan(x) else x for x in values]
