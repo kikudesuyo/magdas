@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from src.constants.time_relation import Min, Sec
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
@@ -11,43 +11,49 @@ from src.usecase.downloads.iaga_meta_data import get_meta_data
 from src.usecase.downloads.iaga_save_file import save_iaga_format
 from src.usecase.downloads.remove_files import remove_files
 from src.usecase.downloads.zip_create import create_zip_buffer
-from src.usecase.ee_index.calc_edst import Edst
-from src.usecase.ee_index.calc_er import Er
-from src.usecase.ee_index.calc_euel import Euel
-from src.usecase.ee_index.calc_h_component import HComponent
+from src.usecase.ee_index.factory_ee import EeFactory
 from src.utils.date import to_datetime
 from src.utils.path import generate_parent_abs_path
 
 
 class DownloadEeIndexReq(BaseModel):
-    date: str
+    start_date: str
+    days: int = Field(default=1, ge=1, le=365)
     station_code: str
 
     @classmethod
     def from_query(
         cls,
-        date: str = Query(description="YYYY-MM-DD"),
+        start_date: str = Query(alias="startDate", description="YYYY-MM-DD"),
+        days: int = Query(
+            default=1, description="Number of days to fetch (1, 3, 7, or 30)"
+        ),
         station_code: str = Query(alias="stationCode", description="station_code"),
     ):
-        return cls(date=date, station_code=station_code)
+        return cls(start_date=start_date, days=days, station_code=station_code)
 
 
-def handle_get_daily_ee_index_zip_file(
+def handle_get_ee_index_zip_file_by_days(
     request: DownloadEeIndexReq = Depends(DownloadEeIndexReq.from_query),
 ):
     # TODO 現在のファイルははIAGA形式、もし他の形式を実装する場合は、クエリパラメータでフォーマットを指定させる
-    ut = to_datetime(request.date)
-    station = EeIndexStation[request.station_code]
+    start_dt = to_datetime(request.start_date)
 
-    start_ut = ut.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_ut = ut.replace(hour=23, minute=59, second=59, microsecond=0)
+    start_ut = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_ut = start_ut.replace(hour=23, minute=59, second=59, microsecond=0) + timedelta(
+        days=request.days - 1
+    )
+    days = request.days
+    station = EeIndexStation[request.station_code]
 
     period = Period(start_ut, end_ut)
     params = StationParams(station, period)
-    h = HComponent(params)
-    er = Er(h)
-    edst = Edst(period)
-    euel = Euel(er, edst)
+
+    factory = EeFactory()
+    er = factory.create_er(params)
+    edst = factory.create_edst(period)
+    euel = factory.create_euel(params)
+
     er_values = er.calc_er()
     edst_values = edst.compute_smoothed_edst()
     euel_values = euel.calc_euel()
@@ -58,7 +64,6 @@ def handle_get_daily_ee_index_zip_file(
         "",
         8888.88,
     )
-    days = 1
     start_day_of_year = start_ut.timetuple().tm_yday
     data = {
         "DATE": [
@@ -83,4 +88,13 @@ def handle_get_daily_ee_index_zip_file(
     zip_buffer = create_zip_buffer()
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     remove_files()
-    return JSONResponse(content={"file": zip_base64})
+
+    start_date = start_ut.strftime("%Y-%m-%d")
+    end_date = end_ut.strftime("%Y-%m-%d")
+    return JSONResponse(
+        content={
+            "base64Zip": zip_base64,
+            "fileName": f"ee_index_{start_date}_to_{end_date}.zip",
+            "contentType": "application/zip",
+        }
+    )
