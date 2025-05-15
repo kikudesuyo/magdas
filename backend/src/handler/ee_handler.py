@@ -17,27 +17,24 @@ from src.utils.date import to_datetime
 class DailyEeIndexReq(BaseModel):
     date: str
     station_code: str
-    data_kind: str
 
     @classmethod
     def from_query(
         cls,
         date: str = Query(description="YYYY-MM-DD"),
         station_code: str = Query(alias="stationCode", description="station_code"),
-        data_kind: str = Query(alias="dataKind", description="data_kind"),
     ):
-        return cls(date=date, station_code=station_code, data_kind=data_kind)
+        return cls(date=date, station_code=station_code)
 
 
 def handle_get_daily_ee_index(
     req: DailyEeIndexReq = Depends(DailyEeIndexReq.from_query),
 ):
-    date, station_code, data_kind = (
+    date, station_code = (
         req.date,
         req.station_code,
-        req.data_kind,
     )
-    print(f"date: {date}, station_code: {station_code}, data_kind: {data_kind}")
+    print(f"date: {date}, station_code: {station_code}")
     station = EeIndexStation[station_code]
     start_ut = to_datetime(date)
     end_ut = start_ut + timedelta(days=Day.ONE.const, minutes=-1)

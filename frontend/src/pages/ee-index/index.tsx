@@ -19,12 +19,8 @@ const EeIndex = () => {
     date: "",
   });
 
-  const handleButtonClick = async (
-    stationCode: string,
-    dataKind: string,
-    date: string
-  ) => {
-    const reqParams = { stationCode, dataKind, date };
+  const handleButtonClick = async (stationCode: string, date: string) => {
+    const reqParams = { stationCode, date };
     const data = await fetchEeIndexData(reqParams);
     if (!data) return;
     setPlotData(data);
