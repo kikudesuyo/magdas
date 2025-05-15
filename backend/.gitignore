@@ -163,7 +163,7 @@ cython_debug/
 **/__pycache__/**
 img
 data
-Storage
+Storage/ee_index
 previous
 sandbox.py
 *.txt

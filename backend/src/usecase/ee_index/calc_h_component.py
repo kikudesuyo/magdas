@@ -15,7 +15,7 @@ def get_h_for_a_day(station_code: str, ut_date: date):
     day = ut_date.strftime("%d")
     filenames = glob(
         generate_parent_abs_path(
-            f"/Storage/{station_code}/Min/{year}/{station_code}_MIN_{year}{month}{day}*.mgd"
+            f"/Storage/ee_index/{station_code}/Min/{year}/{station_code}_MIN_{year}{month}{day}*.mgd"
         )
     )
     if len(filenames) == 0:

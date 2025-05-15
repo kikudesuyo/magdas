@@ -54,11 +54,17 @@ stations = {
 
 ## 環境構築
 
-### Storage ディレクトリの作成
+### Storage ディレクトリ
+
+#### MAGDAS データの準備
 
 生データ(.mgd 形式)を準備してください。
-データ構造は以下です。(変更を予定しています。)
-backend/Storage/AAB/Min/1999/AAB_MIN_199911300000.mgd
+backend/Storage/ee_index/AAB/Min/1999/AAB_MIN_199911300000.mgd
+
+#### KP データ
+
+KP データは Storage ディレクトリ内にあります。
+Storage/ee_idex/kpdata.csv
 
 ### 仮想環境の作成
 
