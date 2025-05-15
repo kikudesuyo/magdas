@@ -55,6 +55,10 @@ const Chart = ({ xLabels, datasets, xAxisTitle, yAxisTitle }: Props) => {
   };
 
   const options: ChartOptions = {
+    interaction: {
+      mode: "index", // 全データを表示
+      intersect: false, // ポイントに直接触れなくてもツールチップを出す
+    },
     scales: {
       x: {
         title: {
