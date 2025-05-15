@@ -5,18 +5,25 @@ import { STATIONS } from "@/utils/constant";
 import { DateSelection, DateValue } from "@/components";
 
 interface FormData {
+  stationCode: string;
   startDate: DateValue;
   endDate: DateValue;
 }
 
 const PeriodSelectionForm: React.FC = () => {
-  const [stationCode, setStationCode] = React.useState("ANC");
   const {
+    register,
     handleSubmit,
     formState: { errors },
     watch,
     setValue,
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      stationCode: "ANC",
+      startDate: { year: "2010", month: "05", day: "01" },
+      endDate: { year: "2010", month: "05", day: "02" },
+    },
+  });
 
   const startDate = watch("startDate");
 
@@ -27,9 +34,11 @@ const PeriodSelectionForm: React.FC = () => {
   }, [startDate, setValue]);
 
   const onSubmit = async (data: FormData) => {
-    const startDateStr = `${data.startDate.year}-${data.startDate.month}-${data.startDate.day}`;
-    const endDateStr = `${data.endDate.year}-${data.endDate.month}-${data.endDate.day}`;
-    const props = { startDate: startDateStr, endDate: endDateStr, stationCode };
+    const props = {
+      stationCode: data.stationCode,
+      startDate: `${data.startDate.year}-${data.startDate.month}-${data.startDate.day}`,
+      endDate: `${data.endDate.year}-${data.endDate.month}-${data.endDate.day}`,
+    };
     await downloadFile(props);
   };
 
@@ -47,8 +56,7 @@ const PeriodSelectionForm: React.FC = () => {
           <label className="block text-gray-700 mb-2 font-bold">観測点</label>
           <div>
             <select
-              value={stationCode}
-              onChange={(e) => setStationCode(e.target.value)}
+              {...register("stationCode")}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
               {STATIONS.map((stationCode) => (
