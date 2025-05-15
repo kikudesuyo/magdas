@@ -1,25 +1,23 @@
 import React from "react";
 
+export interface DateValue {
+  year: string;
+  month: string;
+  day: string;
+}
+
 interface DateSelectionProps {
   label: string;
-  yearValue: string;
-  monthValue: string;
-  dayValue: string;
-  onYearChange: (value: string) => void;
-  onMonthChange: (value: string) => void;
-  onDayChange: (value: string) => void;
+  value: DateValue;
+  onChange: (date: DateValue) => void;
   hasError?: boolean;
   errorMessage?: string;
 }
 
 const DateSelection: React.FC<DateSelectionProps> = ({
   label,
-  yearValue,
-  monthValue,
-  dayValue,
-  onYearChange,
-  onMonthChange,
-  onDayChange,
+  value,
+  onChange,
   hasError = false,
   errorMessage = "日付を正しく選択してください。",
 }) => {
@@ -31,13 +29,25 @@ const DateSelection: React.FC<DateSelectionProps> = ({
     String(i + 1).padStart(2, "0")
   ); // 1~31日
 
+  const handleYearChange = (year: string) => {
+    onChange({ ...value, year });
+  };
+
+  const handleMonthChange = (month: string) => {
+    onChange({ ...value, month });
+  };
+
+  const handleDayChange = (day: string) => {
+    onChange({ ...value, day });
+  };
+
   return (
     <div className="mb-4">
       <label className="block text-gray-700 mb-2 font-bold">{label}</label>
       <div className="flex space-x-2">
         <select
-          value={yearValue}
-          onChange={(e) => onYearChange(e.target.value)}
+          value={value.year}
+          onChange={(e) => handleYearChange(e.target.value)}
           className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
         >
           <option value="">年</option>
@@ -48,8 +58,8 @@ const DateSelection: React.FC<DateSelectionProps> = ({
           ))}
         </select>
         <select
-          value={monthValue}
-          onChange={(e) => onMonthChange(e.target.value)}
+          value={value.month}
+          onChange={(e) => handleMonthChange(e.target.value)}
           className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
         >
           <option value="">月</option>
@@ -60,8 +70,8 @@ const DateSelection: React.FC<DateSelectionProps> = ({
           ))}
         </select>
         <select
-          value={dayValue}
-          onChange={(e) => onDayChange(e.target.value)}
+          value={value.day}
+          onChange={(e) => handleDayChange(e.target.value)}
           className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
         >
           <option value="">日</option>

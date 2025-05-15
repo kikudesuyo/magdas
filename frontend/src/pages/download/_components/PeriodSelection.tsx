@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { downloadFile } from "../helper/fileDownload";
 import { STATIONS } from "@/utils/constant";
-import { DateSelection } from "@/components";
+import { DateSelection, DateValue } from "@/components";
 
 interface FormData {
   startYear: string;
@@ -77,24 +77,32 @@ const PeriodSelectionForm: React.FC = () => {
 
         <DateSelection
           label="開始日"
-          yearValue={watch("startYear") || ""}
-          monthValue={watch("startMonth") || ""}
-          dayValue={watch("startDay") || ""}
-          onYearChange={(value) => setValue("startYear", value)}
-          onMonthChange={(value) => setValue("startMonth", value)}
-          onDayChange={(value) => setValue("startDay", value)}
+          value={{
+            year: watch("startYear") || "",
+            month: watch("startMonth") || "",
+            day: watch("startDay") || ""
+          }}
+          onChange={(date: DateValue) => {
+            setValue("startYear", date.year);
+            setValue("startMonth", date.month);
+            setValue("startDay", date.day);
+          }}
           hasError={!!(errors.startYear || errors.startMonth || errors.startDay)}
           errorMessage="開始日を正しく選択してください。"
         />
 
         <DateSelection
           label="終了日"
-          yearValue={watch("endYear") || ""}
-          monthValue={watch("endMonth") || ""}
-          dayValue={watch("endDay") || ""}
-          onYearChange={(value) => setValue("endYear", value)}
-          onMonthChange={(value) => setValue("endMonth", value)}
-          onDayChange={(value) => setValue("endDay", value)}
+          value={{
+            year: watch("endYear") || "",
+            month: watch("endMonth") || "",
+            day: watch("endDay") || ""
+          }}
+          onChange={(date: DateValue) => {
+            setValue("endYear", date.year);
+            setValue("endMonth", date.month);
+            setValue("endDay", date.day);
+          }}
           hasError={!!(errors.endYear || errors.endMonth || errors.endDay)}
           errorMessage="終了日を正しく選択してください。"
         />
