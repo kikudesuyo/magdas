@@ -15,7 +15,7 @@ const EeIndexChart = ({ values, dates }: IndexProps) => {
 
   return (
     <Chart
-      xLabels={xLabel(dates.length)}
+      xLabels={xLabel(dates)}
       datasets={[
         {
           type: "line",
