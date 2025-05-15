@@ -1,25 +1,20 @@
-import { fetchDailyDateFile } from "@/services/api";
+import {
+  fetchEeIndexFromDateWithDays,
+  type DownloadByDateRangeReq,
+} from "@/api";
 
-export const downloadFile = async (fileParams: {
-  date: string;
-  stationCode: string;
-}) => {
-  const { date, stationCode } = fileParams;
-  console.log(date, stationCode);
-  const responseData = await fetchDailyDateFile({
-    date,
-    stationCode,
-  });
-  const byteCharacters = atob(responseData.file);
+export const downloadFile = async (fileParams: DownloadByDateRangeReq) => {
+  const responseData = await fetchEeIndexFromDateWithDays(fileParams);
+  const byteCharacters = atob(responseData.base64Zip);
   const byteNumbers = new Uint8Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
     byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
-  const blob = new Blob([byteNumbers], { type: "application/zip" });
+  const blob = new Blob([byteNumbers], { type: responseData.contentType });
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.setAttribute("download", "ee_index.zip");
+  link.setAttribute("download", responseData.fileName);
   document.body.appendChild(link);
   link.click();
   link.remove();

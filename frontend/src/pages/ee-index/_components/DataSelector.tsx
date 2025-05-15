@@ -4,7 +4,7 @@ import DownloadButton from "@/pages/ee-index/_components/DownloadButton";
 import { STATIONS } from "@/utils/constant";
 
 type DataSelectorProps = {
-  onSelect: (station: string, date: string, days: number) => void;
+  onSelect: (station: string, startDate: string, days: number) => void;
 };
 
 const DAYS_OPTIONS = [
@@ -17,12 +17,12 @@ const DAYS_OPTIONS = [
 const DEFAULT_DAYS = 1;
 
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
-  const [station, setStation] = useState("ANC");
-  const [date, setDate] = useState("2014-06-03");
+  const [startDate, setStartDate] = useState("2014-06-03");
   const [days, setDays] = useState(DEFAULT_DAYS);
+  const [station, setStation] = useState("ANC");
 
   const handleSelect = () => {
-    if (!date) {
+    if (!startDate) {
       alert("開始日時を入力してください");
       return;
     }
@@ -32,7 +32,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
       return;
     }
 
-    onSelect(station, date, days);
+    onSelect(station, startDate, days);
   };
 
   return (
@@ -56,8 +56,8 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
         <input
           type="date"
           className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
         />
       </div>
       <div>
@@ -75,7 +75,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
         </select>
       </div>
       <Button label="プロット" func={handleSelect} />
-      <DownloadButton date={date} stationCode={station} />
+      <DownloadButton startDate={startDate} days={days} stationCode={station} />
     </div>
   );
 };

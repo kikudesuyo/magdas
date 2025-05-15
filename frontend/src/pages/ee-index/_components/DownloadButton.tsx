@@ -1,18 +1,23 @@
 import { useState } from "react";
 import { downloadFile } from "@/pages/ee-index/helper/fileDownload";
+import { type DownloadByDateRangeReq } from "@/api";
 
-type DailyDownloadData = {
-  date: string;
-  stationCode: string;
-};
-const DownloadButton = ({ date, stationCode }: DailyDownloadData) => {
+// DownloadByDateRangeReq をラップ。 追加の props が必要な場合はここに追加
+export type DownloadButtonProps = DownloadByDateRangeReq;
+
+const DownloadButton = ({
+  startDate,
+  days,
+  stationCode,
+}: DownloadButtonProps) => {
   const [loading, setLoading] = useState(false);
   const handleDownload = async () => {
     setLoading(true);
 
     try {
       await downloadFile({
-        date: date,
+        startDate,
+        days,
         stationCode: stationCode,
       });
     } catch (err) {

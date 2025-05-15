@@ -6,10 +6,10 @@ from src.usecase.ee_index.ee_index_retrieval import get_ee_index_data
 from src.utils.date import to_datetime
 
 
-class DailyEeIndexReq(BaseModel):
+class EeIndexDateRangeReq(BaseModel):
     start_date: str
-    station_code: str
     days: int = Field(default=1, ge=1, le=30)  # Limit to 30 days maximum
+    station_code: str
 
     @classmethod
     def from_query(
@@ -25,8 +25,8 @@ class DailyEeIndexReq(BaseModel):
         return cls(start_date=start_date, station_code=station_code, days=days)
 
 
-def handle_get_daily_ee_index(
-    req: DailyEeIndexReq = Depends(DailyEeIndexReq.from_query),
+def handle_get_ee_index_by_date_range(
+    req: EeIndexDateRangeReq = Depends(EeIndexDateRangeReq.from_query),
 ):
     date, station_code, days = (
         req.start_date,
