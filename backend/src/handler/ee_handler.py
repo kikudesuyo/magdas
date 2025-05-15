@@ -25,7 +25,7 @@ class EeIndexDateRangeReq(BaseModel):
         return cls(start_date=start_date, station_code=station_code, days=days)
 
 
-def handle_get_ee_index_by_date_range(
+def handle_get_ee_by_range(
     req: EeIndexDateRangeReq = Depends(EeIndexDateRangeReq.from_query),
 ):
     date, station_code, days = (
