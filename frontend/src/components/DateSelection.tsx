@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { getDaysInMonth, isValid, setDate } from "date-fns";
 
 export interface DateValue {
   year: string;
@@ -49,18 +50,10 @@ const DateSelection: React.FC<DateSelectionProps> = ({
     }
 
     const year = parseInt(value.year);
-    const month = parseInt(value.month);
+    const month = parseInt(value.month) - 1; // date-fnsは0-11の月を使用
     
-    // 月ごとの日数を計算
-    let daysInMonth = 31;
-    
-    if (month === 2) {
-      // うるう年の計算
-      const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-      daysInMonth = isLeapYear ? 29 : 28;
-    } else if ([4, 6, 9, 11].includes(month)) {
-      daysInMonth = 30;
-    }
+    // date-fnsを使用して月の日数を取得
+    const daysInMonth = getDaysInMonth(new Date(year, month));
     
     return Array.from({ length: daysInMonth }, (_, i) =>
       String(i + 1).padStart(2, "0")
@@ -72,21 +65,17 @@ const DateSelection: React.FC<DateSelectionProps> = ({
     const newValue = { ...value, year };
     
     if (newValue.month && newValue.day) {
-      const month = parseInt(newValue.month);
+      const monthNum = parseInt(newValue.month) - 1; // date-fnsは0-11の月を使用
       const day = parseInt(newValue.day);
       const yearNum = parseInt(year);
       
-      let maxDay = 31;
-      if (month === 2) {
-        const isLeapYear = (yearNum % 4 === 0 && yearNum % 100 !== 0) || (yearNum % 400 === 0);
-        maxDay = isLeapYear ? 29 : 28;
-      } else if ([4, 6, 9, 11].includes(month)) {
-        maxDay = 30;
-      }
+      // date-fnsを使用して日付が有効かチェック
+      const dateObj = new Date(yearNum, monthNum, day);
       
-      // 日が新しい最大日数を超える場合は、最大日数に調整
-      if (day > maxDay) {
-        newValue.day = String(maxDay).padStart(2, "0");
+      if (!isValid(dateObj) || dateObj.getDate() !== day) {
+        // 無効な日付の場合、その月の最大日数に調整
+        const daysInMonth = getDaysInMonth(new Date(yearNum, monthNum));
+        newValue.day = String(Math.min(day, daysInMonth)).padStart(2, "0");
       }
     }
     
@@ -98,21 +87,17 @@ const DateSelection: React.FC<DateSelectionProps> = ({
     const newValue = { ...value, month };
     
     if (newValue.year && newValue.day) {
-      const monthNum = parseInt(month);
+      const monthNum = parseInt(month) - 1; // date-fnsは0-11の月を使用
       const day = parseInt(newValue.day);
-      const year = parseInt(newValue.year);
+      const yearNum = parseInt(newValue.year);
       
-      let maxDay = 31;
-      if (monthNum === 2) {
-        const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-        maxDay = isLeapYear ? 29 : 28;
-      } else if ([4, 6, 9, 11].includes(monthNum)) {
-        maxDay = 30;
-      }
+      // date-fnsを使用して日付が有効かチェック
+      const dateObj = new Date(yearNum, monthNum, day);
       
-      // 日が新しい最大日数を超える場合は、最大日数に調整
-      if (day > maxDay) {
-        newValue.day = String(maxDay).padStart(2, "0");
+      if (!isValid(dateObj) || dateObj.getDate() !== day) {
+        // 無効な日付の場合、その月の最大日数に調整
+        const daysInMonth = getDaysInMonth(new Date(yearNum, monthNum));
+        newValue.day = String(Math.min(day, daysInMonth)).padStart(2, "0");
       }
     }
     
