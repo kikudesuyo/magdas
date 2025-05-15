@@ -1,4 +1,4 @@
-import { fetchDailyDateFile } from "@/services/api";
+import { fetchDailyDateFile } from "@/api";
 
 export const downloadFile = async (fileParams: {
   date: string;

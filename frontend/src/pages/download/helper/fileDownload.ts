@@ -1,4 +1,4 @@
-import { fetchCustomDateFile } from "@/services/api";
+import { fetchCustomDateFile } from "@/api";
 
 export const downloadFile = async (fileParams: {
   startDate: string;
