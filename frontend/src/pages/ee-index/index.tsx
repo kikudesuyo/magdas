@@ -19,12 +19,18 @@ const EeIndex = () => {
     dates: [],
   });
 
-  const handleButtonClick = async (stationCode: string, date: string, days: number) => {
-    const reqParams = { stationCode, date, days };
+  const handleButtonClick = async (
+    stationCode: string,
+    startDate: string,
+    days: number
+  ) => {
+    const reqParams = { stationCode, startDate, days };
     const data = await fetchEeIndexData(reqParams);
     if (!data) return;
     setPlotData(data);
   };
+
+  console.log(plotData.dates);
 
   return (
     <Main style="items-center gap-8 pt-4">
