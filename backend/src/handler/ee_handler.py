@@ -41,7 +41,6 @@ def handle_get_daily_ee_index(
     station = EeIndexStation[station_code]
     start_ut = to_datetime(date)
 
-    # Fetch data for the requested period
     er_values, edst_values, euel_values, minute_labels = fetch_data_for_period(
         station, start_ut, days
     )

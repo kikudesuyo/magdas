@@ -30,8 +30,6 @@ const EeIndex = () => {
     setPlotData(data);
   };
 
-  console.log(plotData.minuteLabels);
-
   return (
     <Main style="items-center gap-8 pt-4">
       <h1 className="text-4xl font-bold">EE-index Plot</h1>
