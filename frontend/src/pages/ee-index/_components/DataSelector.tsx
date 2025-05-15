@@ -8,16 +8,18 @@ type DataSelectorProps = {
 };
 
 const DAYS_OPTIONS = [
-  { value: 1, label: "1日" },
-  { value: 3, label: "3日" },
-  { value: 7, label: "7日" },
-  { value: 30, label: "30日" },
+  { value: 1, label: "1 day" },
+  { value: 3, label: "3 days" },
+  { value: 7, label: "7 days" },
+  { value: 30, label: "30 days" },
 ];
+
+const DEFAULT_DAYS = 1;
 
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
   const [station, setStation] = useState("ANC");
   const [date, setDate] = useState("2014-06-03");
-  const [days, setDays] = useState(1);
+  const [days, setDays] = useState(DEFAULT_DAYS);
 
   const handleSelect = () => {
     if (!date) {
