@@ -54,7 +54,10 @@ def export_ee_index_as_iaga(
     save_as_iaga(
         iaga_meta_data, iaga_data, generate_parent_abs_path("/tmp/iaga_format.txt")
     )
-    zip_buffer = create_zip_buffer(TMP_DIR_PATH)
+
+    dir_path = generate_parent_abs_path(TMP_DIR_PATH)
+    print(dir_path)
+    zip_buffer = create_zip_buffer(dir_path)
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     remove_tmp_files()
 

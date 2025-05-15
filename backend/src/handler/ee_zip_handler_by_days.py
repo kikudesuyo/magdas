@@ -38,6 +38,7 @@ def handle_get_ee_index_zip_file_by_days(
     )
 
     zip_base64 = export_ee_index_as_iaga(station, start_ut, end_ut)
+
     start_date = start_ut.strftime("%Y-%m-%d")
     end_date = end_ut.strftime("%Y-%m-%d")
     return JSONResponse(
