@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { downloadFile } from "../helper/fileDownload";
 import { STATIONS } from "@/utils/constant";
-import { DateSelection, DateValue } from "@/components";
+import { DateSelection, type DateValue } from "@/components";
 
 interface FormData {
   stationCode: string;
@@ -45,7 +45,7 @@ const PeriodSelectionForm: React.FC = () => {
   // データ取得可能な期間を定義
   const availableDateRange = {
     startYear: 2000, // 2000年から
-    endYear: 2023,   // 2023年まで
+    endYear: 2023, // 2023年まで
   };
 
   return (
@@ -76,7 +76,7 @@ const PeriodSelectionForm: React.FC = () => {
 
         <DateSelection
           label="開始日"
-          value={watch("startDate") || { year: "", month: "", day: "" }}
+          dateValue={watch("startDate") || { year: "", month: "", day: "" }}
           onChange={(date: DateValue) => {
             setValue("startDate", date);
           }}
@@ -87,7 +87,7 @@ const PeriodSelectionForm: React.FC = () => {
 
         <DateSelection
           label="終了日"
-          value={watch("endDate") || { year: "", month: "", day: "" }}
+          dateValue={watch("endDate") || { year: "", month: "", day: "" }}
           onChange={(date: DateValue) => {
             setValue("endDate", date);
           }}
