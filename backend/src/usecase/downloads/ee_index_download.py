@@ -10,10 +10,7 @@ from src.usecase.downloads.build_iaga import (
 )
 from src.usecase.downloads.remove_files import TMP_DIR_PATH, remove_tmp_files
 from src.usecase.downloads.zip_create import create_zip_buffer
-from src.usecase.ee_index.calc_edst import Edst
-from src.usecase.ee_index.calc_er import Er
-from src.usecase.ee_index.calc_euel import Euel
-from src.usecase.ee_index.calc_h_component import HComponent
+from src.usecase.ee_index.factory_ee import EeFactory
 from src.utils.path import generate_parent_abs_path
 
 
@@ -33,10 +30,11 @@ def download_ee_index_data(
     """
     period = Period(start_ut, end_ut)
     params = StationParams(station, period)
-    h = HComponent(params)
-    er = Er(h)
-    edst = Edst(period)
-    euel = Euel(er, edst)
+
+    factory = EeFactory()
+    er = factory.create_er(params)
+    edst = factory.create_edst(period)
+    euel = factory.create_euel(params)
     er_values = er.calc_er()
     edst_values = edst.compute_smoothed_edst()
     euel_values = euel.calc_euel()
