@@ -10,17 +10,21 @@ type ResParams = {
     edst: number[];
     euel: number[];
   };
-  date: string;
+  minuteLabels: string[];
 };
 
 const EeIndex = () => {
   const [plotData, setPlotData] = useState<ResParams>({
     values: { er: [], edst: [], euel: [] },
-    date: "",
+    minuteLabels: [],
   });
 
-  const handleButtonClick = async (stationCode: string, date: string) => {
-    const reqParams = { stationCode, date };
+  const handleButtonClick = async (
+    stationCode: string,
+    startDate: string,
+    days: number
+  ) => {
+    const reqParams = { stationCode, startDate, days };
     const data = await fetchEeIndexData(reqParams);
     if (!data) return;
     setPlotData(data);
@@ -31,7 +35,10 @@ const EeIndex = () => {
       <h1 className="text-4xl font-bold">EE-index Plot</h1>
       <div className="flex flex-row gap-4">
         <DataRangeSelector onSelect={handleButtonClick} />
-        <EeIndexChart values={plotData.values} date={plotData.date} />
+        <EeIndexChart
+          values={plotData.values}
+          minuteLabels={plotData.minuteLabels}
+        />
       </div>
     </Main>
   );

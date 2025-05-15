@@ -4,12 +4,22 @@ import DownloadButton from "@/pages/ee-index/_components/DownloadButton";
 import { STATIONS } from "@/utils/constant";
 
 type DataSelectorProps = {
-  onSelect: (station: string, date: string) => void;
+  onSelect: (station: string, date: string, days: number) => void;
 };
+
+const DAYS_OPTIONS = [
+  { value: 1, label: "1 day" },
+  { value: 3, label: "3 days" },
+  { value: 7, label: "7 days" },
+  { value: 30, label: "30 days" },
+];
+
+const DEFAULT_DAYS = 1;
 
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
   const [station, setStation] = useState("ANC");
   const [date, setDate] = useState("2014-06-03");
+  const [days, setDays] = useState(DEFAULT_DAYS);
 
   const handleSelect = () => {
     if (!date) {
@@ -22,7 +32,7 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
       return;
     }
 
-    onSelect(station, date);
+    onSelect(station, date, days);
   };
 
   return (
@@ -42,13 +52,27 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
         </select>
       </div>
       <div>
-        <label className="text-sm">日時</label>
+        <label className="text-sm">開始日時</label>
         <input
           type="date"
-          className="border border-gray-300 rounded-md"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
+      </div>
+      <div>
+        <label className="text-sm">表示日数</label>
+        <select
+          value={days}
+          onChange={(e) => setDays(Number(e.target.value))}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        >
+          {DAYS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
       <Button label="プロット" func={handleSelect} />
       <DownloadButton date={date} stationCode={station} />

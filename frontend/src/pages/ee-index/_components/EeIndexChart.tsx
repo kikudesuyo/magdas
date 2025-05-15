@@ -1,5 +1,4 @@
 import Chart from "@/components/chart/Chart";
-import { xLabel } from "@/pages/ee-index/helper/xLabel";
 
 type IndexProps = {
   values: {
@@ -7,15 +6,15 @@ type IndexProps = {
     edst: number[];
     euel: number[];
   };
-  date: string;
+  minuteLabels: string[];
 };
 
-const EeIndexChart = ({ values, date }: IndexProps) => {
+const EeIndexChart = ({ values, minuteLabels }: IndexProps) => {
   const { er, edst, euel } = values;
-  console.log(date);
+
   return (
     <Chart
-      xLabels={xLabel()}
+      xLabels={minuteLabels}
       datasets={[
         {
           type: "line",
