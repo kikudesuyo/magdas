@@ -2,7 +2,7 @@ from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from src.domain.magdas_station import EeIndexStation
-from src.usecase.downloads.ee_index_download import download_ee_index_data
+from src.usecase.downloads.export_ee_index import export_ee_index_as_iaga
 from src.utils.date import to_datetime
 
 
@@ -33,5 +33,5 @@ def handle_get_ee_index_zip_file(
     )
     end_ut = to_datetime(end_date).replace(hour=23, minute=59, second=59, microsecond=0)
 
-    zip_base64 = download_ee_index_data(station, start_ut, end_ut)
+    zip_base64 = export_ee_index_as_iaga(station, start_ut, end_ut)
     return JSONResponse(content={"file": zip_base64})

@@ -14,7 +14,7 @@ from src.usecase.ee_index.factory_ee import EeFactory
 from src.utils.path import generate_parent_abs_path
 
 
-def download_ee_index_data(
+def export_ee_index_as_iaga(
     station: EeIndexStation, start_ut: datetime, end_ut: datetime
 ):
     """
