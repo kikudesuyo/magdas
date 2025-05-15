@@ -5,12 +5,8 @@ import { STATIONS } from "@/utils/constant";
 import { DateSelection, DateValue } from "@/components";
 
 interface FormData {
-  startYear: string;
-  startMonth: string;
-  startDay: string;
-  endYear: string;
-  endMonth: string;
-  endDay: string;
+  startDate: DateValue;
+  endDate: DateValue;
 }
 
 const PeriodSelectionForm: React.FC = () => {
@@ -22,22 +18,18 @@ const PeriodSelectionForm: React.FC = () => {
     setValue,
   } = useForm<FormData>();
 
-  const startYear = watch("startYear");
-  const startMonth = watch("startMonth");
-  const startDay = watch("startDay");
+  const startDate = watch("startDate");
 
   useEffect(() => {
-    if (startYear && startMonth && startDay) {
-      setValue("endYear", startYear);
-      setValue("endMonth", startMonth);
-      setValue("endDay", startDay);
+    if (startDate?.year && startDate?.month && startDate?.day) {
+      setValue("endDate", { ...startDate });
     }
-  }, [startYear, startMonth, startDay, setValue]);
+  }, [startDate, setValue]);
 
   const onSubmit = async (data: FormData) => {
-    const startDate = `${data.startYear}-${data.startMonth}-${data.startDay}`;
-    const endDate = `${data.endYear}-${data.endMonth}-${data.endDay}`;
-    const props = { startDate, endDate, stationCode };
+    const startDateStr = `${data.startDate.year}-${data.startDate.month}-${data.startDate.day}`;
+    const endDateStr = `${data.endDate.year}-${data.endDate.month}-${data.endDate.day}`;
+    const props = { startDate: startDateStr, endDate: endDateStr, stationCode };
     await downloadFile(props);
   };
 
@@ -70,35 +62,21 @@ const PeriodSelectionForm: React.FC = () => {
 
         <DateSelection
           label="開始日"
-          value={{
-            year: watch("startYear") || "",
-            month: watch("startMonth") || "",
-            day: watch("startDay") || "",
-          }}
+          value={watch("startDate") || { year: "", month: "", day: "" }}
           onChange={(date: DateValue) => {
-            setValue("startYear", date.year);
-            setValue("startMonth", date.month);
-            setValue("startDay", date.day);
+            setValue("startDate", date);
           }}
-          hasError={
-            !!(errors.startYear || errors.startMonth || errors.startDay)
-          }
+          hasError={!!errors.startDate}
           errorMessage="開始日を正しく選択してください。"
         />
 
         <DateSelection
           label="終了日"
-          value={{
-            year: watch("endYear") || "",
-            month: watch("endMonth") || "",
-            day: watch("endDay") || "",
-          }}
+          value={watch("endDate") || { year: "", month: "", day: "" }}
           onChange={(date: DateValue) => {
-            setValue("endYear", date.year);
-            setValue("endMonth", date.month);
-            setValue("endDay", date.day);
+            setValue("endDate", date);
           }}
-          hasError={!!(errors.endYear || errors.endMonth || errors.endDay)}
+          hasError={!!errors.endDate}
           errorMessage="終了日を正しく選択してください。"
         />
         <button
