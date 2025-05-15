@@ -42,7 +42,7 @@ def handle_get_daily_ee_index(
     start_ut = to_datetime(date)
 
     # Fetch data for the requested period
-    er_values, edst_values, euel_values, date_strings = fetch_data_for_period(
+    er_values, edst_values, euel_values, minute_labels = fetch_data_for_period(
         station, start_ut, days
     )
 
@@ -53,7 +53,7 @@ def handle_get_daily_ee_index(
                 "edst": edst_values,
                 "euel": euel_values,
             },
-            "dates": date_strings,
+            "minuteLabels": minute_labels,
         }
     )
 
@@ -82,13 +82,14 @@ def fetch_data_for_period(
     edst_with_none = [float(x) if not np.isnan(x) else None for x in edst_values]
     euel_with_none = [float(x) if not np.isnan(x) else None for x in euel_values]
 
-    date_strings = [
-        (start_ut + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)
+    minute_labels = [
+        (start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
+        for i in range(days * 24 * 60)
     ]
 
     return (
         er_with_none,
         edst_with_none,
         euel_with_none,
-        date_strings,
+        minute_labels,
     )

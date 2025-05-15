@@ -10,13 +10,13 @@ type ResParams = {
     edst: number[];
     euel: number[];
   };
-  dates: string[];
+  minuteLabels: string[];
 };
 
 const EeIndex = () => {
   const [plotData, setPlotData] = useState<ResParams>({
     values: { er: [], edst: [], euel: [] },
-    dates: [],
+    minuteLabels: [],
   });
 
   const handleButtonClick = async (
@@ -30,14 +30,17 @@ const EeIndex = () => {
     setPlotData(data);
   };
 
-  console.log(plotData.dates);
+  console.log(plotData.minuteLabels);
 
   return (
     <Main style="items-center gap-8 pt-4">
       <h1 className="text-4xl font-bold">EE-index Plot</h1>
       <div className="flex flex-row gap-4">
         <DataRangeSelector onSelect={handleButtonClick} />
-        <EeIndexChart values={plotData.values} dates={plotData.dates} />
+        <EeIndexChart
+          values={plotData.values}
+          minuteLabels={plotData.minuteLabels}
+        />
       </div>
     </Main>
   );
