@@ -1,15 +1,22 @@
-import { fetchDailyDateFile } from "@/api";
+import {
+  fetchEeIndexFromDateWithDays,
+  type DownloadDailyDateEeIndexReq,
+} from "@/api";
 
 export const downloadFile = async (fileParams: {
-  date: string;
+  startDate: string;
+  days: number;
   stationCode: string;
 }) => {
-  const { date, stationCode } = fileParams;
-  console.log(date, stationCode);
-  const responseData = await fetchDailyDateFile({
-    date,
+  const { startDate, days, stationCode } = fileParams;
+
+  const req: DownloadDailyDateEeIndexReq = {
+    startDate,
+    days,
     stationCode,
-  });
+  };
+
+  const responseData = await fetchEeIndexFromDateWithDays(req);
   const byteCharacters = atob(responseData.file);
   const byteNumbers = new Uint8Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {

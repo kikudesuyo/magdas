@@ -2,17 +2,23 @@ import { useState } from "react";
 import { downloadFile } from "@/pages/ee-index/helper/fileDownload";
 
 type DailyDownloadData = {
-  date: string;
+  startDate: string;
+  days: number;
   stationCode: string;
 };
-const DownloadButton = ({ date, stationCode }: DailyDownloadData) => {
+const DownloadButton = ({
+  startDate,
+  days,
+  stationCode,
+}: DailyDownloadData) => {
   const [loading, setLoading] = useState(false);
   const handleDownload = async () => {
     setLoading(true);
 
     try {
       await downloadFile({
-        date: date,
+        startDate,
+        days,
         stationCode: stationCode,
       });
     } catch (err) {

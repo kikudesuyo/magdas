@@ -4,4 +4,8 @@ export {
   type DownloadCustomDateEeIndexReq,
   type DownloadCustomDateEeIndexResp,
 } from "./downloadCustomDate";
-export { fetchDailyDateFile } from "./downloadDailyDate";
+export {
+  fetchEeIndexFromDateWithDays,
+  type DownloadByDateRangeReq as DownloadDailyDateEeIndexReq,
+  type EeIndexDownloadByDateRangeResp as DownloadDailyDateEeIndexResp,
+} from "./downloadEeIndexFromDateWithDays";

@@ -13,8 +13,8 @@ from src.utils.date import to_datetime
 
 class DailyEeIndexReq(BaseModel):
     start_date: str
-    station_code: str
     days: int = Field(default=1, ge=1, le=30)  # Limit to 30 days maximum
+    station_code: str
 
     @classmethod
     def from_query(
