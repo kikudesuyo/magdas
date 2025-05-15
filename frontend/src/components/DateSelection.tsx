@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 export interface DateValue {
   year: string;
   month: string;
   day: string;
+}
+
+export interface DateRange {
+  startYear: number;
+  endYear: number;
 }
 
 interface DateSelectionProps {
@@ -12,6 +17,7 @@ interface DateSelectionProps {
   onChange: (date: DateValue) => void;
   hasError?: boolean;
   errorMessage?: string;
+  dateRange?: DateRange;
 }
 
 const DateSelection: React.FC<DateSelectionProps> = ({
@@ -20,21 +26,97 @@ const DateSelection: React.FC<DateSelectionProps> = ({
   onChange,
   hasError = false,
   errorMessage = "",
+  dateRange = { startYear: 1970, endYear: 2020 }, // デフォルトの範囲
 }) => {
-  const years = Array.from({ length: 50 }, (_, i) => String(1970 + i)); // 1970年から50年分
-  const months = Array.from({ length: 12 }, (_, i) =>
-    String(i + 1).padStart(2, "0")
-  ); // 1~12月
-  const days = Array.from({ length: 31 }, (_, i) =>
-    String(i + 1).padStart(2, "0")
-  ); // 1~31日
+  // 年の範囲を生成
+  const years = useMemo(() => {
+    const { startYear, endYear } = dateRange;
+    const length = endYear - startYear + 1;
+    return Array.from({ length }, (_, i) => String(startYear + i));
+  }, [dateRange]);
+
+  // 月の配列を生成
+  const months = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) =>
+      String(i + 1).padStart(2, "0")
+    ); // 1~12月
+  }, []);
+
+  // 選択された年と月に基づいて日の配列を生成
+  const days = useMemo(() => {
+    if (!value.year || !value.month) {
+      return Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0"));
+    }
+
+    const year = parseInt(value.year);
+    const month = parseInt(value.month);
+    
+    // 月ごとの日数を計算
+    let daysInMonth = 31;
+    
+    if (month === 2) {
+      // うるう年の計算
+      const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+      daysInMonth = isLeapYear ? 29 : 28;
+    } else if ([4, 6, 9, 11].includes(month)) {
+      daysInMonth = 30;
+    }
+    
+    return Array.from({ length: daysInMonth }, (_, i) =>
+      String(i + 1).padStart(2, "0")
+    );
+  }, [value.year, value.month]);
 
   const handleYearChange = (year: string) => {
-    onChange({ ...value, year });
+    // 年が変わった場合、日付が月の最大日数を超えていないか確認
+    const newValue = { ...value, year };
+    
+    if (newValue.month && newValue.day) {
+      const month = parseInt(newValue.month);
+      const day = parseInt(newValue.day);
+      const yearNum = parseInt(year);
+      
+      let maxDay = 31;
+      if (month === 2) {
+        const isLeapYear = (yearNum % 4 === 0 && yearNum % 100 !== 0) || (yearNum % 400 === 0);
+        maxDay = isLeapYear ? 29 : 28;
+      } else if ([4, 6, 9, 11].includes(month)) {
+        maxDay = 30;
+      }
+      
+      // 日が新しい最大日数を超える場合は、最大日数に調整
+      if (day > maxDay) {
+        newValue.day = String(maxDay).padStart(2, "0");
+      }
+    }
+    
+    onChange(newValue);
   };
 
   const handleMonthChange = (month: string) => {
-    onChange({ ...value, month });
+    // 月が変わった場合、日付が月の最大日数を超えていないか確認
+    const newValue = { ...value, month };
+    
+    if (newValue.year && newValue.day) {
+      const monthNum = parseInt(month);
+      const day = parseInt(newValue.day);
+      const year = parseInt(newValue.year);
+      
+      let maxDay = 31;
+      if (monthNum === 2) {
+        const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        maxDay = isLeapYear ? 29 : 28;
+      } else if ([4, 6, 9, 11].includes(monthNum)) {
+        maxDay = 30;
+      }
+      
+      // 日が新しい最大日数を超える場合は、最大日数に調整
+      if (day > maxDay) {
+        newValue.day = String(maxDay).padStart(2, "0");
+      }
+    }
+    
+    onChange(newValue);
   };
 
   const handleDayChange = (day: string) => {
