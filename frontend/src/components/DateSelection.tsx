@@ -19,7 +19,7 @@ const DateSelection: React.FC<DateSelectionProps> = ({
   value,
   onChange,
   hasError = false,
-  errorMessage = "日付を正しく選択してください。",
+  errorMessage = "",
 }) => {
   const years = Array.from({ length: 50 }, (_, i) => String(1970 + i)); // 1970年から50年分
   const months = Array.from({ length: 12 }, (_, i) =>
