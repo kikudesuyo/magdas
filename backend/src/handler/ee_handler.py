@@ -35,42 +35,6 @@ class DailyEeIndexReq(BaseModel):
         return cls(start_date=start_date, station_code=station_code, days=days)
 
 
-def fetch_data_for_period(
-    station: EeIndexStation, start_date: datetime, days: int
-) -> tuple[
-    List[Optional[float]], List[Optional[float]], List[Optional[float]], List[str]
-]:
-    """Fetch data for a specific period and return combined values."""
-
-    period = Period(start_date, start_date + timedelta(days=days))
-    params = StationParams(station=station, period=period)
-
-    factory = EeFactory()
-    er = factory.create_er(params)
-    edst = factory.create_edst(period)
-    euel = factory.create_euel(params)
-
-    er_values = er.calc_er()
-    edst_values = edst.compute_smoothed_edst()
-    euel_values = euel.calc_euel()
-
-    # Convert NaN to None for JSON serialization
-    er_with_none = [float(x) if not np.isnan(x) else None for x in er_values]
-    edst_with_none = [float(x) if not np.isnan(x) else None for x in edst_values]
-    euel_with_none = [float(x) if not np.isnan(x) else None for x in euel_values]
-
-    date_strings = [
-        (start_date + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)
-    ]
-
-    return (
-        er_with_none,
-        edst_with_none,
-        euel_with_none,
-        date_strings,
-    )
-
-
 def handle_get_daily_ee_index(
     req: DailyEeIndexReq = Depends(DailyEeIndexReq.from_query),
 ):
@@ -79,8 +43,6 @@ def handle_get_daily_ee_index(
         req.station_code,
         req.days,
     )
-    print(f"date: {date}, station_code: {station_code}, days: {days}")
-
     station = EeIndexStation[station_code]
     start_ut = to_datetime(date)
 
@@ -98,4 +60,40 @@ def handle_get_daily_ee_index(
             },
             "dates": date_strings,
         }
+    )
+
+
+def fetch_data_for_period(
+    station: EeIndexStation, start_ut: datetime, days: int
+) -> tuple[
+    List[Optional[float]], List[Optional[float]], List[Optional[float]], List[str]
+]:
+    """Fetch data for a specific period and return combined values."""
+
+    period = Period(start_ut, start_ut + timedelta(days=days))
+    params = StationParams(station=station, period=period)
+
+    factory = EeFactory()
+    er = factory.create_er(params)
+    edst = factory.create_edst(period)
+    euel = factory.create_euel(params)
+
+    er_values = er.calc_er()
+    edst_values = edst.compute_smoothed_edst()
+    euel_values = euel.calc_euel()
+
+    # Convert NaN to None for JSON serialization
+    er_with_none = [float(x) if not np.isnan(x) else None for x in er_values]
+    edst_with_none = [float(x) if not np.isnan(x) else None for x in edst_values]
+    euel_with_none = [float(x) if not np.isnan(x) else None for x in euel_values]
+
+    date_strings = [
+        (start_ut + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)
+    ]
+
+    return (
+        er_with_none,
+        edst_with_none,
+        euel_with_none,
+        date_strings,
     )
