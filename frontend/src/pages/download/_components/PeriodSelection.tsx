@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { downloadFile } from "../helper/fileDownload";
 import { STATIONS } from "@/utils/constant";
+import { DateSelection } from "@/components";
 
 interface FormData {
   startYear: string;
@@ -38,13 +39,7 @@ const PeriodSelectionForm: React.FC = () => {
     }
   }, [startYear, startMonth, startDay, setValue]);
 
-  const years = Array.from({ length: 50 }, (_, i) => String(1970 + i)); // 1970年から50年分
-  const months = Array.from({ length: 12 }, (_, i) =>
-    String(i + 1).padStart(2, "0")
-  ); // 1~12月
-  const days = Array.from({ length: 31 }, (_, i) =>
-    String(i + 1).padStart(2, "0")
-  ); // 1~31日
+  // 日付選択はDateSelectionコンポーネントに移動
 
   const onSubmit = async (data: FormData) => {
     const startDate = `${data.startYear}-${data.startMonth}-${data.startDay}`;
@@ -80,93 +75,29 @@ const PeriodSelectionForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700  mb-2 font-bold">開始日</label>
-          <div className="flex space-x-2">
-            <select
-              {...register("startYear", requiredField("開始年"))}
-              className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-            >
-              <option value="">年</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-            <select
-              {...register("startMonth", requiredField("開始月"))}
-              className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-            >
-              <option value="">月</option>
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
-            <select
-              {...register("startDay", requiredField("開始日"))}
-              className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-            >
-              <option value="">日</option>
-              {days.map((day) => (
-                <option key={day} value={day}>
-                  {day}
-                </option>
-              ))}
-            </select>
-          </div>
-          {(errors.startYear || errors.startMonth || errors.startDay) && (
-            <p className="text-red-600 text-sm mt-1">
-              開始日を正しく選択してください。
-            </p>
-          )}
-        </div>
+        <DateSelection
+          label="開始日"
+          yearValue={watch("startYear") || ""}
+          monthValue={watch("startMonth") || ""}
+          dayValue={watch("startDay") || ""}
+          onYearChange={(value) => setValue("startYear", value)}
+          onMonthChange={(value) => setValue("startMonth", value)}
+          onDayChange={(value) => setValue("startDay", value)}
+          hasError={!!(errors.startYear || errors.startMonth || errors.startDay)}
+          errorMessage="開始日を正しく選択してください。"
+        />
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">終了日</label>
-          <div className="flex space-x-2">
-            <select
-              {...register("endYear", requiredField("終了年"))}
-              className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-            >
-              <option value="">年</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-            <select
-              {...register("endMonth", requiredField("終了月"))}
-              className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-            >
-              <option value="">月</option>
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
-            <select
-              {...register("endDay", requiredField("終了日"))}
-              className="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-            >
-              <option value="">日</option>
-              {days.map((day) => (
-                <option key={day} value={day}>
-                  {day}
-                </option>
-              ))}
-            </select>
-          </div>
-          {(errors.endYear || errors.endMonth || errors.endDay) && (
-            <p className="text-red-600 text-sm mt-1">
-              終了日を正しく選択してください。
-            </p>
-          )}
-        </div>
+        <DateSelection
+          label="終了日"
+          yearValue={watch("endYear") || ""}
+          monthValue={watch("endMonth") || ""}
+          dayValue={watch("endDay") || ""}
+          onYearChange={(value) => setValue("endYear", value)}
+          onMonthChange={(value) => setValue("endMonth", value)}
+          onDayChange={(value) => setValue("endDay", value)}
+          hasError={!!(errors.endYear || errors.endMonth || errors.endDay)}
+          errorMessage="終了日を正しく選択してください。"
+        />
         <button
           type="submit"
           className="w-full py-4 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 items-center"
