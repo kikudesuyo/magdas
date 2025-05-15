@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { downloadFile } from "../helper/fileDownload";
 import { STATIONS } from "@/utils/constant";
-import { DateSelection, DateValue } from "@/components";
+import { DateSelection, type DateValue } from "@/components";
 
 interface FormData {
   stationCode: string;
@@ -42,6 +42,12 @@ const PeriodSelectionForm: React.FC = () => {
     await downloadFile(props);
   };
 
+  // データ取得可能な期間を定義
+  const availableDateRange = {
+    startYear: 2000, // 2000年から
+    endYear: 2023, // 2023年まで
+  };
+
   return (
     <div className="flex flex-col p-4 w-4/5">
       <form
@@ -70,22 +76,24 @@ const PeriodSelectionForm: React.FC = () => {
 
         <DateSelection
           label="開始日"
-          value={watch("startDate") || { year: "", month: "", day: "" }}
+          dateValue={watch("startDate") || { year: "", month: "", day: "" }}
           onChange={(date: DateValue) => {
             setValue("startDate", date);
           }}
           hasError={!!errors.startDate}
           errorMessage="開始日を正しく選択してください。"
+          dateRange={availableDateRange}
         />
 
         <DateSelection
           label="終了日"
-          value={watch("endDate") || { year: "", month: "", day: "" }}
+          dateValue={watch("endDate") || { year: "", month: "", day: "" }}
           onChange={(date: DateValue) => {
             setValue("endDate", date);
           }}
           hasError={!!errors.endDate}
           errorMessage="終了日を正しく選択してください。"
+          dateRange={availableDateRange}
         />
         <button
           type="submit"
