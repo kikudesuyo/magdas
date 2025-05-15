@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-from typing import List, Optional
+from datetime import timedelta
+from typing import Iterable
 
 import numpy as np
 from fastapi import Depends, Query
@@ -30,7 +30,7 @@ class EeIndexDateRangeReq(BaseModel):
         return cls(start_date=start_date, station_code=station_code, days=days)
 
 
-def handle_get_ee_index_by_date_range(
+def handle_get_ee_by_range(
     req: EeIndexDateRangeReq = Depends(EeIndexDateRangeReq.from_query),
 ):
     date, station_code, days = (
@@ -41,29 +41,6 @@ def handle_get_ee_index_by_date_range(
     station = EeIndexStation[station_code]
     start_ut = to_datetime(date)
 
-    er_values, edst_values, euel_values, minute_labels = fetch_data_for_period(
-        station, start_ut, days
-    )
-
-    return JSONResponse(
-        content={
-            "values": {
-                "er": er_values,
-                "edst": edst_values,
-                "euel": euel_values,
-            },
-            "minuteLabels": minute_labels,
-        }
-    )
-
-
-def fetch_data_for_period(
-    station: EeIndexStation, start_ut: datetime, days: int
-) -> tuple[
-    List[Optional[float]], List[Optional[float]], List[Optional[float]], List[str]
-]:
-    """Fetch data for a specific period and return combined values."""
-
     period = Period(start_ut, start_ut + timedelta(days=days))
     params = StationParams(station=station, period=period)
 
@@ -72,23 +49,27 @@ def fetch_data_for_period(
     edst = factory.create_edst(period)
     euel = factory.create_euel(params)
 
-    er_values = er.calc_er()
-    edst_values = edst.compute_smoothed_edst()
-    euel_values = euel.calc_euel()
-
-    # Convert NaN to None for JSON serialization
-    er_with_none = [float(x) if not np.isnan(x) else None for x in er_values]
-    edst_with_none = [float(x) if not np.isnan(x) else None for x in edst_values]
-    euel_with_none = [float(x) if not np.isnan(x) else None for x in euel_values]
+    # for JSON serialization
+    er_with_none = nan_to_none(er.calc_er())
+    edst_with_none = nan_to_none(edst.compute_smoothed_edst())
+    euel_with_none = nan_to_none(euel.calc_euel())
 
     minute_labels = [
         (start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
         for i in range(days * 24 * 60)
     ]
 
-    return (
-        er_with_none,
-        edst_with_none,
-        euel_with_none,
-        minute_labels,
+    return JSONResponse(
+        content={
+            "values": {
+                "er": er_with_none,
+                "edst": edst_with_none,
+                "euel": euel_with_none,
+            },
+            "minuteLabels": minute_labels,
+        }
     )
+
+
+def nan_to_none(values: Iterable[float] | np.ndarray):
+    return [None if np.isnan(x) else x for x in values]
