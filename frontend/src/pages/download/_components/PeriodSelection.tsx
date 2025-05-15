@@ -22,7 +22,6 @@ const PeriodSelectionForm: React.FC = () => {
     setValue,
   } = useForm<FormData>();
 
-  // Watch for changes in start date fields
   const startYear = watch("startYear");
   const startMonth = watch("startMonth");
   const startDay = watch("startDay");
@@ -31,12 +30,7 @@ const PeriodSelectionForm: React.FC = () => {
     required: `${label}は必須です`,
   });
 
-  // 使用例
-  // {...register("startYear", requiredField("開始年"))}
-
-  // Update end date when start date changes
   useEffect(() => {
-    // Only update if all start date fields have values
     if (startYear && startMonth && startDay) {
       setValue("endYear", startYear);
       setValue("endMonth", startMonth);
