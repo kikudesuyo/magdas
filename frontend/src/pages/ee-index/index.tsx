@@ -2,19 +2,10 @@ import { useState } from "react";
 import Main from "@/components/Main";
 import EeIndexChart from "@/pages/ee-index/_components/EeIndexChart";
 import DataRangeSelector from "@/pages/ee-index/_components/DataSelector";
-import { fetchEeIndexData } from "@/api";
-
-type ResParams = {
-  values: {
-    er: number[];
-    edst: number[];
-    euel: number[];
-  };
-  minuteLabels: string[];
-};
+import { fetchEeIndexData, type EeIndexResp, type EeIndexReq } from "@/api";
 
 const EeIndex = () => {
-  const [plotData, setPlotData] = useState<ResParams>({
+  const [plotData, setPlotData] = useState<EeIndexResp>({
     values: { er: [], edst: [], euel: [] },
     minuteLabels: [],
   });
@@ -24,7 +15,11 @@ const EeIndex = () => {
     startDate: string,
     days: number
   ) => {
-    const reqParams = { stationCode, startDate, days };
+    const reqParams: EeIndexReq = {
+      startDate,
+      days,
+      stationCode,
+    };
     const data = await fetchEeIndexData(reqParams);
     if (!data) return;
     setPlotData(data);

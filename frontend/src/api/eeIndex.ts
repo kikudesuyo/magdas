@@ -1,14 +1,25 @@
 import { apiClient } from "./config";
 
-// Request type
-export type EeIndexRequest<T> = T;
+export type EeIndexReq = {
+  startDate: string;
+  days: number;
+  stationCode: string;
+};
 
-// Response type (generic for now, can be updated with actual response structure)
-export type EeIndexResponse = any;
+export type EeIndexResp = {
+  values: {
+    er: number[];
+    edst: number[];
+    euel: number[];
+  };
+  minuteLabels: string[];
+};
 
-export const fetchEeIndexData = async <T>(data: EeIndexRequest<T>): Promise<EeIndexResponse> => {
-  const response = await apiClient.get("/ee-index", {
-    params: data,
+export const fetchEeIndexData = async (
+  req: EeIndexReq
+): Promise<EeIndexResp> => {
+  const resp = await apiClient.get("/ee-index", {
+    params: req,
   });
-  return response.data;
+  return resp.data;
 };
