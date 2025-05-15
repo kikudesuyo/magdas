@@ -6,7 +6,11 @@ export type DownloadByDateRangeReq = {
   stationCode: string;
 };
 
-export type EeIndexDownloadByDateRangeResp = any;
+export type EeIndexDownloadByDateRangeResp = {
+  base64Zip: string;
+  fileName: string;
+  contentType: string;
+};
 
 export const fetchEeIndexFromDateWithDays = async (
   data: DownloadByDateRangeReq

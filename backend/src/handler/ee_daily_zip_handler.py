@@ -11,10 +11,7 @@ from src.usecase.downloads.iaga_meta_data import get_meta_data
 from src.usecase.downloads.iaga_save_file import save_iaga_format
 from src.usecase.downloads.remove_files import remove_files
 from src.usecase.downloads.zip_create import create_zip_buffer
-from src.usecase.ee_index.calc_edst import Edst
-from src.usecase.ee_index.calc_er import Er
-from src.usecase.ee_index.calc_euel import Euel
-from src.usecase.ee_index.calc_h_component import HComponent
+from src.usecase.ee_index.factory_ee import EeFactory
 from src.utils.date import to_datetime
 from src.utils.path import generate_parent_abs_path
 
@@ -42,19 +39,21 @@ def handle_get_daily_ee_index_zip_file(
     # TODO 現在のファイルははIAGA形式、もし他の形式を実装する場合は、クエリパラメータでフォーマットを指定させる
     start_dt = to_datetime(request.start_date)
 
-    start_dt = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_ut = start_dt.replace(hour=23, minute=59, second=59, microsecond=0) + timedelta(
+    start_ut = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_ut = start_ut.replace(hour=23, minute=59, second=59, microsecond=0) + timedelta(
         days=request.days - 1
     )
     days = request.days
     station = EeIndexStation[request.station_code]
 
-    period = Period(start_dt, end_ut)
+    period = Period(start_ut, end_ut)
     params = StationParams(station, period)
-    h = HComponent(params)
-    er = Er(h)
-    edst = Edst(period)
-    euel = Euel(er, edst)
+
+    factory = EeFactory()
+    er = factory.create_er(params)
+    edst = factory.create_edst(period)
+    euel = factory.create_euel(params)
+
     er_values = er.calc_er()
     edst_values = edst.compute_smoothed_edst()
     euel_values = euel.calc_euel()
@@ -65,10 +64,10 @@ def handle_get_daily_ee_index_zip_file(
         "",
         8888.88,
     )
-    start_day_of_year = start_dt.timetuple().tm_yday
+    start_day_of_year = start_ut.timetuple().tm_yday
     data = {
         "DATE": [
-            (start_dt + timedelta(days=j)).strftime("%Y-%m-%d")
+            (start_ut + timedelta(days=j)).strftime("%Y-%m-%d")
             for j in range(days)
             for _ in range(Min.ONE_DAY.const)
         ],
@@ -89,4 +88,13 @@ def handle_get_daily_ee_index_zip_file(
     zip_buffer = create_zip_buffer()
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     remove_files()
-    return JSONResponse(content={"file": zip_base64})
+
+    start_date = start_ut.strftime("%Y-%m-%d")
+    end_date = end_ut.strftime("%Y-%m-%d")
+    return JSONResponse(
+        content={
+            "base64Zip": zip_base64,
+            "fileName": f"ee_index_{start_date}_to_{end_date}.zip",
+            "contentType": "application/zip",
+        }
+    )
