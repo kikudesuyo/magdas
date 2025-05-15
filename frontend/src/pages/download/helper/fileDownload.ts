@@ -1,4 +1,4 @@
-import { fetchCustomDateFile } from "@/api";
+import { fetchCustomDateFile, type DownloadCustomDateEeIndexReq } from "@/api";
 
 export const downloadFile = async (fileParams: {
   startDate: string;
@@ -6,21 +6,24 @@ export const downloadFile = async (fileParams: {
   stationCode: string;
 }) => {
   const { startDate, endDate, stationCode } = fileParams;
-  const responseData = await fetchCustomDateFile({
+
+  const req: DownloadCustomDateEeIndexReq = {
     startDate,
     endDate,
     stationCode,
-  });
-  const byteCharacters = atob(responseData.file);
+  };
+
+  const resp = await fetchCustomDateFile(req);
+  const byteCharacters = atob(resp.base64Zip);
   const byteNumbers = new Uint8Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
     byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
-  const blob = new Blob([byteNumbers], { type: "application/zip" });
+  const blob = new Blob([byteNumbers], { type: resp.contentType });
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.setAttribute("download", "ee_index.zip");
+  link.setAttribute("download", resp.fileName);
   document.body.appendChild(link);
   link.click();
   link.remove();

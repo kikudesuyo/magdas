@@ -87,4 +87,10 @@ def handle_get_ee_index_zip_file(
     zip_buffer = create_zip_buffer()
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     remove_files()
-    return JSONResponse(content={"file": zip_base64})
+    return JSONResponse(
+        content={
+            "base64Zip": zip_base64,
+            "fileName": f"ee_index_{start_date}_to_{end_date}.zip",
+            "contentType": "application/zip",
+        }
+    )
