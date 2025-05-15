@@ -10,6 +10,38 @@ interface FormData {
   endDate: DateValue;
 }
 
+// 日付を比較する関数
+const compareDates = (date1: DateValue, date2: DateValue): number => {
+  if (
+    !date1.year ||
+    !date1.month ||
+    !date1.day ||
+    !date2.year ||
+    !date2.month ||
+    !date2.day
+  ) {
+    return 0;
+  }
+
+  const d1 = new Date(
+    parseInt(date1.year),
+    parseInt(date1.month) - 1,
+    parseInt(date1.day)
+  );
+
+  const d2 = new Date(
+    parseInt(date2.year),
+    parseInt(date2.month) - 1,
+    parseInt(date2.day)
+  );
+
+  return d1.getTime() - d2.getTime();
+};
+
+const isValidDate = (date?: DateValue) => {
+  return !!(date?.year && date.month && date.day);
+};
+
 const PeriodSelectionForm: React.FC = () => {
   const {
     register,
@@ -26,12 +58,23 @@ const PeriodSelectionForm: React.FC = () => {
   });
 
   const startDate = watch("startDate");
+  const endDate = watch("endDate");
 
+  // 開始日を選択したとき、終了日が開始日より前の日付にならないようにする
   useEffect(() => {
-    if (startDate?.year && startDate?.month && startDate?.day) {
+    if (!isValidDate(startDate) || !isValidDate(endDate)) return;
+    if (compareDates(startDate, endDate) > 0) {
       setValue("endDate", { ...startDate });
     }
   }, [startDate, setValue]);
+
+  // 終了日を選択したとき、開始日が終了日より後の日付にならないようにする
+  useEffect(() => {
+    if (!isValidDate(startDate) || !isValidDate(endDate)) return;
+    if (compareDates(startDate, endDate) > 0) {
+      setValue("startDate", { ...endDate });
+    }
+  }, [endDate, setValue]);
 
   const onSubmit = async (data: FormData) => {
     const props = {

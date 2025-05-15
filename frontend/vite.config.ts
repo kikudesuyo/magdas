@@ -7,13 +7,4 @@ export default defineConfig({
     alias: [{ find: "@", replacement: "/src" }],
   },
   plugins: [react()],
-  // server: {
-  //   host: "0.0.0.0",
-  //   port: 12000,
-  //   strictPort: true,
-  //   cors: true,
-  //   headers: {
-  //     "Access-Control-Allow-Origin": "*",
-  //   },
-  // },
 });
