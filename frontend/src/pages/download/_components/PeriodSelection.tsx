@@ -16,7 +16,6 @@ interface FormData {
 const PeriodSelectionForm: React.FC = () => {
   const [stationCode, setStationCode] = React.useState("ANC");
   const {
-    register,
     handleSubmit,
     formState: { errors },
     watch,
@@ -27,10 +26,6 @@ const PeriodSelectionForm: React.FC = () => {
   const startMonth = watch("startMonth");
   const startDay = watch("startDay");
 
-  const requiredField = (label: string) => ({
-    required: `${label}は必須です`,
-  });
-
   useEffect(() => {
     if (startYear && startMonth && startDay) {
       setValue("endYear", startYear);
@@ -38,8 +33,6 @@ const PeriodSelectionForm: React.FC = () => {
       setValue("endDay", startDay);
     }
   }, [startYear, startMonth, startDay, setValue]);
-
-  // 日付選択はDateSelectionコンポーネントに移動
 
   const onSubmit = async (data: FormData) => {
     const startDate = `${data.startYear}-${data.startMonth}-${data.startDay}`;
@@ -80,14 +73,16 @@ const PeriodSelectionForm: React.FC = () => {
           value={{
             year: watch("startYear") || "",
             month: watch("startMonth") || "",
-            day: watch("startDay") || ""
+            day: watch("startDay") || "",
           }}
           onChange={(date: DateValue) => {
             setValue("startYear", date.year);
             setValue("startMonth", date.month);
             setValue("startDay", date.day);
           }}
-          hasError={!!(errors.startYear || errors.startMonth || errors.startDay)}
+          hasError={
+            !!(errors.startYear || errors.startMonth || errors.startDay)
+          }
           errorMessage="開始日を正しく選択してください。"
         />
 
@@ -96,7 +91,7 @@ const PeriodSelectionForm: React.FC = () => {
           value={{
             year: watch("endYear") || "",
             month: watch("endMonth") || "",
-            day: watch("endDay") || ""
+            day: watch("endDay") || "",
           }}
           onChange={(date: DateValue) => {
             setValue("endYear", date.year);
