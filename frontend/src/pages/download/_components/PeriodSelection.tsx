@@ -10,6 +10,27 @@ interface FormData {
   endDate: DateValue;
 }
 
+// 日付を比較する関数
+const compareDates = (date1: DateValue, date2: DateValue): number => {
+  if (!date1.year || !date1.month || !date1.day || !date2.year || !date2.month || !date2.day) {
+    return 0;
+  }
+  
+  const d1 = new Date(
+    parseInt(date1.year),
+    parseInt(date1.month) - 1,
+    parseInt(date1.day)
+  );
+  
+  const d2 = new Date(
+    parseInt(date2.year),
+    parseInt(date2.month) - 1,
+    parseInt(date2.day)
+  );
+  
+  return d1.getTime() - d2.getTime();
+};
+
 const PeriodSelectionForm: React.FC = () => {
   const {
     register,
@@ -26,12 +47,29 @@ const PeriodSelectionForm: React.FC = () => {
   });
 
   const startDate = watch("startDate");
+  const endDate = watch("endDate");
 
+  // 開始日が変更されたときの処理
   useEffect(() => {
-    if (startDate?.year && startDate?.month && startDate?.day) {
-      setValue("endDate", { ...startDate });
+    if (startDate?.year && startDate?.month && startDate?.day && 
+        endDate?.year && endDate?.month && endDate?.day) {
+      // 開始日が終了日より未来の場合、終了日を開始日と同じにする
+      if (compareDates(startDate, endDate) > 0) {
+        setValue("endDate", { ...startDate });
+      }
     }
-  }, [startDate, setValue]);
+  }, [startDate, endDate, setValue]);
+
+  // 終了日が変更されたときの処理
+  useEffect(() => {
+    if (startDate?.year && startDate?.month && startDate?.day && 
+        endDate?.year && endDate?.month && endDate?.day) {
+      // 終了日が開始日より過去の場合、開始日を終了日と同じにする
+      if (compareDates(startDate, endDate) > 0) {
+        setValue("startDate", { ...endDate });
+      }
+    }
+  }, [endDate, startDate, setValue]);
 
   const onSubmit = async (data: FormData) => {
     const props = {
