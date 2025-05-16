@@ -14,7 +14,7 @@ from src.usecase.ee_index.factory_ee import EeFactory
 from src.utils.path import generate_parent_abs_path
 
 
-def export_ee_index_as_iaga(
+def export_ee_as_iaga_zip(
     station: EeIndexStation, start_ut: datetime, end_ut: datetime
 ):
     """
@@ -56,7 +56,6 @@ def export_ee_index_as_iaga(
     )
 
     dir_path = generate_parent_abs_path(TMP_DIR_PATH)
-    print(dir_path)
     zip_buffer = create_zip_buffer(dir_path)
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     remove_tmp_files()
