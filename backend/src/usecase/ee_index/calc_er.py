@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 import numpy as np
-from src.constants.ee_index import MAX_ER, MIN_ER_
+from src.constants.ee_index import MAX_ER, MIN_ER
 from src.constants.time_relation import DawnAndDusk
 from src.usecase.ee_index.calc_h_component import HComponent
 from src.usecase.ee_index.nan_calculator import NanCalculator
@@ -20,7 +20,7 @@ class Er:
 
     def _remove_outliers(self, raw_er: np.ndarray) -> np.ndarray:
         raw_er[raw_er > MAX_ER] = np.nan
-        raw_er[raw_er < MIN_ER_] = np.nan
+        raw_er[raw_er < MIN_ER] = np.nan
         return raw_er
 
     def _get_lt_array(self) -> np.ndarray:

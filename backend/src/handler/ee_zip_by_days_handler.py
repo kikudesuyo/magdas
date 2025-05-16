@@ -4,7 +4,7 @@ from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from src.domain.magdas_station import EeIndexStation
-from src.usecase.downloads.export_ee_index import export_ee_index_as_iaga
+from src.usecase.downloads.export_ee_zip import export_ee_as_iaga_zip
 from src.utils.date import to_datetime
 
 
@@ -37,7 +37,7 @@ def handle_get_ee_zip_content_by_days(
         days=request.days - 1
     )
 
-    zip_base64 = export_ee_index_as_iaga(station, start_ut, end_ut)
+    zip_base64 = export_ee_as_iaga_zip(station, start_ut, end_ut)
 
     start_date = start_ut.strftime("%Y-%m-%d")
     end_date = end_ut.strftime("%Y-%m-%d")
