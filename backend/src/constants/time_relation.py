@@ -8,12 +8,6 @@ class TimeConst:
     const: int
 
 
-class Day(TimeConst, Enum):
-    ONE = 1
-    IN_LEAP_YEAR = 366
-    IN_NON_LEAP_YEAR = 365
-
-
 class Min(TimeConst, Enum):
     ONE_HOUR = 60
     THREE_HOURS = 180
@@ -50,11 +44,4 @@ class DawnAndDusk(TimeRange, Enum):
     NIGHTSIDE = (
         datetime.time(18, 0, 0),
         datetime.time(5, 59, 59),
-    )
-
-
-class DayTimeRange(TimeRange, Enum):
-    DAY = (
-        datetime.time(0, 0, 0),
-        datetime.time(23, 59, 59),
     )
