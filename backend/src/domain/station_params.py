@@ -26,8 +26,8 @@ class Period:
         """
         time_diff = self.end - self.start
         days = time_diff.days
-        hours = time_diff.seconds // Sec.ONE_HOUR.const
-        minutes = time_diff.seconds % Sec.ONE_HOUR.const // Sec.ONE_MINUTE.const
+        hours = time_diff.seconds // Sec.ONE_HOUR
+        minutes = time_diff.seconds % Sec.ONE_HOUR // Sec.ONE_MINUTE
         return days, hours, minutes
 
 

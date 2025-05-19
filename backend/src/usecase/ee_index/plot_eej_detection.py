@@ -60,8 +60,7 @@ class EejDetectionPlotter:
 
     def _set_axis_labels(self):
         data_length = (
-            int((self.end_lt - self.start_lt).total_seconds()) // Sec.ONE_MINUTE.const
-            + 1
+            int((self.end_lt - self.start_lt).total_seconds()) // Sec.ONE_MINUTE + 1
         )
         self.ax.set_ylabel("nT", rotation=0)
         self.ax.set_xlim(0, data_length)
