@@ -3,14 +3,14 @@ from datetime import datetime
 
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.usecase.downloads.build_iaga import (
+from src.usecase.ee_index.factory_ee import EeFactory
+from src.usecase.file_exporter.build_iaga import (
     build_iaga_data,
     build_iaga_meta_data,
     save_as_iaga,
 )
-from src.usecase.downloads.remove_files import TMP_DIR_PATH, remove_tmp_files
-from src.usecase.downloads.zip_create import create_zip_buffer
-from src.usecase.ee_index.factory_ee import EeFactory
+from src.usecase.file_exporter.remove_files import TMP_DIR_PATH, remove_tmp_files
+from src.usecase.file_exporter.zip_create import create_zip_buffer
 from src.utils.path import generate_parent_abs_path
 
 

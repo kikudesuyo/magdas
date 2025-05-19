@@ -2,7 +2,7 @@ from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from src.domain.magdas_station import EeIndexStation
-from src.usecase.downloads.export_ee_zip import export_ee_as_iaga_zip
+from src.usecase.file_exporter.export_ee_zip import export_ee_as_iaga_zip
 from src.utils.date import to_datetime
 
 

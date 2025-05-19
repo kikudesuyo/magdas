@@ -5,7 +5,7 @@ import numpy as np
 from src.constants.time_relation import Sec
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.usecase.ee_index.calc_moving_ave import calc_moving_avg
+from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
 from src.usecase.ee_index.factory_ee import EeFactory
 from src.usecase.ee_index.plot_config import PlotConfig
 

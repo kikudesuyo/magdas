@@ -39,7 +39,9 @@ def build_iaga_data(
             for i in range(Min.ONE_DAY.const * days)
         ],
         "DOY": [
-            start_day_of_year + i for i in range(days) for _ in range(Min.ONE_DAY.const)
+            (start_ut + timedelta(days=j)).timetuple().tm_yday
+            for j in range(days)
+            for _ in range(Min.ONE_DAY.const)
         ],
         "EDst1h": edst_values,
         "EDst6h": [0.0] * Min.ONE_DAY.const * days,
