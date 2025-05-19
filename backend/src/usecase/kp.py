@@ -23,5 +23,6 @@ class Kp:
         return df_filterd["kp"].max()
 
 
-kp = Kp()
-max_kp = kp.get_max(datetime(2021, 12, 31), datetime(2022, 1, 1))
+if __name__ == "__main__":
+    kp = Kp()
+    max_kp = kp.get_max(datetime(2021, 12, 31), datetime(2022, 1, 1))

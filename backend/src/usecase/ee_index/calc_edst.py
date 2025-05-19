@@ -16,7 +16,7 @@ class Edst:
 
     def calc_edst(self) -> np.ndarray:
         days, hours, minutes = self.period.time_diff()
-        length = days * Min.ONE_DAY.const + hours * Min.ONE_HOUR.const + minutes + 1
+        length = days * Min.ONE_DAY + hours * Min.ONE_HOUR + minutes + 1
         night_er_list = np.empty((0, length), dtype=float)
         for station in EeIndexStation:
             params = StationParams(station, self.period)
@@ -27,8 +27,8 @@ class Edst:
         edst = NanCalculator.nanmean(night_er_list)
         return edst
 
-    def compute_smoothed_edst(self) -> np.ndarray:
+    def compute_smoothed_edst(self, window_size: int = Min.ONE_HOUR) -> np.ndarray:
         edst = self.calc_edst()
-        weight = np.ones(60) / 60
-        moved_edst = np.convolve(edst, weight, mode="same")
+        uniform_weights = np.ones(window_size) / window_size
+        moved_edst = np.convolve(edst, uniform_weights, mode="same")
         return moved_edst

@@ -23,28 +23,32 @@ def build_iaga_meta_data(station: EeIndexStation, iaga_code, elevation):
 
 
 def build_iaga_data(
-    start_ut: datetime, end_ut: datetime, edst_values, er_values, euel_values
+    start_ut: datetime,
+    end_ut: datetime,
+    edst_1h_values,
+    edst_6h_values,
+    er_values,
+    euel_values,
 ):
     days = (end_ut - start_ut).days + 1
-    start_day_of_year = start_ut.timetuple().tm_yday
 
     return {
         "DATE": [
             (start_ut + timedelta(days=j)).strftime("%Y-%m-%d")
             for j in range(days)
-            for _ in range(Min.ONE_DAY.const)
+            for _ in range(Min.ONE_DAY)
         ],
         "TIME": [
-            f"{(i % Min.ONE_DAY.const) // Min.ONE_HOUR.const:02d}:{(i % Min.ONE_DAY.const) % Sec.ONE_MINUTE.const:02d}:00.000"
-            for i in range(Min.ONE_DAY.const * days)
+            f"{(i % Min.ONE_DAY) // Min.ONE_HOUR:02d}:{(i % Min.ONE_DAY) % Sec.ONE_MINUTE:02d}:00.000"
+            for i in range(Min.ONE_DAY * days)
         ],
         "DOY": [
             (start_ut + timedelta(days=j)).timetuple().tm_yday
             for j in range(days)
-            for _ in range(Min.ONE_DAY.const)
+            for _ in range(Min.ONE_DAY)
         ],
-        "EDst1h": edst_values,
-        "EDst6h": [0.0] * Min.ONE_DAY.const * days,
+        "EDst1h": edst_1h_values,
+        "EDst6h": edst_6h_values,
         "ER": er_values,
         "EUEL": euel_values,
     }

@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Iterable
+from typing import Iterable, List
 
 import numpy as np
 from fastapi import Depends, Query
@@ -50,9 +50,9 @@ def handle_get_ee_by_range(
     euel = factory.create_euel(params)
 
     # for JSON serialization
-    er_with_none = nan_to_none(er.calc_er())
-    edst_with_none = nan_to_none(edst.compute_smoothed_edst())
-    euel_with_none = nan_to_none(euel.calc_euel())
+    er_with_none = sanitize_np(er.calc_er())
+    edst_with_none = sanitize_np(edst.compute_smoothed_edst())
+    euel_with_none = sanitize_np(euel.calc_euel())
 
     minute_labels = [
         (start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
@@ -71,5 +71,13 @@ def handle_get_ee_by_range(
     )
 
 
-def nan_to_none(values: Iterable[float] | np.ndarray):
+def np_nan_to_none(values: np.ndarray) -> List[float | None]:
     return [None if np.isnan(x) else x for x in values]
+
+
+def to_float(values: Iterable[float | None]) -> List[float | None]:
+    return [float(x) if x is not None else None for x in values]
+
+
+def sanitize_np(values: np.ndarray) -> List[float | None]:
+    return to_float(np_nan_to_none(values))

@@ -1,23 +1,19 @@
 import datetime
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, IntEnum
 
 
-@dataclass
-class TimeConst:
-    const: int
-
-
-class Min(TimeConst, Enum):
+class Min(IntEnum):
     ONE_HOUR = 60
     THREE_HOURS = 180
+    SIX_HOURS = 360
     ONE_DAY = 1440
     FIVE_DAYS = 7200
     THIRTY_DAYS = 43200
     SIXTY_DAYS = 86400
 
 
-class Sec(TimeConst, Enum):
+class Sec(IntEnum):
     ONE_DAY = 86400
     ONE_HOUR = 3600
     ONE_MINUTE = 60

@@ -1,6 +1,7 @@
 import base64
 from datetime import datetime
 
+from src.constants.time_relation import Min
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.factory_ee import EeFactory
@@ -35,8 +36,10 @@ def export_ee_as_iaga_zip(
     er = factory.create_er(params)
     edst = factory.create_edst(period)
     euel = factory.create_euel(params)
+
     er_values = er.calc_er()
-    edst_values = edst.compute_smoothed_edst()
+    edst_1h_values = edst.compute_smoothed_edst()
+    edst_6h_values = edst.compute_smoothed_edst(window_size=Min.SIX_HOURS)
     euel_values = euel.calc_euel()
 
     iaga_meta_data = build_iaga_meta_data(
@@ -47,7 +50,8 @@ def export_ee_as_iaga_zip(
     iaga_data = build_iaga_data(
         start_ut,
         end_ut,
-        edst_values,
+        edst_1h_values,
+        edst_6h_values,
         er_values,
         euel_values,
     )

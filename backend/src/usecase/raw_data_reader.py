@@ -24,10 +24,10 @@ def read_raw_min_data(path):
                 break
         # 生データの取得
         data = np.fromfile(file, np.float32)
-        if len(data) == Min.ONE_DAY.const * SEVEN_COMPONENTS:
-            array = data.reshape((Min.ONE_DAY.const, SEVEN_COMPONENTS))
-        elif len(data) == Min.ONE_DAY.const * EIGHT_COMPONENTS:
-            array = data.reshape((Min.ONE_DAY.const, EIGHT_COMPONENTS))
+        if len(data) == Min.ONE_DAY * SEVEN_COMPONENTS:
+            array = data.reshape((Min.ONE_DAY, SEVEN_COMPONENTS))
+        elif len(data) == Min.ONE_DAY * EIGHT_COMPONENTS:
+            array = data.reshape((Min.ONE_DAY, EIGHT_COMPONENTS))
         else:
             raise ValueError(f"There are missing data! Elements is {len(data)}.")
     return array
@@ -54,8 +54,8 @@ def read_raw_sec_data(path):
                 break
         # 生データの取得
         data = np.fromfile(file, np.float32)
-        if len(data) == Sec.ONE_DAY.const * FOUR_COMPONENTS:
-            array = data.reshape((Sec.ONE_DAY.const, FOUR_COMPONENTS))
+        if len(data) == Sec.ONE_DAY * FOUR_COMPONENTS:
+            array = data.reshape((Sec.ONE_DAY, FOUR_COMPONENTS))
             return array
         else:
             raise ValueError(f"There are missing data! Elements is {len(data)}.")
