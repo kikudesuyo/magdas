@@ -40,7 +40,8 @@ class EeIndexPlotter:
     def plot_edst(self):
         factory = EeFactory()
         edst = factory.create_edst(self.period)
-        edst_values = edst.compute_smoothed_edst()
+        edst_raw = edst.calc_edst()
+        edst_values = calc_moving_avg(edst_raw, 60, 30)
         x_axis, y_axis = np.arange(0, len(edst_values), 1), edst_values
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
@@ -60,14 +61,15 @@ class EeIndexPlotter:
         edst = factory.create_edst(self.period)
         euel = factory.create_euel(params)
         er_values = er.calc_er()
-        edst_values = edst.compute_smoothed_edst()
+        edst_raw = edst.calc_edst()
+        edst_values = calc_moving_avg(edst_raw, 60, 30)
         euel_values = euel.calc_euel()
         if len(er_values) != len(edst_values) or len(er_values) != len(euel_values):
             raise ValueError("The length of the arrays must be the same")
         x_axis = np.arange(0, len(er_values), 1)
-        self.ax.plot(x_axis, er, label="ER", color="black", lw=0.5)
-        self.ax.plot(x_axis, edst, label="EDst", color="green", lw=0.5)
-        self.ax.plot(x_axis, euel, label="EUEL", color="red", lw=0.5)
+        self.ax.plot(x_axis, er_values, label="ER", color="black", lw=0.5)
+        self.ax.plot(x_axis, edst_values, label="EDst", color="green", lw=0.5)
+        self.ax.plot(x_axis, euel_values, label="EUEL", color="red", lw=0.5)
 
     def _set_axis_labels(self):
         data_length = (

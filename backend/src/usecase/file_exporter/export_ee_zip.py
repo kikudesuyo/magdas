@@ -4,6 +4,7 @@ from datetime import datetime
 from src.constants.time_relation import Min
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
+from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
 from src.usecase.ee_index.factory_ee import EeFactory
 from src.usecase.file_exporter.build_iaga import (
     build_iaga_data,
@@ -38,8 +39,9 @@ def export_ee_as_iaga_zip(
     euel = factory.create_euel(params)
 
     er_values = er.calc_er()
-    edst_1h_values = edst.compute_smoothed_edst()
-    edst_6h_values = edst.compute_smoothed_edst(window_size=Min.SIX_HOURS)
+    edst_raw = edst.calc_edst()
+    edst_1h_values = calc_moving_avg(edst_raw, Min.ONE_HOUR, 30)
+    edst_6h_values = calc_moving_avg(edst_raw, Min.SIX_HOURS, Min.THREE_HOURS)
     euel_values = euel.calc_euel()
 
     iaga_meta_data = build_iaga_meta_data(

@@ -29,10 +29,10 @@ class EejDetectionPlotter:
         ut_params = params.to_ut_params()
         factory = EeFactory()
         euel = factory.create_euel(ut_params)
-        euel_values = euel.calc_euel()
-        moving_avg = calc_moving_avg(euel_values, 120, 60)
-        x_axis = np.arange(0, len(moving_avg), 1)
-        self.ax.plot(x_axis, moving_avg, label=station.name)
+        raw_euel = euel.calc_euel()
+        euel_values = calc_moving_avg(raw_euel, 120, 60)
+        x_axis = np.arange(0, len(euel_values), 1)
+        self.ax.plot(x_axis, euel_values, label=station.name)
 
     def plot_euel_to_detect_eej(self, station: EeIndexStation, color):
         """EEJを検知するためのプロット
@@ -49,7 +49,7 @@ class EejDetectionPlotter:
         x_axis = np.arange(0, len(euel), 1)
         self.ax.plot(x_axis, euel, label=station.name, color=color)
 
-    def plot_pure(self, station: EeIndexStation, color):
+    def plot_pure_euel(self, station: EeIndexStation, color):
         lt_params = StationParams(station, self.lt_period)
         ut_params = lt_params.to_ut_params()
         factory = EeFactory()
