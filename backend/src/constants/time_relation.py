@@ -3,20 +3,27 @@ from dataclasses import dataclass
 from enum import Enum, IntEnum
 
 
-class Min(IntEnum):
-    ONE_HOUR = 60
-    THREE_HOURS = 180
-    SIX_HOURS = 360
-    ONE_DAY = 1440
-    FIVE_DAYS = 7200
-    THIRTY_DAYS = 43200
-    SIXTY_DAYS = 86400
+class TimeUnit(IntEnum):
+    """Time unit in seconds."""
 
-
-class Sec(IntEnum):
-    ONE_DAY = 86400
-    ONE_HOUR = 3600
     ONE_MINUTE = 60
+    ONE_HOUR = 60 * 60
+    THREE_HOURS = 3 * 60 * 60
+    SIX_HOURS = 6 * 60 * 60
+    ONE_DAY = 24 * 60 * 60
+
+    @property
+    def sec(self) -> int:
+        return self.value
+
+    @property
+    def min(self) -> int:
+        return self.value // 60
+
+    @property
+    def hour(self) -> int:
+        print("[Log] Time Unit hour property: value be truncated to integer hours")
+        return self.value // (60 * 60)
 
 
 @dataclass

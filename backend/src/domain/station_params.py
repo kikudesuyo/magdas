@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from src.constants.time_relation import Sec
+from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.utils.date import DateUtils
 
@@ -26,8 +26,8 @@ class Period:
         """
         time_diff = self.end - self.start
         days = time_diff.days
-        hours = time_diff.seconds // Sec.ONE_HOUR
-        minutes = time_diff.seconds % Sec.ONE_HOUR // Sec.ONE_MINUTE
+        hours = time_diff.seconds // TimeUnit.ONE_HOUR.sec
+        minutes = time_diff.seconds % TimeUnit.ONE_HOUR.sec // TimeUnit.ONE_MINUTE.sec
         return days, hours, minutes
 
 

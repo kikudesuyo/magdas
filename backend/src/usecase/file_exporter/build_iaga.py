@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 import pandas as pd
-from src.constants.time_relation import Min, Sec
+from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 
 
@@ -36,16 +36,16 @@ def build_iaga_data(
         "DATE": [
             (start_ut + timedelta(days=j)).strftime("%Y-%m-%d")
             for j in range(days)
-            for _ in range(Min.ONE_DAY)
+            for _ in range(TimeUnit.ONE_DAY.min)
         ],
         "TIME": [
-            f"{(i % Min.ONE_DAY) // Min.ONE_HOUR:02d}:{(i % Min.ONE_DAY) % Sec.ONE_MINUTE:02d}:00.000"
-            for i in range(Min.ONE_DAY * days)
+            f"{(i % TimeUnit.ONE_DAY.min) // TimeUnit.ONE_HOUR.min:02d}:{(i % TimeUnit.ONE_DAY.min) % TimeUnit.ONE_MINUTE.sec:02d}:00.000"
+            for i in range(TimeUnit.ONE_DAY.min * days)
         ],
         "DOY": [
             (start_ut + timedelta(days=j)).timetuple().tm_yday
             for j in range(days)
-            for _ in range(Min.ONE_DAY)
+            for _ in range(TimeUnit.ONE_DAY.min)
         ],
         "EDst1h": edst_1h_values,
         "EDst6h": edst_6h_values,
