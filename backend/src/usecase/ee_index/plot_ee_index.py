@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-from src.constants.time_relation import Sec
+from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
@@ -73,7 +73,9 @@ class EeIndexPlotter:
 
     def _set_axis_labels(self):
         data_length = (
-            int((self.end_ut - self.start_ut).total_seconds()) // Sec.ONE_MINUTE + 1
+            int((self.end_ut - self.start_ut).total_seconds())
+            // TimeUnit.ONE_MINUTE.sec
+            + 1
         )
         self.ax.set_ylabel("nT", rotation=0)
         self.ax.set_xlim(0, data_length)

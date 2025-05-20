@@ -3,7 +3,7 @@ from glob import glob
 
 import numpy as np
 from src.constants.ee_index import MAX_RAW_H, MIN_RAW_H
-from src.constants.time_relation import Min
+from src.constants.time_relation import TimeUnit
 from src.domain.station_params import StationParams
 from src.usecase.raw_data_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
@@ -19,7 +19,7 @@ def get_h_for_a_day(station_code: str, ut_date: date):
         )
     )
     if len(filenames) == 0:
-        h_for_day = np.full(Min.ONE_DAY, np.NaN)
+        h_for_day = np.full(TimeUnit.ONE_DAY.min, np.NaN)
         return h_for_day
     if len(filenames) > 1:
         raise FileNotFoundError(
@@ -27,12 +27,12 @@ def get_h_for_a_day(station_code: str, ut_date: date):
         )
     try:
         h_for_day = read_raw_min_data(filenames[0])[:, 0]
-        for i in range(Min.ONE_DAY):
+        for i in range(TimeUnit.ONE_DAY.min):
             if h_for_day[i] <= MIN_RAW_H or h_for_day[i] >= MAX_RAW_H:
                 h_for_day[i] = np.NaN
         return h_for_day
     except ValueError as e:  # ファイルのデータ形式によるエラーが発生する場合がある
-        h_for_day = np.full(Min.ONE_DAY, np.NaN)
+        h_for_day = np.full(TimeUnit.ONE_DAY.min, np.NaN)
         return h_for_day
 
 
@@ -45,8 +45,10 @@ class HComponent:
     def get_h_component(self):
         start_date, end_date = self.start_ut.date(), self.end_ut.date()
         if start_date == end_date:
-            start_idx = self.start_ut.hour * Min.ONE_HOUR + self.start_ut.minute
-            end_idx = self.end_ut.hour * Min.ONE_HOUR + self.end_ut.minute
+            start_idx = (
+                self.start_ut.hour * TimeUnit.ONE_HOUR.min + self.start_ut.minute
+            )
+            end_idx = self.end_ut.hour * TimeUnit.ONE_HOUR.min + self.end_ut.minute
             day_h_data = get_h_for_a_day(self.station.code, start_date)[
                 start_idx : end_idx + 1
             ]
@@ -56,10 +58,12 @@ class HComponent:
             current_date = start_date + timedelta(days=i)
             day_h_data = get_h_for_a_day(self.station.code, current_date)
             if current_date == start_date:
-                start_idx = self.start_ut.hour * Min.ONE_HOUR + self.start_ut.minute
+                start_idx = (
+                    self.start_ut.hour * TimeUnit.ONE_HOUR.min + self.start_ut.minute
+                )
                 h_values = np.concatenate((h_values, day_h_data[start_idx:]))
             elif current_date == end_date:
-                end_idx = self.end_ut.hour * Min.ONE_HOUR + self.end_ut.minute
+                end_idx = self.end_ut.hour * TimeUnit.ONE_HOUR.min + self.end_ut.minute
                 h_values = np.concatenate((h_values, day_h_data[: end_idx + 1]))
             else:
                 h_values = np.concatenate((h_values, day_h_data))

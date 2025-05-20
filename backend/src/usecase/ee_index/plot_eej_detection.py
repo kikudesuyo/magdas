@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from src.constants.time_relation import Sec
+from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_detect_eej import calc_euel_for_eej_detection
@@ -60,7 +60,9 @@ class EejDetectionPlotter:
 
     def _set_axis_labels(self):
         data_length = (
-            int((self.end_lt - self.start_lt).total_seconds()) // Sec.ONE_MINUTE + 1
+            int((self.end_lt - self.start_lt).total_seconds())
+            // TimeUnit.ONE_MINUTE.sec
+            + 1
         )
         self.ax.set_ylabel("nT", rotation=0)
         self.ax.set_xlim(0, data_length)
