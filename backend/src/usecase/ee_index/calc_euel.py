@@ -10,4 +10,3 @@ class Euel:
 
     def calc_euel(self) -> np.ndarray:
         return self.er.calc_er() - self.edst.calc_edst()
-        # return self.er.calc_er() - self.edst.compute_smoothed_edst()

@@ -51,7 +51,7 @@ def handle_get_ee_by_range(
 
     # for JSON serialization
     er_with_none = sanitize_np(er.calc_er())
-    edst_with_none = sanitize_np(edst.compute_smoothed_edst())
+    edst_with_none = sanitize_np(edst.calc_edst())
     euel_with_none = sanitize_np(euel.calc_euel())
 
     minute_labels = [

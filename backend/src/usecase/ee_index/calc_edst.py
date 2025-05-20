@@ -26,9 +26,3 @@ class Edst:
             night_er_list = np.vstack((night_er_list, night_er_val))
         edst = NanCalculator.nanmean(night_er_list)
         return edst
-
-    def compute_smoothed_edst(self, window_size: int = Min.ONE_HOUR) -> np.ndarray:
-        edst = self.calc_edst()
-        uniform_weights = np.ones(window_size) / window_size
-        moved_edst = np.convolve(edst, uniform_weights, mode="same")
-        return moved_edst
