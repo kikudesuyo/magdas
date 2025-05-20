@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
@@ -14,20 +14,22 @@ class Period:
     def __post_init__(self):
         if self.start >= self.end:
             raise ValueError("Start time must be before end time.")
+        if self.start.second != 0 or self.start.microsecond != 0:
+            raise ValueError("Start time must be minute-precision (no seconds).")
+        if self.end.second != 0 or self.end.microsecond != 0:
+            raise ValueError("End time must be minute-precision (no seconds).")
+
+    def total_minutes(self) -> int:
+        return int((self.end - self.start).total_seconds() // TimeUnit.ONE_MINUTE.sec)
 
     def time_diff(self) -> tuple[int, int, int]:
-        """Calculate the time difference
-
-        Args:
-          start_time (datetime.datetime):
-          end_time (datetime.datetime):
-        Return:
-          (days, hours, minutes) (tuple(int)): time difference
-        """
-        time_diff = self.end - self.start
-        days = time_diff.days
-        hours = time_diff.seconds // TimeUnit.ONE_HOUR.sec
-        minutes = time_diff.seconds % TimeUnit.ONE_HOUR.sec // TimeUnit.ONE_MINUTE.sec
+        """Return (days, hours, minutes) of the period."""
+        diff = self.end - self.start
+        days = diff.days
+        # timedelta.seconds は 日数を除いた部分(0 ~86399秒)を返す
+        seconds = diff.seconds
+        hours, r = divmod(seconds, TimeUnit.ONE_HOUR.sec)
+        minutes, _ = divmod(r, TimeUnit.ONE_MINUTE.sec)
         return days, hours, minutes
 
 

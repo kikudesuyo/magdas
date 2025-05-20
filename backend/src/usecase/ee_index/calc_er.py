@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import numpy as np
 from src.constants.ee_index import MAX_ER, MIN_ER
-from src.constants.time_relation import DawnAndDusk
+from src.constants.time_relation import DawnAndDusk, TimeUnit
 from src.usecase.ee_index.calc_h_component import HComponent
 from src.usecase.ee_index.nan_calculator import NanCalculator
 from src.utils.date import DateUtils
@@ -24,9 +24,15 @@ class Er:
         return raw_er
 
     def _get_lt_array(self) -> np.ndarray:
-        total_minutes = int((self.h.end_ut - self.h.start_ut).total_seconds() // 60) + 1
+        length = (
+            int(
+                (self.h.end_ut - self.h.start_ut).total_seconds()
+                // TimeUnit.ONE_MINUTE.sec
+            )
+            + 1  # include start_ut
+        )
         lt_arr = []
-        for i in range(total_minutes):
+        for i in range(length):
             lt = DateUtils.to_lt(
                 self.h.station, self.h.start_ut + timedelta(minutes=i)
             ).time()
