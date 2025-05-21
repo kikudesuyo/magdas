@@ -2,6 +2,7 @@ from datetime import date, datetime, time, timedelta
 
 import numpy as np
 from src.constants.ee_index import EEJ_THRESHOLD
+from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_linear_completion import interpolate_nan
@@ -49,22 +50,22 @@ def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
         return euel_values
     euel_for_baseline = np.concatenate(
         (
-            euel_values[0 : 5 * 60],
-            np.nan * np.ones(14 * 60),
-            euel_values[19 * 60 : 24 * 60],
+            euel_values[0 : 5 * TimeUnit.ONE_MINUTE.min],
+            np.nan * np.ones(14 * TimeUnit.ONE_MINUTE.min),
+            euel_values[19 * TimeUnit.ONE_MINUTE.min : 24 * TimeUnit.ONE_MINUTE.min],
         )
     )
     y_filled = interpolate_nan(euel_for_baseline)
     euel_for_eej_detection = euel_values - y_filled
-    return calc_moving_avg(euel_for_eej_detection, 60, 30)
+    return calc_moving_avg(euel_for_eej_detection, TimeUnit.ONE_MINUTE.min, TimeUnit.ONE_MINUTE.min // 2)
 
 
 def has_night_data(local_daily_data: np.ndarray) -> bool:
     """一日の夜間データが存在するかどうかを判定する"""
-    if len(local_daily_data) != 1440:
-        raise ValueError("daily_data must have 1440 elements.")
-    dawn_e = local_daily_data[0 : 5 * 60]
-    dusk_e = local_daily_data[19 * 60 : 24 * 60]
+    if len(local_daily_data) != TimeUnit.ONE_DAY.min:
+        raise ValueError(f"daily_data must have {TimeUnit.ONE_DAY.min} elements.")
+    dawn_e = local_daily_data[0 : 5 * TimeUnit.ONE_MINUTE.min]
+    dusk_e = local_daily_data[19 * TimeUnit.ONE_MINUTE.min : 24 * TimeUnit.ONE_MINUTE.min]
     return not (np.all(np.isnan(dawn_e)) and np.all(np.isnan(dusk_e)))
 
 
