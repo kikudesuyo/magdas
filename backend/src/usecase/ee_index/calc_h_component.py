@@ -39,6 +39,7 @@ def get_h_for_a_day(station_code: str, ut_date: date):
 class HComponent:
     def __init__(self, params: StationParams):
         self.station = params.station
+        self.period = params.period
         self.start_ut = params.period.start
         self.end_ut = params.period.end
 
