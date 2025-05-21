@@ -5,6 +5,7 @@ import numpy as np
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.factory_ee import EeFactory
@@ -56,7 +57,7 @@ def handle_get_ee_by_range(
 
     minute_labels = [
         (start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
-        for i in range(days * 24 * 60)
+        for i in range(days * TimeUnit.ONE_DAY.min)
     ]
 
     return JSONResponse(

@@ -30,7 +30,9 @@ class EejDetectionPlotter:
         factory = EeFactory()
         euel = factory.create_euel(ut_params)
         raw_euel = euel.calc_euel()
-        euel_values = calc_moving_avg(raw_euel, 120, 60)
+        euel_values = calc_moving_avg(
+            raw_euel, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min
+        )
         x_axis = np.arange(0, len(euel_values), 1)
         self.ax.plot(x_axis, euel_values, label=station.name)
 
