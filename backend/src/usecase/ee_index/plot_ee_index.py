@@ -41,7 +41,7 @@ class EeIndexPlotter:
         factory = EeFactory()
         edst = factory.create_edst(self.period)
         edst_raw = edst.calc_edst()
-        edst_values = calc_moving_avg(edst_raw, 60, 30)
+        edst_values = calc_moving_avg(edst_raw, TimeUnit.ONE_MINUTE.min, 30)
         x_axis, y_axis = np.arange(0, len(edst_values), 1), edst_values
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
@@ -50,7 +50,7 @@ class EeIndexPlotter:
         factoy = EeFactory()
         euel = factoy.create_euel(p)
         euel_values = euel.calc_euel()
-        smoothed_euel = calc_moving_avg(euel_values, 120, 60)
+        smoothed_euel = calc_moving_avg(euel_values, TimeUnit.ONE_MINUTE.min * 2, TimeUnit.ONE_MINUTE.min)
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
 
@@ -62,7 +62,7 @@ class EeIndexPlotter:
         euel = factory.create_euel(params)
         er_values = er.calc_er()
         edst_raw = edst.calc_edst()
-        edst_values = calc_moving_avg(edst_raw, 60, 30)
+        edst_values = calc_moving_avg(edst_raw, TimeUnit.ONE_MINUTE.min, 30)
         euel_values = euel.calc_euel()
         if len(er_values) != len(edst_values) or len(er_values) != len(euel_values):
             raise ValueError("The length of the arrays must be the same")

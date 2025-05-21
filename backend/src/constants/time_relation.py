@@ -9,7 +9,10 @@ class TimeUnit(IntEnum):
     ONE_MINUTE = 60
     ONE_HOUR = 60 * 60
     THREE_HOURS = 3 * 60 * 60
+    FIVE_HOURS = 5 * 60 * 60
     SIX_HOURS = 6 * 60 * 60
+    FOURTEEN_HOURS = 14 * 60 * 60
+    NINETEEN_HOURS = 19 * 60 * 60
     ONE_DAY = 24 * 60 * 60
 
     @property
