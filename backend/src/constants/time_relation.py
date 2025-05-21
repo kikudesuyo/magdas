@@ -7,7 +7,9 @@ class TimeUnit(IntEnum):
     """Time unit in seconds."""
 
     ONE_MINUTE = 60
+    THIRTY_MINUTES = 30 * 60
     ONE_HOUR = 60 * 60
+    TWO_HOURS = 2 * 60 * 60
     THREE_HOURS = 3 * 60 * 60
     FIVE_HOURS = 5 * 60 * 60
     SIX_HOURS = 6 * 60 * 60

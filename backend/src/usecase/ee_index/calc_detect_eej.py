@@ -57,7 +57,9 @@ def calc_euel_for_eej_detection(station: EeIndexStation, local_date: date):
     )
     y_filled = interpolate_nan(euel_for_baseline)
     euel_for_eej_detection = euel_values - y_filled
-    return calc_moving_avg(euel_for_eej_detection, TimeUnit.ONE_MINUTE.min, 30)
+    return calc_moving_avg(
+        euel_for_eej_detection, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
+    )
 
 
 def has_night_data(local_daily_data: np.ndarray) -> bool:
