@@ -165,6 +165,8 @@ img
 data
 !data/er_baseline
 !data/er_baseline/README.md
+!data/baselines
+!data/baselines/README.md
 Storage/ee_index
 previous
 sandbox.py
