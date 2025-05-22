@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.backend_bases import MouseEvent
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
@@ -11,10 +12,8 @@ from src.usecase.ee_index.plot_config import PlotConfig
 
 
 class EeIndexPlotter:
-    def __init__(self, start_ut: datetime, end_ut: datetime):
-        self.start_ut = start_ut
-        self.end_ut = end_ut
-        self.period = Period(start_ut, end_ut)
+    def __init__(self, ut_period: Period):
+        self.ut_period = ut_period
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
@@ -32,14 +31,14 @@ class EeIndexPlotter:
 
     def plot_er(self, station: EeIndexStation, color):
         factory = EeFactory()
-        er = factory.create_er(StationParams(station, self.period))
+        er = factory.create_er(StationParams(station, self.ut_period))
         er_values = er.calc_er()
         x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
-        self.ax.plot(x_axis, y_axis, label="ER", color=color)
+        self.ax.plot(x_axis, y_axis, label=f"{station.code}_ER", color=color)
 
     def plot_edst(self):
         factory = EeFactory()
-        edst = factory.create_edst(self.period)
+        edst = factory.create_edst(self.ut_period)
         edst_raw = edst.calc_edst()
         edst_values = calc_moving_avg(
             edst_raw, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
@@ -48,7 +47,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
     def plot_euel(self, station: EeIndexStation, color):
-        p = StationParams(station, self.period)
+        p = StationParams(station, self.ut_period)
         factory = EeFactory()
         euel = factory.create_euel(p)
         euel_values = euel.calc_euel()
@@ -56,13 +55,13 @@ class EeIndexPlotter:
             euel_values, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min
         )
         x_axis = np.arange(0, len(smoothed_euel), 1)
-        self.ax.plot(x_axis, smoothed_euel, label=f"{station}_EUEL", color=color)
+        self.ax.plot(x_axis, smoothed_euel, label=f"{station.code}_EUEL", color=color)
 
     def plot_ee(self, station: EeIndexStation):
-        params = StationParams(station, self.period)
+        params = StationParams(station, self.ut_period)
         factory = EeFactory()
         er = factory.create_er(params)
-        edst = factory.create_edst(self.period)
+        edst = factory.create_edst(self.ut_period)
         euel = factory.create_euel(params)
         er_values = er.calc_er()
         edst_raw = edst.calc_edst()
@@ -78,11 +77,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, euel_values, label="EUEL", color="red", lw=0.5)
 
     def _set_axis_labels(self):
-        data_length = (
-            int((self.end_ut - self.start_ut).total_seconds())
-            // TimeUnit.ONE_MINUTE.sec
-            + 1
-        )
+        data_length = self.ut_period.total_minutes() + 1
         self.ax.set_ylabel("nT", rotation=0)
         self.ax.set_xlim(0, data_length)
         self.ax.set_ylim(-100, 200)
@@ -90,17 +85,21 @@ class EeIndexPlotter:
         tick_interval = max(1, data_length // 8)
         ticks = range(0, data_length, tick_interval)
         time_labels = [
-            (self.start_ut + timedelta(minutes=i)).strftime("%m/%d %H:%M")
+            (self.ut_period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
             for i in ticks
         ]
         self.ax.set_xticks(ticks)
         self.ax.set_xticklabels(time_labels)
 
-    def _on_move(self, event):
+    def _on_move(self, event: MouseEvent):
         if not event.inaxes:
             return
         x, y = event.xdata, event.ydata
-        time_str = (self.start_ut + timedelta(minutes=int(x))).strftime("%m/%d %H:%M")
+        if x is None or y is None:
+            return
+        time_str = (self.ut_period.start + timedelta(minutes=int(x))).strftime(
+            "%m/%d %H:%M"
+        )
         self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
@@ -123,12 +122,13 @@ class EeIndexPlotter:
 
 
 if __name__ == "__main__":
-    start_date = datetime(2014, 1, 1, 0, 0)
-    end_date = datetime(2014, 1, 31, 23, 59)
-
+    ut_period = Period(
+        start=datetime(2014, 1, 1, 0, 0),
+        end=datetime(2014, 1, 31, 23, 59),
+    )
     anc = EeIndexStation.ANC
     eus = EeIndexStation.EUS
-    p = EeIndexPlotter(start_date, end_date)
+    p = EeIndexPlotter(ut_period)
     p.plot_er(anc, "blue")
     p.plot_er(eus, "red")
     p.plot_edst()

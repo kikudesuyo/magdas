@@ -15,34 +15,34 @@ class TestERValue(unittest.TestCase):
     TODO: 夜側のERの値が1日ごとのベースラインによって求められているか確認する(未実施)
     """
 
-    def setUp(self):
-        warnings.filterwarnings(
-            "ignore", category=RuntimeWarning, message="All-NaN slice encountered"
-        )
-
     station = EeIndexStation.ANC
     start_ut = datetime(2014, 4, 1, 0, 0)
     end_ut = datetime(2014, 4, 2, 0, 0)
 
+    @classmethod
+    def setUpClass(cls):
+        warnings.filterwarnings(
+            "ignore", category=RuntimeWarning, message="All-NaN slice encountered"
+        )
+        start_lt = DateUtils.to_lt(cls.station, cls.start_ut).replace(
+            second=0, microsecond=0
+        )
+        end_lt = DateUtils.to_lt(cls.station, cls.end_ut).replace(
+            second=0, microsecond=0
+        )
+        lt_period = Period(start_lt, end_lt)
+        params = StationParams(cls.station, lt_period)
+        h = HComponent(params)
+        cls.er = Er(h)
+        cls.night_er = cls.er.extract_night_er()
+        cls.night_mask = cls.er.nighttime_mask()
+
     def test_is_dayside_er_nan(self):
         """This function is a test code that checks whether the daytime values are set to np.NaN."""
-        start_lt = DateUtils.to_lt(self.station, self.start_ut)
-        end_lt = DateUtils.to_lt(self.station, self.end_ut)
-        period = Period(start_lt, end_lt)
-        p = StationParams(self.station, period)
-        h = HComponent(p)
-        er = Er(h)
-        night_er = er.extract_night_er()
-
-        current_time = start_lt
-        i = 0
-        while current_time <= end_lt:
-            # 1分ごとに時間を進める
-            if not er.nighttime_mask()[i]:
+        for i in range(len(self.night_er)):
+            if not self.night_mask[i]:
                 err_msg = (
-                    f"Error: 昼間側に値が存在します。index: {i}, 値: {night_er[i]}"
+                    f"Error: 昼間側に値が存在します。index: {i}, 値: {self.night_er[i]}"
                 )
-                self.assertTrue(np.isnan(night_er[i]), err_msg)
-            i += 1
-            current_time += timedelta(minutes=1)
+                self.assertTrue(np.isnan(self.night_er[i]), err_msg)
         print("Success!: 昼間側の値は全てnp.NaNです。in test_night_er_values.py")
