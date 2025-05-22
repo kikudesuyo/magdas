@@ -49,8 +49,8 @@ class EeIndexPlotter:
 
     def plot_euel(self, station: EeIndexStation, color):
         p = StationParams(station, self.period)
-        factoy = EeFactory()
-        euel = factoy.create_euel(p)
+        factory = EeFactory()
+        euel = factory.create_euel(p)
         euel_values = euel.calc_euel()
         smoothed_euel = calc_moving_avg(
             euel_values, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min

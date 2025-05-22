@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
