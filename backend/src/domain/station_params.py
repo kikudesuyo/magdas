@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
@@ -15,6 +15,7 @@ class Period:
         if self.start >= self.end:
             raise ValueError("Start time must be before end time.")
         if self.start.second != 0 or self.start.microsecond != 0:
+            print("second", self.start.second, "micro", self.start.microsecond)
             raise ValueError("Start time must be minute-precision (no seconds).")
         if self.end.second != 0 or self.end.microsecond != 0:
             raise ValueError("End time must be minute-precision (no seconds).")
