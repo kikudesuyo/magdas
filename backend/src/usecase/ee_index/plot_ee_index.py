@@ -15,6 +15,8 @@ from src.utils.period import create_month_period
 class EeIndexPlotter:
     def __init__(self, ut_period: Period):
         self.ut_period = ut_period
+        self.factory = EeFactory()
+
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
@@ -31,15 +33,13 @@ class EeIndexPlotter:
         )
 
     def plot_er(self, station: EeIndexStation, color):
-        factory = EeFactory()
-        er = factory.create_er(StationParams(station, self.ut_period))
+        er = self.factory.create_er(StationParams(station, self.ut_period))
         er_values = er.calc_er()
         x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label=f"{station.code}_ER", color=color)
 
     def plot_edst(self):
-        factory = EeFactory()
-        edst = factory.create_edst(self.ut_period)
+        edst = self.factory.create_edst(self.ut_period)
         edst_raw = edst.calc_edst()
         edst_values = calc_moving_avg(
             edst_raw, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
@@ -49,8 +49,7 @@ class EeIndexPlotter:
 
     def plot_euel(self, station: EeIndexStation, color):
         p = StationParams(station, self.ut_period)
-        factory = EeFactory()
-        euel = factory.create_euel(p)
+        euel = self.factory.create_euel(p)
         euel_values = euel.calc_euel()
         smoothed_euel = calc_moving_avg(
             euel_values, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min
@@ -60,10 +59,9 @@ class EeIndexPlotter:
 
     def plot_ee(self, station: EeIndexStation):
         params = StationParams(station, self.ut_period)
-        factory = EeFactory()
-        er = factory.create_er(params)
-        edst = factory.create_edst(self.ut_period)
-        euel = factory.create_euel(params)
+        er = self.factory.create_er(params)
+        edst = self.factory.create_edst(self.ut_period)
+        euel = self.factory.create_euel(params)
         er_values = er.calc_er()
         edst_raw = edst.calc_edst()
         edst_values = calc_moving_avg(
@@ -127,19 +125,19 @@ if __name__ == "__main__":
     from src.utils.path import generate_abs_path
 
     anc = EeIndexStation.ANC
-
+    hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
+    year = 2018
+    for current_month in range(1, 13):
+        ut_period = create_month_period(year, current_month)
+        p = EeIndexPlotter(ut_period)
+        p.plot_er(anc, "red")
+        p.plot_er(hua, "red")
+        p.plot_er(eus, "purple")
 
-    for year in range(2016, 2021):
-        print(f"year: {year}")
-        for current_month in range(1, 13):
-            ut_period = create_month_period(year, current_month)
-            p = EeIndexPlotter(ut_period)
-            p.plot_er(anc, "blue")
-            p.plot_er(eus, "red")
-            p.plot_edst()
-            path = generate_abs_path(
-                f"/usecase/ee_index/img/ee_index/{year}_{current_month}.png"
-            )
-            p.set_title(f"{year:04d}_{current_month:02d} EE Index")
-            p.save(path)
+        p.plot_edst()
+        path = generate_abs_path(
+            f"/usecase/ee_index/img/ee_index/{year}_{current_month}.png"
+        )
+        p.set_title(f"{year:04d}_{current_month:02d} EE Index")
+        p.show()
