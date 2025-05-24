@@ -1,14 +1,12 @@
 from datetime import time, timedelta
+from typing import List, Literal
 
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.backend_bases import MouseEvent
-from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
-from src.usecase.ee_index.calc_eej_detection import calc_euel_for_eej_detection
-from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
-from src.usecase.ee_index.factory_ee import EeFactory
+from src.domain.station_params import Period
+from src.usecase.ee_index.calc_eej_detection import BestEuelSelector
 from src.usecase.ee_index.plot_config import PlotConfig
 from src.utils.period import create_month_period
 
@@ -21,43 +19,43 @@ class EejDetectionPlotter:
         self._set_axis_labels()
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
-    def plot_local_euel(self, station: EeIndexStation):
-        params = StationParams(station, self.lt_period)
-        ut_params = params.to_ut_params()
-        factory = EeFactory()
-        euel = factory.create_euel(ut_params)
-        raw_euel = euel.calc_euel()
-        euel_values = calc_moving_avg(
-            raw_euel, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min
-        )
-        x_axis = np.arange(0, len(euel_values), 1)
-        self.ax.plot(x_axis, euel_values, label=station.name)
-
-    def plot_euel_to_detect_eej(self, station: EeIndexStation, color):
-        """EEJを検知するためのプロット
-        注意:
-        EEJの検知は日毎で行うため、start_ltとend_ltは日付の粒度で指定してください
-        """
+    def _validate_period(self):
         if self.lt_period.start.time() != time(
             0, 0
         ) or self.lt_period.end.time() != time(23, 59):
             raise ValueError("start_lt must be 00:00 and end_lt must be 23:59.")
+
+    def _validate_stations(
+        self, stations: List[EeIndexStation], region: Literal["dip", "offdip"]
+    ):
+        if region not in ["dip", "offdip"]:
+            raise ValueError("region must be 'dip' or 'offdip'.")
+        if not all(station.is_dip() for station in stations) and region == "dip":
+            raise ValueError("All stations must be dip stations for 'dip' region.")
+        if not all(station.is_offdip() for station in stations) and region == "offdip":
+            raise ValueError(
+                "All stations must be off-dip stations for 'offdip' region."
+            )
+
+    def plot_euel_to_detect_eej(
+        self, stations: List[EeIndexStation], color, region: Literal["dip", "offdip"]
+    ):
+        """EEJを検知するためのプロット
+        注意:
+        EEJの検知は日毎で行うため、start_ltとend_ltは日付の粒度で指定してください
+        """
+        self._validate_period()
+        self._validate_stations(stations, region)
         date_range = [
             self.lt_period.start.date() + timedelta(days=i)
             for i in range((self.lt_period.end - self.lt_period.start).days + 1)
         ]
-        euel = np.hstack([calc_euel_for_eej_detection(station, d) for d in date_range])
+        euel = np.hstack(
+            [BestEuelSelector(stations, d).select_euel_values() for d in date_range]
+        )
         x_axis = np.arange(0, len(euel), 1)
-        self.ax.plot(x_axis, euel, label=station.name, color=color)
-
-    def plot_pure_euel(self, station: EeIndexStation, color):
-        lt_params = StationParams(station, self.lt_period)
-        ut_params = lt_params.to_ut_params()
-        factory = EeFactory()
-        euel = factory.create_euel(ut_params)
-        euel_values = euel.calc_euel()
-        x_axis = np.arange(0, len(euel_values), 1)
-        self.ax.plot(x_axis, euel_values, label=station.name, color=color)
+        label = f"{region}(" + ",".join(s.code for s in stations) + ")"
+        self.ax.plot(x_axis, euel, label=label, color=color)
 
     def _set_axis_labels(self):
         data_length = self.lt_period.total_minutes() + 1
@@ -100,29 +98,14 @@ class EejDetectionPlotter:
 
 
 if __name__ == "__main__":
-    from src.utils.path import generate_abs_path
 
-    anc = EeIndexStation.ANC
-    hua = EeIndexStation.HUA
-    eus = EeIndexStation.EUS
+    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
+    offdip_stations = [EeIndexStation.EUS]
+
     year = 2016
-
-    for year in range(2016, 2017):
-        for current_month in range(1, 13):
-            ut_period = create_month_period(year, current_month)
-            detection = EejDetectionPlotter(ut_period)
-            detection.plot_euel_to_detect_eej(anc, "red")
-            detection.plot_euel_to_detect_eej(hua, "red")
-            detection.plot_euel_to_detect_eej(eus, "purple")
-
-            path = generate_abs_path(
-                f"/usecase/ee_index/img/eej_hua/{year}_{current_month}_hua.png"
-            )
-            detection.set_title(f"{year:04d}_{current_month:02d} EEJ Detection")
-            detection.save(path)
-
-    # lt_period = create_month_period(2020, 3)
-    # detection = EejDetectionPlotter(lt_period)
-    # detection.plot_euel_to_detect_eej(EeIndexStation.ANC, "red")
-    # detection.plot_euel_to_detect_eej(EeIndexStation.EUS, "purple")
-    # detection.show()
+    for current_month in range(1, 13):
+        ut_period = create_month_period(year, current_month)
+        detection = EejDetectionPlotter(ut_period)
+        detection.plot_euel_to_detect_eej(dip_stations, "red", "dip")
+        detection.plot_euel_to_detect_eej(offdip_stations, "purple", "offdip")
+        detection.show()
