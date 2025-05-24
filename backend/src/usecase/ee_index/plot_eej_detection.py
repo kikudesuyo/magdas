@@ -1,4 +1,4 @@
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -10,6 +10,7 @@ from src.usecase.ee_index.calc_eej_detection import calc_euel_for_eej_detection
 from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
 from src.usecase.ee_index.factory_ee import EeFactory
 from src.usecase.ee_index.plot_config import PlotConfig
+from src.utils.period import create_month_period
 
 
 class EejDetectionPlotter:
@@ -85,6 +86,9 @@ class EejDetectionPlotter:
         self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
+    def set_title(self, title):
+        self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=10)
+
     def show(self):
         self.ax.legend(loc="lower left", fontsize=18)
         plt.show()
@@ -92,14 +96,33 @@ class EejDetectionPlotter:
     def save(self, path):
         self.ax.legend(loc="lower left", fontsize=18)
         plt.savefig(path)
+        plt.close(self.fig)
 
 
 if __name__ == "__main__":
-    lt_period = Period(
-        start=datetime(2014, 1, 1, 0, 0),
-        end=datetime(2014, 1, 31, 23, 59),
-    )
-    detection = EejDetectionPlotter(lt_period)
-    detection.plot_euel_to_detect_eej(EeIndexStation.ANC, "red")
-    detection.plot_euel_to_detect_eej(EeIndexStation.EUS, "purple")
-    detection.show()
+    from src.utils.path import generate_abs_path
+
+    anc = EeIndexStation.ANC
+    hua = EeIndexStation.HUA
+    eus = EeIndexStation.EUS
+    year = 2016
+
+    for year in range(2016, 2017):
+        for current_month in range(1, 13):
+            ut_period = create_month_period(year, current_month)
+            detection = EejDetectionPlotter(ut_period)
+            detection.plot_euel_to_detect_eej(anc, "red")
+            detection.plot_euel_to_detect_eej(hua, "red")
+            detection.plot_euel_to_detect_eej(eus, "purple")
+
+            path = generate_abs_path(
+                f"/usecase/ee_index/img/eej_hua/{year}_{current_month}_hua.png"
+            )
+            detection.set_title(f"{year:04d}_{current_month:02d} EEJ Detection")
+            detection.save(path)
+
+    # lt_period = create_month_period(2020, 3)
+    # detection = EejDetectionPlotter(lt_period)
+    # detection.plot_euel_to_detect_eej(EeIndexStation.ANC, "red")
+    # detection.plot_euel_to_detect_eej(EeIndexStation.EUS, "purple")
+    # detection.show()
