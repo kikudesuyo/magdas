@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,6 +9,7 @@ from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
 from src.usecase.ee_index.factory_ee import EeFactory
 from src.usecase.ee_index.plot_config import PlotConfig
+from src.utils.period import create_month_period
 
 
 class EeIndexPlotter:
@@ -117,19 +118,28 @@ class EeIndexPlotter:
         Caution:
             show後に呼び出すと白い画面が表示される
         """
-        self.ax.legend(loc="lower left", fontsize=18)
+        self.ax.legend(loc="lower left", fontsize=12)
         plt.savefig(path)
+        plt.close(self.fig)
 
 
 if __name__ == "__main__":
-    ut_period = Period(
-        start=datetime(2014, 1, 1, 0, 0),
-        end=datetime(2014, 1, 31, 23, 59),
-    )
+    from src.utils.path import generate_abs_path
+
     anc = EeIndexStation.ANC
+
     eus = EeIndexStation.EUS
-    p = EeIndexPlotter(ut_period)
-    p.plot_er(anc, "blue")
-    p.plot_er(eus, "red")
-    p.plot_edst()
-    p.show()
+
+    for year in range(2016, 2021):
+        print(f"year: {year}")
+        for current_month in range(1, 13):
+            ut_period = create_month_period(year, current_month)
+            p = EeIndexPlotter(ut_period)
+            p.plot_er(anc, "blue")
+            p.plot_er(eus, "red")
+            p.plot_edst()
+            path = generate_abs_path(
+                f"/usecase/ee_index/img/ee_index/{year}_{current_month}.png"
+            )
+            p.set_title(f"{year:04d}_{current_month:02d} EE Index")
+            p.save(path)
