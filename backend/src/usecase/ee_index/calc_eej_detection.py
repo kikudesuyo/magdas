@@ -120,7 +120,8 @@ class EejDetection:
             if not offdip_station.is_offdip():
                 raise ValueError("Off-dip station is not in off-dip region")
 
-    def calc_eej_peak_diff(self):
+    def calc_eej_peak_diff(self) -> float:
+        """EEJピーク差を計算。データ欠損が著しい場合はNaNを返す。"""
         best_selector = BestEuelSelector(self.dip_stations, self.local_date)
         dip_eej_euel = best_selector.select_euel_values()
         offdip_selector = BestEuelSelector(self.offdip_stations, self.local_date)
@@ -130,7 +131,7 @@ class EejDetection:
         is_noon = np.array([EejDetectionTime.contains(dt.time()) for dt in timestamp])
         dip_max = np.max(dip_eej_euel[is_noon])
         offdip_max = np.max(offdip_eej_euel[is_noon])
-        return dip_max - offdip_max
+        return float(dip_max - offdip_max)
 
     def _get_timestamp(self) -> NDArray[np.datetime64]:
         start_lt = datetime(
@@ -158,39 +159,54 @@ class EejDetection:
         kp = Kp().get_max_of_day(s_dt, e_dt)
         return kp
 
+    def is_eej_peak_diff_nan(self):
+        """データ欠損か判定"""
+        return np.isnan(self.eej_peak_diff)
+
     def is_eej_present(self):
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
     def is_singular_eej(self):
-        if np.isnan(self.eej_peak_diff):
+        if self.is_eej_peak_diff_nan():
             return False
-        # min_edst = self._calc_min_edst()
-        # kp = self._get_kp()
-        # if min_edst < -30:
-        #     return False
-        # if kp < 4:
-        #     return False
-
         if self.is_eej_present():
+            return False
+        min_edst = self._calc_min_edst()
+        kp = self._get_kp()
+        if min_edst < -30:
+            return False
+        if kp >= 4:
             return False
         return True
 
 
 if __name__ == "__main__":
 
+    from src.utils.period import create_month_period
+
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
 
-    year = 2020
+    year = 2016
 
-    start_date = datetime(year, 2, 1)
-    end_date = datetime(year, 2, 28)
+    d = {}  # key: month: value(list(nan_cnt, singular_eej_cnt, date_cnt))
 
-    current_date = start_date
-    while current_date <= end_date:
-        eej = EejDetection([anc, hua], [eus], current_date.date())
-
-        if eej.is_singular_eej():
-            print(current_date.date(), eej.eej_peak_diff)
-        current_date += timedelta(days=1)
+    for month in range(1, 13):
+        d[month] = [0, 0, 0]
+        ut_period = create_month_period(year, month)
+        start_date, end_date = (
+            ut_period.start,
+            ut_period.end,
+        )
+        current_date = start_date
+        while current_date <= end_date:
+            d[month][2] += 1
+            eej = EejDetection([anc, hua], [eus], current_date.date())
+            if eej.is_eej_peak_diff_nan():
+                d[month][0] += 1
+            if eej.is_singular_eej():
+                d[month][1] += 1
+            current_date += timedelta(days=1)
+    print(year)
+    print(d)

@@ -1,10 +1,13 @@
+from matplotlib import font_manager
 from matplotlib import pyplot as plt
+from src.utils.path import generate_parent_abs_path
 
 
 class PlotConfig:
     @staticmethod
     def rcparams():
-        plt.rcParams["font.family"] = "Times New Roman"
+        font_prop = get_font_prop()
+        plt.rcParams["font.family"] = font_prop.get_name()
         plt.rcParams["xtick.direction"] = "in"  # x軸の目盛りの向き
         plt.rcParams["ytick.direction"] = "in"  # y軸の目盛りの向き
         plt.rcParams["xtick.labelsize"] = 11  # x軸目盛りのフォントサイズ
@@ -22,3 +25,9 @@ class PlotConfig:
         plt.rcParams["legend.fontsize"] = 11  # 凡例のフォントサイズを設定
         plt.rcParams["xtick.minor.visible"] = True  # x軸補助目盛りの追加
         plt.rcParams["ytick.minor.visible"] = True  # y軸補助目盛りの追加
+
+
+def get_font_prop():
+    font_path = generate_parent_abs_path("/fonts/NotoSansJP-Regular.ttf")
+    font_manager.fontManager.addfont(font_path)
+    return font_manager.FontProperties(fname=font_path)  # type: ignore (OSによって型が異なるため)

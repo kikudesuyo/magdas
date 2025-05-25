@@ -8,7 +8,6 @@ from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
 from src.usecase.ee_index.calc_eej_detection import BestEuelSelector
 from src.usecase.ee_index.plot_config import PlotConfig
-from src.utils.period import create_month_period
 
 
 class EejDetectionPlotter:
@@ -98,14 +97,20 @@ class EejDetectionPlotter:
 
 
 if __name__ == "__main__":
+    from src.utils.path import generate_abs_path
+    from src.utils.period import create_month_period
 
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
 
-    year = 2016
-    for current_month in range(1, 13):
-        ut_period = create_month_period(year, current_month)
-        detection = EejDetectionPlotter(ut_period)
-        detection.plot_euel_to_detect_eej(dip_stations, "red", "dip")
-        detection.plot_euel_to_detect_eej(offdip_stations, "purple", "offdip")
-        detection.show()
+    year = 2021
+    # month = 9
+    for month in range(1, 2):
+        ut_period = create_month_period(year, month)
+        d = EejDetectionPlotter(ut_period)
+        d.plot_euel_to_detect_eej(dip_stations, "red", "dip")
+        d.plot_euel_to_detect_eej(offdip_stations, "purple", "offdip")
+        path = generate_abs_path(f"/usecase/ee_index/img/eej/{year}_{month}.png")
+        d.set_title(f"{year}年{month}月のEEJ検知用EUEL")
+        d.show()
+        # d.save(path)
