@@ -5,7 +5,7 @@ import numpy as np
 from src.constants.ee_index import MAX_RAW_H, MIN_RAW_H
 from src.constants.time_relation import TimeUnit
 from src.domain.station_params import StationParams
-from src.repository.raw_mgd_reader import read_raw_min_data
+from src.repository.raw_file_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 
 
