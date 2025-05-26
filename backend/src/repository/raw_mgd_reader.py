@@ -5,10 +5,10 @@ from src.constants.time_relation import TimeUnit
 
 def read_raw_min_data(path):
     """
-    .mag形式の読み込み
+    .mgd形式の読み込み
 
     Arg:
-      path (str): .mag形式の絶対パス
+      path (str): .mgd形式の絶対パス
     Return:
       data (np.array): 1440分のデータ
     Raises:
