@@ -1,42 +1,19 @@
-from datetime import timedelta
-
 import numpy as np
-from src.constants.time_relation import TimeUnit
 from src.domain.station_params import StationParams
-from src.repository.gm_data import GMDataLoader
+from src.repository.gm_data import GMPeriodRepository
 
 
 class HComponent:
     def __init__(self, params: StationParams):
+        self.params = params
         self.station = params.station
         self.start_ut = params.period.start
         self.end_ut = params.period.end
 
     def get_h_component(self):
-        start_date, end_date = self.start_ut.date(), self.end_ut.date()
-        if start_date == end_date:
-            start_idx = (
-                self.start_ut.hour * TimeUnit.ONE_HOUR.min + self.start_ut.minute
-            )
-            end_idx = self.end_ut.hour * TimeUnit.ONE_HOUR.min + self.end_ut.minute
-            gm_loader = GMDataLoader(self.station.code, start_date)
-            day_h_data = gm_loader.h[start_idx : end_idx + 1]
-            return day_h_data
-        h_values = np.array([], dtype=np.float32)
-        for i in range((end_date - start_date).days + 1):
-            current_date = start_date + timedelta(days=i)
-            gm_loader = GMDataLoader(self.station.code, current_date)
-            day_h_data = gm_loader.h
-            if current_date == start_date:
-                start_idx = (
-                    self.start_ut.hour * TimeUnit.ONE_HOUR.min + self.start_ut.minute
-                )
-                h_values = np.concatenate((h_values, day_h_data[start_idx:]))
-            elif current_date == end_date:
-                end_idx = self.end_ut.hour * TimeUnit.ONE_HOUR.min + self.end_ut.minute
-                h_values = np.concatenate((h_values, day_h_data[: end_idx + 1]))
-            else:
-                h_values = np.concatenate((h_values, day_h_data))
+        """指定された観測点のh成分を取得"""
+        gm_repo = GMPeriodRepository(self.params)
+        h_values = gm_repo.get("h")
         return h_values
 
     def to_equatorial_h(self):

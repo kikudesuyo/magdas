@@ -1,10 +1,12 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, timedelta
 from glob import glob
+from typing import Literal
 
 import numpy as np
 from src.constants.ee_index import MAX_RAW_H, MIN_RAW_H
 from src.constants.time_relation import TimeUnit
+from src.domain.station_params import StationParams
 from src.repository.raw_file_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 
@@ -70,3 +72,30 @@ class GMDataLoader:
     def f(self) -> np.ndarray:
         """Get the f component for the day."""
         return self.gm.f
+
+
+class GMPeriodRepository:
+    def __init__(self, params: StationParams):
+        self.station = params.station
+        self.start_ut = params.period.start
+        self.end_ut = params.period.end
+
+    def _get_idx(self, ut: datetime) -> int:
+        return ut.hour * TimeUnit.ONE_HOUR.min + ut.minute
+
+    def get(self, component: Literal["h", "d", "z", "f"]) -> np.ndarray:
+        start_date, end_date = self.start_ut.date(), self.end_ut.date()
+        values = np.array([], dtype=np.float32)
+        for i in range((end_date - start_date).days + 1):
+            current_date = start_date + timedelta(days=i)
+            gm_loader = GMDataLoader(self.station.code, current_date)
+            day_data = getattr(gm_loader, component)
+            if current_date == start_date:
+                start_idx = self._get_idx(self.start_ut)
+                values = np.concatenate((values, day_data[start_idx:]))
+            elif current_date == end_date:
+                end_idx = self._get_idx(self.end_ut)
+                values = np.concatenate((values, day_data[: end_idx + 1]))
+            else:
+                values = np.concatenate((values, day_data))
+        return values
