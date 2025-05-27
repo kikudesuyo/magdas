@@ -34,13 +34,13 @@ class GMDataLoader:
                 f"/Storage/ee_index/{self.station_code}/Min/{year}/{self.station_code}_MIN_{year}{month}{day}*.mgd"
             )
         )
-        if len(filenames) == 0:
-            nan_arr = np.full(TimeUnit.ONE_DAY.min, np.NaN)
-            return GM(h=nan_arr, d=nan_arr, z=nan_arr, f=nan_arr)
         if len(filenames) > 1:
             raise FileNotFoundError(
                 f"Multiple files found for {self.station_code} at {self.ut_date}: {filenames}"
             )
+        if len(filenames) == 0:
+            nan_arr = np.full(TimeUnit.ONE_DAY.min, np.NaN)
+            return GM(nan_arr, nan_arr, nan_arr, nan_arr)
         try:
             raw_data = read_raw_min_data(filenames[0])[:, :4]  # Get only h, d, z, f
             data = self._sanitize(raw_data)
