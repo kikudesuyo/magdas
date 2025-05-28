@@ -9,7 +9,6 @@ from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
 from src.usecase.ee_index.factory_ee import EeFactory
 from src.usecase.ee_index.plot_config import PlotConfig
-from src.utils.period import create_month_period
 
 
 class EeIndexPlotter:
@@ -122,22 +121,19 @@ class EeIndexPlotter:
 
 
 if __name__ == "__main__":
-    from src.utils.path import generate_abs_path
+    from datetime import datetime
+
+    from src.domain.station_params import Period, StationParams
+    from src.utils.period import create_month_period
 
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
-    year = 2018
-    for current_month in range(1, 13):
-        ut_period = create_month_period(year, current_month)
-        p = EeIndexPlotter(ut_period)
-        p.plot_er(anc, "red")
-        p.plot_er(hua, "red")
-        p.plot_er(eus, "purple")
+    ut_period = Period(datetime(2023, 10, 1, 10, 0), datetime(2023, 10, 1, 22, 0))
+    p = EeIndexPlotter(ut_period)
+    p.plot_er(anc, "red")
+    p.plot_er(hua, "red")
+    p.plot_er(eus, "purple")
 
-        p.plot_edst()
-        path = generate_abs_path(
-            f"/usecase/ee_index/img/ee_index/{year}_{current_month}.png"
-        )
-        p.set_title(f"{year:04d}_{current_month:02d} EE Index")
-        p.show()
+    p.plot_edst()
+    p.show()

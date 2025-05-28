@@ -11,7 +11,7 @@ class EeFactory:
 
     def create_er(self, calc_params: StationParams):
         h = self.create_h(calc_params)
-        return Er(h)
+        return Er(h.get_equatorial_h())
 
     def create_edst(self, period: Period):
         return Edst(period)

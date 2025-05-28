@@ -34,11 +34,7 @@ class EeIndexDateRangeReq(BaseModel):
 def handle_get_ee_by_range(
     req: EeIndexDateRangeReq = Depends(EeIndexDateRangeReq.from_query),
 ):
-    date, station_code, days = (
-        req.start_date,
-        req.station_code,
-        req.days,
-    )
+    date, station_code, days = (req.start_date, req.station_code, req.days)
     station = EeIndexStation[station_code]
     start_ut = to_datetime(date)
 

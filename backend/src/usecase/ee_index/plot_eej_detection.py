@@ -97,6 +97,8 @@ class EejDetectionPlotter:
 
 
 if __name__ == "__main__":
+    import time as t
+
     from src.utils.path import generate_abs_path
     from src.utils.period import create_month_period
 
@@ -104,7 +106,7 @@ if __name__ == "__main__":
     offdip_stations = [EeIndexStation.EUS]
 
     year = 2021
-    # month = 9
+    start = t.time()
     for month in range(1, 2):
         ut_period = create_month_period(year, month)
         d = EejDetectionPlotter(ut_period)
@@ -112,5 +114,6 @@ if __name__ == "__main__":
         d.plot_euel_to_detect_eej(offdip_stations, "purple", "offdip")
         path = generate_abs_path(f"/usecase/ee_index/img/eej/{year}_{month}.png")
         d.set_title(f"{year}年{month}月のEEJ検知用EUEL")
-        d.show()
-        # d.save(path)
+        # d.show()
+    end = t.time()
+    print(f"Plotting took {end - start:.2f} seconds.")

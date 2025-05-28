@@ -47,18 +47,9 @@ def export_ee_as_iaga_zip(
 
     euel_values = euel.calc_euel()
 
-    iaga_meta_data = build_iaga_meta_data(
-        station,
-        "EEI",
-        8888.88,
-    )
+    iaga_meta_data = build_iaga_meta_data(station, "EEI", 8888.88)
     iaga_data = build_iaga_data(
-        start_ut,
-        end_ut,
-        edst_1h_values,
-        edst_6h_values,
-        er_values,
-        euel_values,
+        start_ut, end_ut, edst_1h_values, edst_6h_values, er_values, euel_values
     )
     save_as_iaga(
         iaga_meta_data, iaga_data, generate_parent_abs_path("/tmp/iaga_format.txt")
