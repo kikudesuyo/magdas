@@ -4,6 +4,7 @@ from src.constants.ee_index import MAX_ER, MIN_ER
 from src.constants.time_relation import DawnAndDusk, TimeUnit
 from src.usecase.ee_index.calc_h_component import HData
 from src.usecase.ee_index.nan_calculator import NanCalculator
+from src.utils.period import get_minute_list
 
 
 class Er:
@@ -17,15 +18,11 @@ class Er:
         return self._remove_outliers(raw_er)
 
     def _remove_outliers(self, raw_er: np.ndarray) -> np.ndarray:
-        filtered_er = np.where(
-            (raw_er > MAX_ER) | (raw_er < MIN_ER),
-            np.nan,
-            raw_er,
-        )
+        filtered_er = np.where((raw_er > MAX_ER) | (raw_er < MIN_ER), np.nan, raw_er)
         return filtered_er
 
     def _get_lt_timestamps(self) -> NDArray[np.datetime64]:
-        ut_timestamps = self.h_data.timestamps
+        ut_timestamps = get_minute_list(self.h_data.ut_params.period)
         time_diff_hour = self.h_data.ut_params.station.time_diff
         time_diff_min = int(time_diff_hour * TimeUnit.ONE_HOUR.min)
         lt_timestamps = ut_timestamps + np.timedelta64(time_diff_min, "m")
@@ -40,9 +37,5 @@ class Er:
 
     def extract_night_er(self) -> np.ndarray:
         """Night definition 18:00 to 05:59"""
-        night_er = np.where(
-            self.nighttime_mask(),
-            self.calc_er(),
-            np.nan,
-        )
+        night_er = np.where(self.nighttime_mask(), self.calc_er(), np.nan)
         return night_er

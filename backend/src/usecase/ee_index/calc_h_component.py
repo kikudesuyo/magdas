@@ -4,14 +4,12 @@ import numpy as np
 from numpy.typing import NDArray
 from src.domain.station_params import StationParams
 from src.repository.gm_data import GMPeriodRepository
-from src.utils.period import get_minute_list
 
 
 @dataclass
 class HData:
     ut_params: StationParams
     h_values: NDArray[np.float64]
-    timestamps: NDArray[np.datetime64]
 
 
 class HComponent:
@@ -26,8 +24,4 @@ class HComponent:
         equatorial_h_component = h_values / np.cos(
             np.deg2rad(self.ut_params.station.gm_lat)
         )
-        return HData(
-            ut_params=self.ut_params,
-            h_values=equatorial_h_component,
-            timestamps=get_minute_list(self.ut_params.period),
-        )
+        return HData(ut_params=self.ut_params, h_values=equatorial_h_component)

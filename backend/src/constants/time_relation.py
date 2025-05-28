@@ -45,11 +45,5 @@ class TimeRange:
 
 
 class DawnAndDusk(TimeRange, Enum):
-    DAYSIDE = (
-        datetime.time(6, 0, 0),
-        datetime.time(17, 59, 59),
-    )
-    NIGHTSIDE = (
-        datetime.time(18, 0, 0),
-        datetime.time(5, 59, 59),
-    )
+    DAYSIDE = (datetime.time(6, 0, 0), datetime.time(17, 59, 59))
+    NIGHTSIDE = (datetime.time(18, 0, 0), datetime.time(5, 59, 59))

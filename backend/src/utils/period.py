@@ -19,6 +19,5 @@ def get_minute_list(period: Period) -> NDArray[np.datetime64]:
     start = np.datetime64(period.start, "m")
     length = period.total_minutes() + 1  # include start and end
     return np.array(
-        [start + np.timedelta64(i, "m") for i in range(length)],
-        dtype="datetime64[m]",
+        [start + np.timedelta64(i, "m") for i in range(length)], dtype="datetime64[m]"
     )

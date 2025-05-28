@@ -9,7 +9,6 @@ from src.domain.station_params import Period, StationParams
 from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
 from src.usecase.ee_index.factory_ee import EeFactory
 from src.usecase.ee_index.plot_config import PlotConfig
-from src.utils.period import create_month_period
 
 
 class EeIndexPlotter:
@@ -125,6 +124,7 @@ if __name__ == "__main__":
     from datetime import datetime
 
     from src.domain.station_params import Period, StationParams
+    from src.utils.period import create_month_period
 
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA

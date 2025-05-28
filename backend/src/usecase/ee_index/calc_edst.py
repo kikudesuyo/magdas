@@ -7,10 +7,7 @@ from src.usecase.ee_index.nan_calculator import NanCalculator
 
 
 class Edst:
-    def __init__(
-        self,
-        period: Period,
-    ):
+    def __init__(self, period: Period):
         self.period = period
 
     def calc_edst(self) -> np.ndarray:
