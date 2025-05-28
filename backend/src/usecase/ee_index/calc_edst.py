@@ -19,7 +19,7 @@ class Edst:
         for station in EeIndexStation:
             params = StationParams(station, self.period)
             h = HComponent(params)
-            er = Er(h)
+            er = Er(h.get_equatorial_h())
             night_er_val = er.extract_night_er()
             night_er_list = np.vstack((night_er_list, night_er_val))
         edst = NanCalculator.nanmean(night_er_list)

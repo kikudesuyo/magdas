@@ -1,6 +1,6 @@
 import unittest
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import numpy as np
 from src.domain.magdas_station import EeIndexStation
@@ -33,7 +33,7 @@ class TestERValue(unittest.TestCase):
         lt_period = Period(start_lt, end_lt)
         params = StationParams(cls.station, lt_period)
         h = HComponent(params)
-        cls.er = Er(h)
+        cls.er = Er(h.get_equatorial_h())
         cls.night_er = cls.er.extract_night_er()
         cls.night_mask = cls.er.nighttime_mask()
 

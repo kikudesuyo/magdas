@@ -85,15 +85,21 @@ class GMPeriodRepository:
 
     def get(self, component: Literal["h", "d", "z", "f"]) -> np.ndarray:
         start_date, end_date = self.start_ut.date(), self.end_ut.date()
+        if start_date == end_date:
+            start_idx = self._get_idx(self.start_ut)
+            end_idx = self._get_idx(self.end_ut)
+            gm_loader = GMDataLoader(self.station.code, start_date)
+            return getattr(gm_loader, component)[start_idx : end_idx + 1]
+
         values = np.array([], dtype=np.float32)
         for i in range((end_date - start_date).days + 1):
             current_date = start_date + timedelta(days=i)
             gm_loader = GMDataLoader(self.station.code, current_date)
             day_data = getattr(gm_loader, component)
-            if current_date == start_date:
+            if current_date == start_date:  # 初日
                 start_idx = self._get_idx(self.start_ut)
                 values = np.concatenate((values, day_data[start_idx:]))
-            elif current_date == end_date:
+            elif current_date == end_date:  # 最終日
                 end_idx = self._get_idx(self.end_ut)
                 values = np.concatenate((values, day_data[: end_idx + 1]))
             else:

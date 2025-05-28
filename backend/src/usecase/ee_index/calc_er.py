@@ -1,47 +1,83 @@
-from datetime import timedelta
-
 import numpy as np
+from numpy.typing import NDArray
 from src.constants.ee_index import MAX_ER, MIN_ER
 from src.constants.time_relation import DawnAndDusk, TimeUnit
-from src.usecase.ee_index.calc_h_component import HComponent
+from src.usecase.ee_index.calc_h_component import HComponent, HData
 from src.usecase.ee_index.nan_calculator import NanCalculator
-from src.utils.date import DateUtils
+
+# class Er:
+#     def __init__(self, h: HComponent):
+#         self.h = h
+
+#     def calc_er(self):
+#         h_data = self.h.get_equatorial_h()
+#         h_values = h_data.values
+#         base = NanCalculator.nanmedian(h_values)
+#         raw_er = h_values - base
+#         return self._remove_outliers(raw_er)
+
+#     def _remove_outliers(self, raw_er: np.ndarray) -> np.ndarray:
+#         filtered_er = np.where(
+#             (raw_er > MAX_ER) | (raw_er < MIN_ER),
+#             np.nan,
+#             raw_er,
+#         )
+#         return filtered_er
+
+#     def _get_lt_timestamps(self) -> NDArray[np.datetime64]:
+#         ut_timestamps = self.h.get_h_component().timestamps
+#         time_diff_min = int(self.h.ut_params.station.time_diff * TimeUnit.ONE_HOUR.min)
+#         lt_timestamps = ut_timestamps + np.timedelta64(time_diff_min, "m")
+#         return np.array(lt_timestamps)
+
+#     def nighttime_mask(self) -> np.ndarray:
+#         lt_arr = self._get_lt_timestamps()
+#         lt_times = np.array(
+#             [lt.astype("datetime64[m]").astype("O").time() for lt in lt_arr]
+#         )
+#         return np.array([DawnAndDusk.NIGHTSIDE.contains(lt) for lt in lt_times])
+
+#     def extract_night_er(self) -> np.ndarray:
+#         """Night definition 18:00 to 05:59"""
+#         night_er = np.where(
+#             self.nighttime_mask(),
+#             self.calc_er(),
+#             np.nan,
+#         )
+#         return night_er
 
 
 class Er:
-    def __init__(self, h: HComponent):
-        self.h = h
+    def __init__(self, h_data: HData):
+        self.h_data = h_data
 
     def calc_er(self):
-        h_component = self.h.to_equatorial_h()
-        base = NanCalculator.nanmedian(h_component)
-        raw_er = h_component - base
+        h_values = self.h_data.h_values
+        base = NanCalculator.nanmedian(h_values)
+        raw_er = h_values - base
         return self._remove_outliers(raw_er)
 
     def _remove_outliers(self, raw_er: np.ndarray) -> np.ndarray:
-        raw_er[raw_er > MAX_ER] = np.nan
-        raw_er[raw_er < MIN_ER] = np.nan
-        return raw_er
-
-    def _get_lt_array(self) -> np.ndarray:
-        length = (
-            int(
-                (self.h.end_ut - self.h.start_ut).total_seconds()
-                // TimeUnit.ONE_MINUTE.sec
-            )
-            + 1  # include start_ut
+        filtered_er = np.where(
+            (raw_er > MAX_ER) | (raw_er < MIN_ER),
+            np.nan,
+            raw_er,
         )
-        lt_arr = []
-        for i in range(length):
-            lt = DateUtils.to_lt(
-                self.h.station, self.h.start_ut + timedelta(minutes=i)
-            ).time()
-            lt_arr.append(lt)
-        return np.array(lt_arr)
+        return filtered_er
+
+    def _get_lt_timestamps(self) -> NDArray[np.datetime64]:
+        ut_timestamps = self.h_data.timestamps
+        time_diff_hour = self.h_data.ut_params.station.time_diff
+        time_diff_min = int(time_diff_hour * TimeUnit.ONE_HOUR.min)
+        lt_timestamps = ut_timestamps + np.timedelta64(time_diff_min, "m")
+        return np.array(lt_timestamps)
 
     def nighttime_mask(self) -> np.ndarray:
-        lt_arr = self._get_lt_array()
-        return np.array([DawnAndDusk.NIGHTSIDE.contains(lt) for lt in lt_arr])
+        lt_arr = self._get_lt_timestamps()
+        lt_times = np.array(
+            [lt.astype("datetime64[m]").astype("O").time() for lt in lt_arr]
+        )
+        return np.array([DawnAndDusk.NIGHTSIDE.contains(lt) for lt in lt_times])
 
     def extract_night_er(self) -> np.ndarray:
         """Night definition 18:00 to 05:59"""

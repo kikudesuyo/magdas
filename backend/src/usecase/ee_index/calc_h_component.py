@@ -1,24 +1,33 @@
+from dataclasses import dataclass
+
 import numpy as np
+from numpy.typing import NDArray
 from src.domain.station_params import StationParams
 from src.repository.gm_data import GMPeriodRepository
+from src.utils.period import get_minute_list
+
+
+@dataclass
+class HData:
+    ut_params: StationParams
+    h_values: NDArray[np.float64]
+    timestamps: NDArray[np.datetime64]
 
 
 class HComponent:
-    def __init__(self, params: StationParams):
-        self.params = params
-        self.station = params.station
-        self.start_ut = params.period.start
-        self.end_ut = params.period.end
+    def __init__(self, ut_params: StationParams):
+        self.gm_repo = GMPeriodRepository(ut_params)
+        self.ut_params = ut_params
 
-    def get_h_component(self):
-        """指定された観測点のh成分を取得"""
-        gm_repo = GMPeriodRepository(self.params)
-        h_values = gm_repo.get("h")
-        return h_values
-
-    def to_equatorial_h(self):
-        """指定された観測点のh成分を、磁気赤道（gm_lat=0）での値に換算"""
+    def get_equatorial_h(self) -> HData:
+        """指定された観測点のh成分を、磁気赤道（gm_lat=0）の値に換算"""
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
-        h_value = self.get_h_component()
-        equatorial_h_component = h_value / np.cos(np.deg2rad(self.station.gm_lat))
-        return equatorial_h_component
+        h_values = self.gm_repo.get("h")
+        equatorial_h_component = h_values / np.cos(
+            np.deg2rad(self.ut_params.station.gm_lat)
+        )
+        return HData(
+            ut_params=self.ut_params,
+            h_values=equatorial_h_component,
+            timestamps=get_minute_list(self.ut_params.period),
+        )
