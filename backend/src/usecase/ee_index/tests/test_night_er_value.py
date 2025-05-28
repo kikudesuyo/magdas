@@ -33,7 +33,8 @@ class TestERValue(unittest.TestCase):
         lt_period = Period(start_lt, end_lt)
         params = StationParams(cls.station, lt_period)
         h = HComponent(params)
-        cls.er = Er(h.get_equatorial_h())
+        h_data = h.get_equatorial_h()
+        cls.er = Er(h_data)
         cls.night_er = cls.er.extract_night_er()
         cls.night_mask = cls.er.nighttime_mask()
 
