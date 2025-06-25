@@ -1,6 +1,6 @@
 import numpy as np
-from src.usecase.ee_index.calc_edst import Edst
-from src.usecase.ee_index.calc_er import Er
+from src.service.ee_index.calc_edst import Edst
+from src.service.ee_index.calc_er import Er
 
 
 class Euel:

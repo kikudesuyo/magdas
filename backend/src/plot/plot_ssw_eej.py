@@ -5,7 +5,7 @@ from matplotlib.backend_bases import MouseEvent
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
 from src.plot.plot_config import PlotConfig
-from src.usecase.ssw import Ssw
+from src.service.ssw import Ssw
 
 
 class SswPlotter:

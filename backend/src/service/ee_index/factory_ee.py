@@ -1,8 +1,8 @@
 from src.domain.station_params import Period, StationParams
-from src.usecase.ee_index.calc_edst import Edst
-from src.usecase.ee_index.calc_er import Er
-from src.usecase.ee_index.calc_euel import Euel
-from src.usecase.ee_index.calc_h_component import HComponent
+from src.service.ee_index.calc_edst import Edst
+from src.service.ee_index.calc_er import Er
+from src.service.ee_index.calc_euel import Euel
+from src.service.ee_index.calc_h_component import HComponent
 
 
 class EeFactory:

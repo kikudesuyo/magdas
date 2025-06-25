@@ -7,7 +7,7 @@ from matplotlib.backend_bases import MouseEvent
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
 from src.plot.plot_config import PlotConfig
-from src.usecase.ee_index.calc_eej_detection import BestEuelSelector
+from src.service.ee_index.calc_eej_detection import BestEuelSelector
 
 
 class EejDetectionPlotter:

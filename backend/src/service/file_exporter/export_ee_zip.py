@@ -4,15 +4,15 @@ from datetime import datetime
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
-from src.usecase.ee_index.factory_ee import EeFactory
-from src.usecase.file_exporter.build_iaga import (
+from src.service.ee_index.calc_moving_avg import calc_moving_avg
+from src.service.ee_index.factory_ee import EeFactory
+from src.service.file_exporter.build_iaga import (
     build_iaga_data,
     build_iaga_meta_data,
     save_as_iaga,
 )
-from src.usecase.file_exporter.remove_files import TMP_DIR_PATH, remove_tmp_files
-from src.usecase.file_exporter.zip_create import create_zip_buffer
+from src.service.file_exporter.remove_files import TMP_DIR_PATH, remove_tmp_files
+from src.service.file_exporter.zip_create import create_zip_buffer
 from src.utils.path import generate_parent_abs_path
 
 

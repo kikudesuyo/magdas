@@ -8,10 +8,10 @@ from src.constants.ee_index import EEJ_THRESHOLD
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.usecase.ee_index.calc_linear_completion import interpolate_nan
-from src.usecase.ee_index.calc_moving_avg import calc_moving_avg
-from src.usecase.ee_index.factory_ee import EeFactory
-from src.usecase.kp import Kp
+from src.service.ee_index.calc_linear_completion import interpolate_nan
+from src.service.ee_index.calc_moving_avg import calc_moving_avg
+from src.service.ee_index.factory_ee import EeFactory
+from src.service.kp import Kp
 
 
 class EejDetectionTime:
