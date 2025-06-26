@@ -3,7 +3,7 @@ from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.service.ee_index.calc_er import Er
 from src.service.ee_index.calc_h_component import HComponent
-from src.service.ee_index.nan_calculator import NanCalculator
+from src.service.nan_calculator import NanCalculator
 
 
 class Edst:
