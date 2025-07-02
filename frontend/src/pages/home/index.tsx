@@ -21,7 +21,6 @@ const Home = () => {
           >
             EEJ
           </Link>
-
           <Link
             to={PATHS.DOWNLOAD}
             className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 rounded-lg border border-slate-400"
