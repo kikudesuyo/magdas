@@ -16,6 +16,13 @@ const Home = () => {
             EE-index Plot
           </Link>
           <Link
+            to={PATHS.EEJ}
+            className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 rounded-lg border border-slate-400"
+          >
+            EEJ
+          </Link>
+
+          <Link
             to={PATHS.DOWNLOAD}
             className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 rounded-lg border border-slate-400"
           >
