@@ -188,25 +188,21 @@ if __name__ == "__main__":
     hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
 
-    year = 2016
+    year = 2015
+    f = open("data/singular_eej_stats.txt", "a")
+    for year in range(2015, 2024):
+        for month in range(1, 13):
+            ut_period = create_month_period(year, month)
+            start_date, end_date = (
+                ut_period.start,
+                ut_period.end,
+            )
+            current_date = start_date
+            while current_date <= end_date:
+                eej = EejDetection([anc, hua], [eus], current_date.date())
+                if eej.is_singular_eej():
+                    f.write(f"{current_date.date()}\n")
+                current_date += timedelta(days=1)
+            print("current_date:", current_date)
 
-    d = {}  # key: month: value(list(nan_cnt, singular_eej_cnt, date_cnt))
-
-    for month in range(1, 13):
-        d[month] = [0, 0, 0]
-        ut_period = create_month_period(year, month)
-        start_date, end_date = (
-            ut_period.start,
-            ut_period.end,
-        )
-        current_date = start_date
-        while current_date <= end_date:
-            d[month][2] += 1
-            eej = EejDetection([anc, hua], [eus], current_date.date())
-            if eej.is_eej_peak_diff_nan():
-                d[month][0] += 1
-            if eej.is_singular_eej():
-                d[month][1] += 1
-            current_date += timedelta(days=1)
-    print(year)
-    print(d)
+    f.close()
