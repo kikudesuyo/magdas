@@ -14,10 +14,10 @@ const DAYS_OPTIONS = [
   { value: 30, label: "30 days" },
 ];
 
-const DEFAULT_DAYS = 1;
+const DEFAULT_DAYS = 3;
 
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
-  const [startDate, setStartDate] = useState("2014-06-03");
+  const [startDate, setStartDate] = useState("2018-01-26");
   const [days, setDays] = useState(DEFAULT_DAYS);
   const [region, setRegion] = useState("south-america");
 
@@ -26,12 +26,10 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
       alert("開始日時を入力してください");
       return;
     }
-
     if (!region) {
       alert("観測地点を選択してください");
       return;
     }
-
     onSelect(startDate, days, region);
   };
 
