@@ -4,6 +4,7 @@ import Home from "@/pages/home";
 import { PATHS } from "@/utils/constant";
 import EeIndex from "@/pages/ee-index";
 import Download from "@/pages/download";
+import Eej from "@/pages/eej";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path={PATHS.HOME} element={<Home />} />
           <Route path={PATHS.EE_INDEX} element={<EeIndex />} />
           <Route path={PATHS.DOWNLOAD} element={<Download />} />
+          <Route path={PATHS.EEJ} element={<Eej />} />
         </Routes>
       </Router>
     </div>

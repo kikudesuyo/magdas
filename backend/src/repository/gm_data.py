@@ -31,7 +31,7 @@ class GMDataLoader:
         day = self.ut_date.strftime("%d")
         filenames = glob(
             generate_parent_abs_path(
-                f"/Storage/ee_index/{self.station_code}/Min/{year}/{self.station_code}_MIN_{year}{month}{day}*.mgd"
+                f"/Storage/magdas/{self.station_code}/Min/{year}/{self.station_code}_MIN_{year}{month}{day}*.mgd"
             )
         )
         if len(filenames) > 1:

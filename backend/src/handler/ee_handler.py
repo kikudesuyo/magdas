@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.usecase.ee_index.factory_ee import EeFactory
+from src.service.ee_index.factory_ee import EeFactory
 from src.utils.date import to_datetime
 
 
@@ -55,6 +55,7 @@ def handle_get_ee_by_range(
         (start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
         for i in range(days * TimeUnit.ONE_DAY.min)
     ]
+    print(er_with_none)
 
     return JSONResponse(
         content={

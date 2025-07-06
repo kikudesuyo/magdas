@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
-from src.usecase.ee_index.plot_config import PlotConfig
-from src.usecase.ssw import Ssw
+from src.plot.plot_config import PlotConfig
+from src.service.ssw import Ssw
 
 
 class SswPlotter:
@@ -25,7 +25,7 @@ class SswPlotter:
         ssw_data = Ssw().get_ssw_by_range(start, end)
         self.ax.set_ylabel("K", rotation=0)
         self.ax.plot(ssw_data["Date"], ssw_data["T_90N_K"], label="SSW", color=color)
-        # self.ax.tick_params(axis="y")
+        self.fig.autofmt_xdate()
         return self.ax
 
     def _on_move(self, event: MouseEvent):
@@ -59,11 +59,12 @@ if __name__ == "__main__":
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
 
-    start = datetime(2018, 12, 1, 0, 0)
-    end = datetime(2019, 1, 31, 23, 59)
-    ut_period = Period(start, end)
-    d = SswPlotter(ut_period)
-    d.plot_ssw("blue")
-    d.set_title("SSW Temperature Plot")
-    d.save("2018-2019_ssw_plot.png")
-    # d.show()
+    for year in range(2015, 2024):
+        start = datetime(year, 11, 1, 0, 0)
+        end = datetime(year + 1, 2, 28, 23, 59)
+        ut_period = Period(start, end)
+        d = SswPlotter(ut_period)
+        d.plot_ssw("blue")
+        d.set_title(f"SSW Temperature Plot {year}")
+        filename = f"img/ssw_plot_{year}.png"
+        d.save(filename)
