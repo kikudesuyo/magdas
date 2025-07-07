@@ -115,10 +115,14 @@ class EejDetection:
     ):
         for dip_station in dip_stations:
             if not dip_station.is_dip():
-                raise ValueError("Dip station is not in dip region")
+                raise ValueError(
+                    f"{dip_station.code} is {dip_station.gm_lat}. It is not in dip region"
+                )
         for offdip_station in offdip_stations:
             if not offdip_station.is_offdip():
-                raise ValueError("Off-dip station is not in off-dip region")
+                raise ValueError(
+                    f"{offdip_station.code} is {offdip_station.gm_lat}. It is not in off-dip region"
+                )
 
     def calc_eej_peak_diff(self) -> float:
         """EEJピーク差を計算。データ欠損が著しい場合はNaNを返す。"""
@@ -167,15 +171,15 @@ class EejDetection:
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
     def is_singular_eej(self):
+        kp = self._get_kp()
+        if kp >= 4:
+            return False
+        min_edst = self._calc_min_edst()
+        if min_edst < -30:
+            return False
         if self.is_eej_peak_diff_nan():
             return False
         if self.is_eej_present():
-            return False
-        min_edst = self._calc_min_edst()
-        kp = self._get_kp()
-        if min_edst < -30:
-            return False
-        if kp >= 4:
             return False
         return True
 
@@ -189,20 +193,19 @@ if __name__ == "__main__":
     eus = EeIndexStation.EUS
 
     year = 2015
-    f = open("data/singular_eej_stats.txt", "a")
+    f = open("data/southeast_asia_singular_eej.txt", "a")
     for year in range(2015, 2024):
         for month in range(1, 13):
-            ut_period = create_month_period(year, month)
-            start_date, end_date = (
-                ut_period.start,
-                ut_period.end,
+            local_period = create_month_period(year, month)
+            local_start_date, local_end_date = (
+                local_period.start,
+                local_period.end,
             )
-            current_date = start_date
-            while current_date <= end_date:
-                eej = EejDetection([anc, hua], [eus], current_date.date())
+            current_local_date = local_start_date
+            while current_local_date <= local_end_date:
+                eej = EejDetection([anc, hua], [eus], current_local_date.date())
                 if eej.is_singular_eej():
-                    f.write(f"{current_date.date()}\n")
-                current_date += timedelta(days=1)
-            print("current_date:", current_date)
-
+                    f.write(f"{current_local_date.date()}\n")
+                current_local_date += timedelta(days=1)
+            print("current_date:", current_local_date)
     f.close()
