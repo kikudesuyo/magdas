@@ -112,7 +112,7 @@ if __name__ == "__main__":
         d = EejDetectionPlotter(ut_period)
         d.plot_euel_to_detect_eej(dip_stations, "red", "dip")
         d.plot_euel_to_detect_eej(offdip_stations, "purple", "offdip")
-        path = generate_abs_path(f"/usecase/ee_index/img/eej/{year}_{month}.png")
+        path = generate_abs_path(f"/service/ee_index/img/eej/{year}_{month}.png")
         d.set_title(f"{year}年{month}月のEEJ検知用EUEL")
         # d.show()
     end = t.time()
