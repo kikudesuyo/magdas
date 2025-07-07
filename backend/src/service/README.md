@@ -13,15 +13,15 @@
 
    - UTC ベースで地磁気 H 成分を計算します。
 
-2. **ER（Electrojet Range）の計算**
+2. **ER の計算**
 
    - H 成分を元に ER を算出します。
 
-3. **EDst（Equatorial Disturbance Storm Time Index）の計算**
+3. **EDst の計算**
 
    - ER を用いて EDst を算出します。
 
-4. **EUEL（Equatorial Upper Electrojet Level）の計算**
+4. **EUEL の計算**
 
    - ER および EDst を元に EUEL を計算します。
 
