@@ -7,14 +7,14 @@ from src.service.nan_calculator import NanCalculator
 
 
 class Edst:
-    def __init__(self, period: Period):
-        self.period = period
+    def __init__(self, ut_period: Period):
+        self.ut_period = ut_period
 
     def calc_edst(self) -> np.ndarray:
-        length = self.period.total_minutes() + 1  # +1 for the start time
+        length = self.ut_period.total_minutes() + 1  # +1 for the start time
         night_er_list = np.empty((0, length), dtype=float)
         for station in EeIndexStation:
-            params = StationParams(station, self.period)
+            params = StationParams(station, self.ut_period)
             h = HComponent(params)
             er = Er(h.get_equatorial_h())
             night_er_val = er.extract_night_er()
