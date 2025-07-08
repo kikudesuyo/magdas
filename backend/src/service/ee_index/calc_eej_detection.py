@@ -4,6 +4,7 @@ from typing import Dict, List
 
 import numpy as np
 from numpy.typing import NDArray
+from pydantic import BaseModel, ConfigDict
 from src.constants.ee_index import EEJ_THRESHOLD
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
@@ -29,24 +30,51 @@ class NanRatioData:
     nan_ratio: float
 
 
-class BestEuelSelector:
-    def __init__(self, stations: List[EeIndexStation], local_date: date):
+class EuelData(BaseModel):
+    # TODO Regionを定義してgm_lonでバリデーションできるようにする
+    station: EeIndexStation
+    array: np.ndarray
+
+    # numpyを使うためにConfigDictを設定
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+class BestEuelSelectorForEej:
+    def __init__(self, stations: List[EeIndexStation], local_date: date, is_dip: bool):
         self.stations = stations
         self.local_date = local_date
 
-    def select_euel_values(self) -> NDArray[np.float64]:
+        self._validate_stations(stations, is_dip)
+
+    def _validate_stations(self, stations: List[EeIndexStation], is_dip: bool):
+        if is_dip:
+            for station in stations:
+                if not station.is_dip():
+                    raise ValueError(
+                        f"{station.code} is {station.gm_lat}. It is not in dip region"
+                    )
+        else:
+            for station in stations:
+                if not station.is_offdip():
+                    raise ValueError(
+                        f"{station.code} is {station.gm_lat}. It is not in off-dip region"
+                    )
+
+    def select_euel_values(self) -> EuelData:
         eej_euels: Dict[EeIndexStation, NanRatioData] = {}
         for station in self.stations:
             eej_euel = self._euel_for_eej_detection(station)
-            nan_count = np.sum(np.isnan(eej_euel))
-            nan_ratio = nan_count / len(eej_euel)
+            nan_ratio = np.sum(np.isnan(eej_euel)) / len(eej_euel)
             eej_euels[station] = NanRatioData(
                 eej_euel,
                 nan_ratio,
             )
 
-        _, best_euel = min(eej_euels.items(), key=lambda x: x[1].nan_ratio)
-        return best_euel.array
+        best_station, best_euel = min(eej_euels.items(), key=lambda x: x[1].nan_ratio)
+        return EuelData(
+            station=best_station,
+            array=best_euel.array,
+        )
 
     def _euel_for_eej_detection(self, station: EeIndexStation):
         s_lt = datetime(
@@ -97,44 +125,21 @@ class BestEuelSelector:
 
 
 class EejDetection:
-    def __init__(
-        self,
-        dip_stations: List[EeIndexStation],
-        offdip_stations: List[EeIndexStation],
-        local_date: date,
-    ):
-        self._validate_stations(dip_stations, offdip_stations)
-
-        self.dip_stations = dip_stations
-        self.offdip_stations = offdip_stations
+    def __init__(self, dip_euel: EuelData, offdip_euel: EuelData, local_date: date):
         self.local_date = local_date
-        self.eej_peak_diff = self.calc_eej_peak_diff()
 
-    def _validate_stations(
-        self, dip_stations: List[EeIndexStation], offdip_stations: List[EeIndexStation]
-    ):
-        for dip_station in dip_stations:
-            if not dip_station.is_dip():
-                raise ValueError(
-                    f"{dip_station.code} is {dip_station.gm_lat}. It is not in dip region"
-                )
-        for offdip_station in offdip_stations:
-            if not offdip_station.is_offdip():
-                raise ValueError(
-                    f"{offdip_station.code} is {offdip_station.gm_lat}. It is not in off-dip region"
-                )
+        self.dip_euel_data = dip_euel
+        self.offdip_euel_data = offdip_euel
 
-    def calc_eej_peak_diff(self) -> float:
+        self.eej_peak_diff = self.calc_euel_peak_diff()
+
+    def calc_euel_peak_diff(self) -> float:
         """EEJピーク差を計算。データ欠損が著しい場合はNaNを返す。"""
-        best_selector = BestEuelSelector(self.dip_stations, self.local_date)
-        dip_eej_euel = best_selector.select_euel_values()
-        offdip_selector = BestEuelSelector(self.offdip_stations, self.local_date)
-        offdip_eej_euel = offdip_selector.select_euel_values()
 
         timestamp = self._get_timestamp()
         is_noon = np.array([EejDetectionTime.contains(dt.time()) for dt in timestamp])
-        dip_max = np.max(dip_eej_euel[is_noon])
-        offdip_max = np.max(offdip_eej_euel[is_noon])
+        dip_max = np.max(self.dip_euel_data.array[is_noon])
+        offdip_max = np.max(self.offdip_euel_data.array[is_noon])
         return float(dip_max - offdip_max)
 
     def _get_timestamp(self) -> NDArray[np.datetime64]:
@@ -179,33 +184,4 @@ class EejDetection:
             return False
         if self.is_eej_peak_diff_nan():
             return False
-        if self.is_eej_present():
-            return False
-        return True
-
-
-if __name__ == "__main__":
-
-    from src.utils.period import create_month_period
-
-    anc = EeIndexStation.ANC
-    hua = EeIndexStation.HUA
-    eus = EeIndexStation.EUS
-
-    year = 2015
-    f = open("data/southeast_asia_singular_eej.txt", "a")
-    for year in range(2015, 2024):
-        for month in range(1, 13):
-            local_period = create_month_period(year, month)
-            local_start_date, local_end_date = (
-                local_period.start,
-                local_period.end,
-            )
-            current_local_date = local_start_date
-            while current_local_date <= local_end_date:
-                eej = EejDetection([anc, hua], [eus], current_local_date.date())
-                if eej.is_singular_eej():
-                    f.write(f"{current_local_date.date()}\n")
-                current_local_date += timedelta(days=1)
-            print("current_date:", current_local_date)
-    f.close()
+        return not self.is_eej_present()
