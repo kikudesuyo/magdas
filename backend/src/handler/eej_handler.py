@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.service.ee_index.calc_eej_detection import EejDetection
+from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej, EejDetection
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.nan_calculator import NanCalculator
 from src.utils.date import to_datetime
@@ -86,7 +86,15 @@ def handle_get_eej_by_range(
     singular_eej_dates = []
     for i in range(days):
         date = start_ut + timedelta(days=i)
-        eej_detection = EejDetection(dip_stations, offdip_stations, date)
+        dip_euel_selector = BestEuelSelectorForEej(dip_stations, date, is_dip=True)
+        offdip_euel_selector = BestEuelSelectorForEej(
+            offdip_stations, date, is_dip=False
+        )
+
+        dip_euel_data = dip_euel_selector.select_euel_values()
+        offdip_euel_data = offdip_euel_selector.select_euel_values()
+
+        eej_detection = EejDetection(dip_euel_data, offdip_euel_data, date)
         if eej_detection.is_singular_eej():
             singular_eej_dates.append(date)
 

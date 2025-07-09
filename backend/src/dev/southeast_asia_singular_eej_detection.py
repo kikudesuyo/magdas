@@ -25,10 +25,10 @@ tgg = EeIndexStation.TGG
 yap = EeIndexStation.YAP
 
 
-dip = [bcl, cdo, ceb, dav, lkw, yap]
-offdip = [gsi, lgz, mnd, mut, scn, tgg]
+dips = [bcl, cdo, ceb, dav, lkw, yap]
+offdips = [gsi, lgz, mnd, mut, scn, tgg]
 
-period = Period(start=datetime(2018, 1, 1), end=datetime(2018, 1, 31))
+period = Period(start=datetime(2015, 1, 1), end=datetime(2022, 12, 31))
 
 
 """dip, offDipのEUELの値を確認する"""
@@ -43,20 +43,20 @@ period = Period(start=datetime(2018, 1, 1), end=datetime(2018, 1, 31))
 # dip_ee_plotter.set_title("Dip Stations EUEL")
 # dip_ee_plotter.show()
 
-offdip_ee_plotter = EeIndexPlotter(period)
-offdip_ee_plotter.plot_euel(gsi, color="red")
-offdip_ee_plotter.plot_euel(lgz, color="orange")
-offdip_ee_plotter.plot_euel(mnd, color="yellow")
-offdip_ee_plotter.plot_euel(mut, color="green")
-offdip_ee_plotter.plot_euel(scn, color="blue")
-offdip_ee_plotter.plot_euel(tgg, color="purple")
-offdip_ee_plotter.set_title("OffDip Stations EUEL")
-offdip_ee_plotter.show()
+# offdip_ee_plotter = EeIndexPlotter(period)
+# offdip_ee_plotter.plot_euel(gsi, color="red")
+# offdip_ee_plotter.plot_euel(lgz, color="orange")
+# offdip_ee_plotter.plot_euel(mnd, color="yellow")
+# offdip_ee_plotter.plot_euel(mut, color="green")
+# offdip_ee_plotter.plot_euel(scn, color="blue")
+# offdip_ee_plotter.plot_euel(tgg, color="purple")
+# offdip_ee_plotter.set_title("OffDip Stations EUEL")
+# offdip_ee_plotter.show()
 
 
-# write_singular_eej_to_csv(
-#     period,
-#     dip_stations=dip,
-#     offdip_stations=offdip,
-#     path="data/southeast_asia_singular_eej.csv",
-# )
+write_singular_eej_to_csv(
+    period,
+    dip_stations=dips,
+    offdip_stations=offdips,
+    path="data/southeast_asia_singular_eej.csv",
+)
