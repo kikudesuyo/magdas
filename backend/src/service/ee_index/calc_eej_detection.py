@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -124,6 +124,15 @@ class BestEuelSelectorForEej:
         )
 
 
+class EejCategory(BaseModel):
+    category: Literal[
+        "singular",  # 特異型EEJ: singular
+        "normal",  # 通常型EEJ: normal
+        "disturbance",  # 擾乱(Kp指数とEDstで判断): disturbance
+        "missing",  # 欠測: missing
+    ]
+
+
 class EejDetection:
     def __init__(self, dip_euel: EuelData, offdip_euel: EuelData, local_date: date):
         self.local_date = local_date
@@ -176,12 +185,21 @@ class EejDetection:
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
     def is_singular_eej(self):
-        kp = self._get_kp()
-        if kp >= 4:
+        if self._get_kp() >= 4:
             return False
-        min_edst = self._calc_min_edst()
-        if min_edst < -30:
+        if self._calc_min_edst() < -30:
             return False
         if self.is_eej_peak_diff_nan():
             return False
         return not self.is_eej_present()
+
+    def eej_category(self) -> EejCategory:
+        if self._get_kp() >= 4:
+            return EejCategory(category="disturbance")
+        if self._calc_min_edst() < -30:
+            return EejCategory(category="disturbance")
+        if self.is_eej_peak_diff_nan():
+            return EejCategory(category="missing")
+        if self.is_eej_present():
+            return EejCategory(category="normal")
+        return EejCategory(category="singular")
