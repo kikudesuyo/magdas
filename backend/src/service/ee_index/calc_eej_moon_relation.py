@@ -2,12 +2,15 @@ from datetime import datetime, timedelta
 
 from matplotlib import pyplot as plt
 from src.domain.magdas_station import EeIndexStation
-from src.service.ee_index.calc_eej_detection import EejDetection
+from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej, EejDetection
 from src.service.ee_index.calc_moon_phase import calc_moon_phase
 
 anc = EeIndexStation.ANC
 hua = EeIndexStation.HUA
 eus = EeIndexStation.EUS
+
+dip = [anc, hua]
+offdip = [eus]
 
 moon_pahse_d = {}  # key: moon_age, value([singular_eej_cnt, nan_cnt, total_cnt])
 
@@ -17,7 +20,13 @@ end_date = datetime(2020, 12, 31)
 
 current = start_date
 while current <= end_date:
-    eej = EejDetection([anc, hua], [eus], current.date())
+    dip_euel_selector = BestEuelSelectorForEej(dip, current, is_dip=True)
+    offdip_euel_selector = BestEuelSelectorForEej(offdip, current, is_dip=False)
+
+    dip_euel = dip_euel_selector.select_euel_values()
+    offdip_euel = offdip_euel_selector.select_euel_values()
+
+    eej = EejDetection(dip_euel, offdip_euel, current.date())
     moon_age = int(calc_moon_phase(current))
     if moon_age not in moon_pahse_d:
         moon_pahse_d[moon_age] = [0, 0, 0]  # [singular_eej_cnt, nan_cnt, total_cnt]
