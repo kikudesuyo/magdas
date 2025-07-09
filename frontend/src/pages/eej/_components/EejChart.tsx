@@ -11,7 +11,6 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Chart as ReactChartJS } from "react-chartjs-2";
-import { useMemo } from "react";
 import { EejPlotData } from "@/pages/eej";
 
 ChartJS.register(
