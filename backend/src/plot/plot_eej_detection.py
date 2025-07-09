@@ -1,12 +1,12 @@
 from datetime import time, timedelta
-from typing import List, Literal
+from typing import List
 
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
-from src.plot.plot_config import PlotConfig
+from src.plot.config import PlotConfig
 from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej
 
 
@@ -86,26 +86,3 @@ class EejDetectionPlotter:
         self.ax.legend(loc="lower left", fontsize=18)
         plt.savefig(path)
         plt.close(self.fig)
-
-
-if __name__ == "__main__":
-    import time as t
-
-    from src.utils.path import generate_abs_path
-    from src.utils.period import create_month_period
-
-    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
-    offdip_stations = [EeIndexStation.EUS]
-
-    year = 2021
-    start = t.time()
-    for month in range(1, 2):
-        ut_period = create_month_period(year, month)
-        d = EejDetectionPlotter(ut_period)
-        d.plot_euel_to_detect_eej(dip_stations, "red", is_dip=True)
-        d.plot_euel_to_detect_eej(offdip_stations, "purple", is_dip=False)
-        path = generate_abs_path(f"/service/ee_index/img/eej/{year}_{month}.png")
-        d.set_title(f"{year}年{month}月のEEJ検知用EUEL")
-        d.show()
-    end = t.time()
-    print(f"Plotting took {end - start:.2f} seconds.")

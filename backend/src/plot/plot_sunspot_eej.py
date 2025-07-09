@@ -1,13 +1,12 @@
 from datetime import datetime, time, timedelta
-from typing import List, Literal
+from typing import List
 
-import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from matplotlib.dates import DateFormatter, DayLocator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
-from src.plot.plot_config import PlotConfig
+from src.plot.config import PlotConfig
 from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej
 from src.service.sunspot import Sunspot
 

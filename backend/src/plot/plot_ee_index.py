@@ -6,7 +6,7 @@ from matplotlib.backend_bases import MouseEvent
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.plot.plot_config import PlotConfig
+from src.plot.config import PlotConfig
 from src.service.ee_index.calc_moving_avg import calc_moving_avg
 from src.service.ee_index.factory_ee import EeFactory
 
