@@ -16,7 +16,7 @@ def write_singular_eej_to_csv(
     offdip_stations: List[EeIndexStation],
     path: str,
 ):
-    with open(path, "a", newline="") as f:
+    with open(path, "a", newline="", buffering=1) as f:
         writer = csv.writer(f)
         writer.writerow(["date", "dip_station_code", "offdip_station_code"])
         start_date = ut_period.start.date()
@@ -32,8 +32,8 @@ def write_singular_eej_to_csv(
                 offdip_stations, current_date, is_dip=False
             )
 
-            dip_euel = dip_euel_selector.select_euel_values()
-            offdip_euel = offdip_euel_selector.select_euel_values()
+            dip_euel = dip_euel_selector.select_euel_data()
+            offdip_euel = offdip_euel_selector.select_euel_data()
             eej = EejDetection(dip_euel, offdip_euel, current_date)
             if eej.is_singular_eej():
                 writer.writerow(
@@ -51,7 +51,19 @@ def write_eej_category_to_csv(
     offdip_stations: List[EeIndexStation],
     path: str,
 ):
-    with open(path, "a", newline="") as f:
+    """EEJのカテゴリをCSVに書き込む
+
+
+
+    CSVのフォーマット:
+    date, dip_station_code, offdip_station_code, category
+
+    - date: 日付
+    - dip_station_code: 採用されたDipステーションのコード
+    - offdip_station_code: 採用されたOffDipステーションのコード
+    - category: EEJのカテゴリ("normal", "singular", "disturbance", "missing")
+    """
+    with open(path, "a", newline="", buffering=1) as f:
         writer = csv.writer(f)
         writer.writerow(["date", "dip_station_code", "offdip_station_code", "category"])
         start_date = ut_period.start.date()
@@ -67,8 +79,8 @@ def write_eej_category_to_csv(
                 offdip_stations, current_date, is_dip=False
             )
 
-            dip_euel = dip_euel_selector.select_euel_values()
-            offdip_euel = offdip_euel_selector.select_euel_values()
+            dip_euel = dip_euel_selector.select_euel_data()
+            offdip_euel = offdip_euel_selector.select_euel_data()
             eej = EejDetection(dip_euel, offdip_euel, current_date)
             category = eej.eej_category()
             writer.writerow(
@@ -79,3 +91,4 @@ def write_eej_category_to_csv(
                     category.category,
                 ]
             )
+            print(f"Processed {current_date} ")
