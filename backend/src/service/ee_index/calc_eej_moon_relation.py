@@ -23,8 +23,8 @@ while current <= end_date:
     dip_euel_selector = BestEuelSelectorForEej(dip, current, is_dip=True)
     offdip_euel_selector = BestEuelSelectorForEej(offdip, current, is_dip=False)
 
-    dip_euel = dip_euel_selector.select_euel_values()
-    offdip_euel = offdip_euel_selector.select_euel_values()
+    dip_euel = dip_euel_selector.select_euel_data()
+    offdip_euel = offdip_euel_selector.select_euel_data()
 
     eej = EejDetection(dip_euel, offdip_euel, current.date())
     moon_age = int(calc_moon_phase(current))
