@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from src.domain.magdas_station import EeIndexStation
 
 
-def to_datetime(date: str) -> datetime:
+def str_to_datetime(str_date: str) -> datetime:
     """Converts a string to a date object"""
-    return datetime.strptime(date, "%Y-%m-%d")
+    return datetime.strptime(str_date, "%Y-%m-%d")
 
 
 class DateUtils:
