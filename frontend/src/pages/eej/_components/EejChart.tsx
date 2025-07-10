@@ -61,10 +61,17 @@ const EejChart = (eejPlotData: EejPlotData) => {
     },
     scales: {
       x: {
+        title: {
+          display: true,
+          text: "Local Time",
+          font: {
+            size: 20,
+          },
+        },
         type: "category",
         ticks: {
           autoSkip: true,
-          maxRotation: 45,
+          maxTicksLimit: 6,
         },
       },
       y: {

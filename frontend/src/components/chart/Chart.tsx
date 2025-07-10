@@ -167,6 +167,9 @@ const Chart = ({
           display: true,
           text: xAxisTitle,
         },
+        ticks: {
+          maxTicksLimit: 6,
+        },
       },
       y: {
         title: {
