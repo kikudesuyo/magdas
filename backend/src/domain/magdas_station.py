@@ -11,6 +11,10 @@ class MagdasStation:
 
 
 class EeIndexStation(Enum):
+    """
+    Ref: https://data.i-spes.kyushu-u.ac.jp/eeindex/SG_v11_No1_2016-pp-37-47.pdf
+    """
+
     # 藤本論文2015での観測点データ
     AAB = MagdasStation("AAB", 2.585333333333333, 0.18, 110.47)
     ABU = MagdasStation("ABU", 0.49266666666666664, -1.53, 79.4)
@@ -63,6 +67,10 @@ class EeIndexStation(Enum):
         return abs(self.gm_lat) < 3
 
     def is_offdip(self) -> bool:
+        """
+        In the referenced paper, offdip is defined as 3 <= |gm_lat| <= 10,
+        but due to limited station data, the range is extended to 15 degrees.
+        """
         return 3 <= abs(self.gm_lat) <= 15
 
     @classmethod
