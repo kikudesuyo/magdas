@@ -38,7 +38,7 @@ class EejDetectionPlotter:
         ]
         euel = np.hstack(
             [
-                BestEuelSelectorForEej(stations, d, is_dip).select_euel_values().array
+                BestEuelSelectorForEej(stations, d, is_dip).select_euel_data().array
                 for d in date_range
             ]
         )

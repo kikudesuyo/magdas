@@ -15,7 +15,7 @@ from src.service.ee_index.factory_ee import EeFactory
 from src.service.kp import Kp
 
 
-class EejDetectionTime:
+class DaytimeInterval:
     START = time(9, 0)
     END = time(14, 59)
 
@@ -60,7 +60,7 @@ class BestEuelSelectorForEej:
                         f"{station.code} is {station.gm_lat}. It is not in off-dip region"
                     )
 
-    def select_euel_values(self) -> EuelData:
+    def select_euel_data(self) -> EuelData:
         eej_euels: Dict[EeIndexStation, NanRatioData] = {}
         for station in self.stations:
             eej_euel = self._euel_for_eej_detection(station)
@@ -126,10 +126,10 @@ class BestEuelSelectorForEej:
 
 class EejCategory(BaseModel):
     category: Literal[
-        "singular",  # 特異型EEJ: singular
+        "peculiar",  # 特異型EEJ: peculiar
         "normal",  # 通常型EEJ: normal
         "disturbance",  # 擾乱(Kp指数とEDstで判断): disturbance
-        "missing",  # 欠測: missing
+        "missing",  # データ欠測: missing
     ]
 
 
@@ -146,7 +146,7 @@ class EejDetection:
         """EEJピーク差を計算。データ欠損が著しい場合はNaNを返す。"""
 
         timestamp = self._get_timestamp()
-        is_noon = np.array([EejDetectionTime.contains(dt.time()) for dt in timestamp])
+        is_noon = np.array([DaytimeInterval.contains(dt.time()) for dt in timestamp])
         dip_max = np.max(self.dip_euel_data.array[is_noon])
         offdip_max = np.max(self.offdip_euel_data.array[is_noon])
         return float(dip_max - offdip_max)
@@ -159,7 +159,7 @@ class EejDetection:
             [start_lt + timedelta(minutes=i) for i in range(TimeUnit.ONE_DAY.min)]
         )
 
-    def _calc_min_edst(self):
+    def _calc_daily_min_edst(self):
         s_dt = datetime(
             self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
         )
@@ -169,7 +169,7 @@ class EejDetection:
         edst = factory.create_edst(period)
         return np.min(edst.calc_edst())
 
-    def _get_kp(self):
+    def _get_daily_max_kp(self):
         s_dt = datetime(
             self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
         )
@@ -184,22 +184,22 @@ class EejDetection:
     def is_eej_present(self):
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
-    def is_singular_eej(self):
-        if self._get_kp() >= 4:
+    def is_peculiar_eej(self):
+        if self._get_daily_max_kp() >= 4:
             return False
-        if self._calc_min_edst() < -30:
+        if self._calc_daily_min_edst() < -30:
             return False
         if self.is_eej_peak_diff_nan():
             return False
         return not self.is_eej_present()
 
     def eej_category(self) -> EejCategory:
-        if self._get_kp() >= 4:
+        if self._get_daily_max_kp() >= 4:
             return EejCategory(category="disturbance")
-        if self._calc_min_edst() < -30:
+        if self._calc_daily_min_edst() < -30:
             return EejCategory(category="disturbance")
         if self.is_eej_peak_diff_nan():
             return EejCategory(category="missing")
         if self.is_eej_present():
             return EejCategory(category="normal")
-        return EejCategory(category="singular")
+        return EejCategory(category="peculiar")

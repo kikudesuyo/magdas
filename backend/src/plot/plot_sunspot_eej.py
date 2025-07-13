@@ -71,9 +71,7 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(stations, date, is_dip)
-                .select_euel_values()
-                .array
+                BestEuelSelectorForEej(stations, date, is_dip).select_euel_data().array
             )
             euel_data.extend(daily_euel)
 
@@ -129,9 +127,7 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(stations, date, is_dip)
-                .select_euel_values()
-                .array
+                BestEuelSelectorForEej(stations, date, is_dip).select_euel_data().array
             )
 
             # サブサンプリング（指定した間隔でデータを取得）

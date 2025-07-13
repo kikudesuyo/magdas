@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from src.domain.magdas_station import EeIndexStation
 from src.service.file_exporter.export_ee_zip import export_ee_as_iaga_zip
-from src.utils.date import to_datetime
+from src.utils.date import str_to_datetime
 
 
 class DownloadEeIndexReq(BaseModel):
@@ -28,10 +28,12 @@ def handle_get_ee_zip_content_by_range(
     start_date = request.start_date
     end_date = request.end_date
     station = EeIndexStation[request.station_code]
-    start_ut = to_datetime(start_date).replace(
+    start_ut = str_to_datetime(start_date).replace(
         hour=0, minute=0, second=0, microsecond=0
     )
-    end_ut = to_datetime(end_date).replace(hour=23, minute=59, second=59, microsecond=0)
+    end_ut = str_to_datetime(end_date).replace(
+        hour=23, minute=59, second=59, microsecond=0
+    )
 
     zip_base64 = export_ee_as_iaga_zip(station, start_ut, end_ut)
 

@@ -14,7 +14,7 @@ type EejRow = {
 
 export type EeJResp = {
   data: EejRow[];
-  singularEejDates: string[];
+  peculiarEejDates: string[];
 };
 
 export const fetchEejData = async (req: EeJReq): Promise<EeJResp> => {

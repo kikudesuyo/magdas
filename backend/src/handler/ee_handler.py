@@ -9,7 +9,7 @@ from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
 from src.service.ee_index.factory_ee import EeFactory
-from src.utils.date import to_datetime
+from src.utils.date import str_to_datetime
 
 
 class EeIndexDateRangeReq(BaseModel):
@@ -36,7 +36,7 @@ def handle_get_ee_by_range(
 ):
     date, station_code, days = (req.start_date, req.station_code, req.days)
     station = EeIndexStation[station_code]
-    start_ut = to_datetime(date)
+    start_ut = str_to_datetime(date)
 
     period = Period(start_ut, start_ut + timedelta(days=days))
     params = StationParams(station=station, period=period)

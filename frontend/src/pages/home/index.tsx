@@ -19,7 +19,7 @@ const Home = () => {
             to={PATHS.EEJ}
             className="text-3xl bg-slate-200 px-4 py-3 hover:bg-slate-400 rounded-lg border border-slate-400"
           >
-            Singular EEJ Detection
+            Peculiar EEJ Detection
           </Link>
           <Link
             to={PATHS.DOWNLOAD}

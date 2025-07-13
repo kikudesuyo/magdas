@@ -6,17 +6,17 @@ from src.service.ee_index.calc_h_component import HComponent
 
 
 class EeFactory:
-    def create_h(self, calc_params: StationParams):
-        return HComponent(calc_params)
+    def create_h(self, ut_params: StationParams):
+        return HComponent(ut_params)
 
-    def create_er(self, calc_params: StationParams):
-        h = self.create_h(calc_params)
+    def create_er(self, ut_params: StationParams):
+        h = self.create_h(ut_params)
         return Er(h.get_equatorial_h())
 
-    def create_edst(self, period: Period):
-        return Edst(period)
+    def create_edst(self, ut_period: Period):
+        return Edst(ut_period)
 
-    def create_euel(self, calc_params: StationParams):
-        er = self.create_er(calc_params)
-        edst = self.create_edst(calc_params.period)
+    def create_euel(self, ut_params: StationParams):
+        er = self.create_er(ut_params)
+        edst = self.create_edst(ut_params.period)
         return Euel(er, edst)

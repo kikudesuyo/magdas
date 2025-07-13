@@ -10,7 +10,7 @@ from src.domain.station_params import Period, StationParams
 from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej, EejDetection
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.nan_calculator import NanCalculator
-from src.utils.date import to_datetime
+from src.utils.date import str_to_datetime
 
 
 class EejReq(BaseModel):
@@ -47,14 +47,14 @@ class EejRow(BaseModel):
 
 class EejResp(BaseModel):
     data: List[EejRow]
-    singularEejDates: List[str]
+    peculiarEejDates: List[str]
 
 
 def handle_get_eej_by_range(
     req: EejReq = Depends(EejReq.from_query),
 ):
-    date, days, region = (req.start_date, req.days, req.region)
-    start_ut = to_datetime(date)
+    str_date, days, region = (req.start_date, req.days, req.region)
+    start_lt = str_to_datetime(str_date)
 
     if region != "south-america":
         raise ValueError("Only 'south_america' region is supported for EEJ detection.")
@@ -66,12 +66,12 @@ def handle_get_eej_by_range(
 
     factory = EeFactory()
     anc_param = StationParams(
-        EeIndexStation.ANC, Period(start_ut, start_ut + timedelta(days=days))
-    )
+        EeIndexStation.ANC, Period(start_lt, start_lt + timedelta(days=days))
+    ).to_ut_params()
     anc_euel = factory.create_euel(anc_param).calc_euel()
     hua_param = StationParams(
-        EeIndexStation.HUA, Period(start_ut, start_ut + timedelta(days=days))
-    )
+        EeIndexStation.HUA, Period(start_lt, start_lt + timedelta(days=days))
+    ).to_ut_params()
     hua_euel = factory.create_euel(hua_param).calc_euel()
 
     dip_euel = sanitize_np(
@@ -79,27 +79,27 @@ def handle_get_eej_by_range(
     )
 
     eus_param = StationParams(
-        EeIndexStation.EUS, Period(start_ut, start_ut + timedelta(days=days))
-    )
+        EeIndexStation.EUS, Period(start_lt, start_lt + timedelta(days=days))
+    ).to_ut_params()
     offdip_euel = sanitize_np(factory.create_euel(eus_param).calc_euel())
 
-    singular_eej_dates = []
+    peculiar_eej_dates = []
     for i in range(days):
-        date = start_ut + timedelta(days=i)
-        dip_euel_selector = BestEuelSelectorForEej(dip_stations, date, is_dip=True)
+        str_date = start_lt + timedelta(days=i)
+        dip_euel_selector = BestEuelSelectorForEej(dip_stations, str_date, is_dip=True)
         offdip_euel_selector = BestEuelSelectorForEej(
-            offdip_stations, date, is_dip=False
+            offdip_stations, str_date, is_dip=False
         )
 
-        dip_euel_data = dip_euel_selector.select_euel_values()
-        offdip_euel_data = offdip_euel_selector.select_euel_values()
+        dip_euel_data = dip_euel_selector.select_euel_data()
+        offdip_euel_data = offdip_euel_selector.select_euel_data()
 
-        eej_detection = EejDetection(dip_euel_data, offdip_euel_data, date)
-        if eej_detection.is_singular_eej():
-            singular_eej_dates.append(date)
+        eej_detection = EejDetection(dip_euel_data, offdip_euel_data, str_date)
+        if eej_detection.is_peculiar_eej():
+            peculiar_eej_dates.append(str_date)
 
     minute_labels = [
-        (start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
+        (start_lt + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
         for i in range(days * TimeUnit.ONE_DAY.min)
     ]
 
@@ -112,7 +112,7 @@ def handle_get_eej_by_range(
             )
             for i in range(len(minute_labels))
         ],
-        singularEejDates=[date.strftime("%Y-%m-%d") for date in singular_eej_dates],
+        peculiarEejDates=[date.strftime("%Y-%m-%d") for date in peculiar_eej_dates],
     )
 
 

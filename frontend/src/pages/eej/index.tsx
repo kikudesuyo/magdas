@@ -10,7 +10,7 @@ export type EejPlotData = {
     offdipEuel: number[];
   };
   minuteLabels: string[];
-  singularEejDates: string[];
+  peculiarEejDates: string[];
 };
 
 const Eej = () => {
@@ -46,7 +46,7 @@ const Eej = () => {
       offdipEuel: rawData.data.map((row) => row.offdipEuel ?? NaN),
     },
     minuteLabels: rawData.data.map((row) => row.time),
-    singularEejDates: rawData.singularEejDates,
+    peculiarEejDates: rawData.peculiarEejDates,
   };
 
   return (
@@ -57,7 +57,7 @@ const Eej = () => {
         <EejChart
           values={plotData.values}
           minuteLabels={plotData.minuteLabels}
-          singularEejDates={plotData.singularEejDates}
+          peculiarEejDates={plotData.peculiarEejDates}
         />
       </div>
     </Main>
