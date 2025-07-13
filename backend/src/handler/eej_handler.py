@@ -47,7 +47,7 @@ class EejRow(BaseModel):
 
 class EejResp(BaseModel):
     data: List[EejRow]
-    singularEejDates: List[str]
+    peculiarEejDates: List[str]
 
 
 def handle_get_eej_by_range(
@@ -83,7 +83,7 @@ def handle_get_eej_by_range(
     ).to_ut_params()
     offdip_euel = sanitize_np(factory.create_euel(eus_param).calc_euel())
 
-    singular_eej_dates = []
+    peculiar_eej_dates = []
     for i in range(days):
         str_date = start_lt + timedelta(days=i)
         dip_euel_selector = BestEuelSelectorForEej(dip_stations, str_date, is_dip=True)
@@ -95,8 +95,8 @@ def handle_get_eej_by_range(
         offdip_euel_data = offdip_euel_selector.select_euel_data()
 
         eej_detection = EejDetection(dip_euel_data, offdip_euel_data, str_date)
-        if eej_detection.is_singular_eej():
-            singular_eej_dates.append(str_date)
+        if eej_detection.is_peculiar_eej():
+            peculiar_eej_dates.append(str_date)
 
     minute_labels = [
         (start_lt + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
@@ -112,7 +112,7 @@ def handle_get_eej_by_range(
             )
             for i in range(len(minute_labels))
         ],
-        singularEejDates=[date.strftime("%Y-%m-%d") for date in singular_eej_dates],
+        peculiarEejDates=[date.strftime("%Y-%m-%d") for date in peculiar_eej_dates],
     )
 
 

@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from src.dev.save_singular_eej import (
+from src.dev.save_peculiar_eej import (
     write_eej_category_to_csv,
-    write_singular_eej_to_csv,
+    write_peculiar_eej_to_csv,
 )
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
@@ -32,7 +32,7 @@ yap = EeIndexStation.YAP
 dips = [bcl, cdo, ceb, dav, lkw, yap]
 offdips = [gsi, lgz, mnd, mut, scn, tgg]
 
-period = Period(start=datetime(2015, 1, 1), end=datetime(2022, 12, 31))
+period = Period(start=datetime(2019, 11, 16), end=datetime(2022, 12, 31))
 
 
 """dip, offDipのEUELの値を確認する"""

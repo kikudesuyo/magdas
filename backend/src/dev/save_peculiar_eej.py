@@ -10,7 +10,7 @@ from src.service.ee_index.calc_eej_detection import (
 )
 
 
-def write_singular_eej_to_csv(
+def write_peculiar_eej_to_csv(
     ut_period: Period,
     dip_stations: List[EeIndexStation],
     offdip_stations: List[EeIndexStation],
@@ -35,7 +35,7 @@ def write_singular_eej_to_csv(
             dip_euel = dip_euel_selector.select_euel_data()
             offdip_euel = offdip_euel_selector.select_euel_data()
             eej = EejDetection(dip_euel, offdip_euel, current_date)
-            if eej.is_singular_eej():
+            if eej.is_peculiar_eej():
                 writer.writerow(
                     [
                         current_date,
@@ -61,7 +61,7 @@ def write_eej_category_to_csv(
     - date: 日付
     - dip_station_code: 採用されたDipステーションのコード
     - offdip_station_code: 採用されたOffDipステーションのコード
-    - category: EEJのカテゴリ("normal", "singular", "disturbance", "missing")
+    - category: EEJのカテゴリ("peculiar", "normal", "disturbance", "missing")
     """
     with open(path, "a", newline="", buffering=1) as f:
         writer = csv.writer(f)

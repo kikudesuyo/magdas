@@ -15,7 +15,7 @@ from src.service.ee_index.factory_ee import EeFactory
 from src.service.kp import Kp
 
 
-class EejDetectionTime:
+class DaytimeInterval:
     START = time(9, 0)
     END = time(14, 59)
 
@@ -126,7 +126,7 @@ class BestEuelSelectorForEej:
 
 class EejCategory(BaseModel):
     category: Literal[
-        "singular",  # 特異型EEJ: singular
+        "peculiar",  # 特異型EEJ: peculiar
         "normal",  # 通常型EEJ: normal
         "disturbance",  # 擾乱(Kp指数とEDstで判断): disturbance
         "missing",  # データ欠測: missing
@@ -146,7 +146,7 @@ class EejDetection:
         """EEJピーク差を計算。データ欠損が著しい場合はNaNを返す。"""
 
         timestamp = self._get_timestamp()
-        is_noon = np.array([EejDetectionTime.contains(dt.time()) for dt in timestamp])
+        is_noon = np.array([DaytimeInterval.contains(dt.time()) for dt in timestamp])
         dip_max = np.max(self.dip_euel_data.array[is_noon])
         offdip_max = np.max(self.offdip_euel_data.array[is_noon])
         return float(dip_max - offdip_max)
@@ -184,7 +184,7 @@ class EejDetection:
     def is_eej_present(self):
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
-    def is_singular_eej(self):
+    def is_peculiar_eej(self):
         if self._get_daily_max_kp() >= 4:
             return False
         if self._calc_daily_min_edst() < -30:
@@ -202,4 +202,4 @@ class EejDetection:
             return EejCategory(category="missing")
         if self.is_eej_present():
             return EejCategory(category="normal")
-        return EejCategory(category="singular")
+        return EejCategory(category="peculiar")

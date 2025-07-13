@@ -12,7 +12,7 @@ eus = EeIndexStation.EUS
 dip = [anc, hua]
 offdip = [eus]
 
-moon_pahse_d = {}  # key: moon_age, value([singular_eej_cnt, nan_cnt, total_cnt])
+moon_pahse_d = {}  # key: moon_age, value([peculiar_eej_cnt, nan_cnt, total_cnt])
 
 start_date = datetime(2017, 1, 1)
 end_date = datetime(2020, 12, 31)
@@ -29,10 +29,10 @@ while current <= end_date:
     eej = EejDetection(dip_euel, offdip_euel, current.date())
     moon_age = int(calc_moon_phase(current))
     if moon_age not in moon_pahse_d:
-        moon_pahse_d[moon_age] = [0, 0, 0]  # [singular_eej_cnt, nan_cnt, total_cnt]
+        moon_pahse_d[moon_age] = [0, 0, 0]  # [peculiar_eej_cnt, nan_cnt, total_cnt]
     if eej.is_eej_peak_diff_nan():
         moon_pahse_d[moon_age][1] += 1
-    if eej.is_singular_eej():
+    if eej.is_peculiar_eej():
         moon_pahse_d[moon_age][0] += 1
     moon_pahse_d[moon_age][2] += 1
     current += timedelta(days=1)
@@ -40,7 +40,7 @@ while current <= end_date:
 
 moon_ages = sorted(moon_pahse_d.keys())
 
-singular_rates = [
+peculiar_rates = [
     moon_pahse_d[age][0] / moon_pahse_d[age][2] if moon_pahse_d[age][2] > 0 else 0
     for age in moon_ages
 ]
@@ -52,9 +52,9 @@ fig, ax = plt.subplots(figsize=(12, 6))
 
 
 plt.figure(figsize=(12, 6))
-plt.bar(moon_ages, singular_rates, color="teal", alpha=0.7)
+plt.bar(moon_ages, peculiar_rates, color="teal", alpha=0.7)
 plt.xlabel("Moon Age (days)")
-plt.ylabel("Singular EEJ Rate")
-plt.title("Singular EEJ Rate by Moon Age")
+plt.ylabel("Peculiar EEJ Rate")
+plt.title("Peculiar EEJ Rate by Moon Age")
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 plt.show()

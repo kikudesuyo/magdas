@@ -24,7 +24,11 @@ ChartJS.register(
 );
 
 const EejChart = (eejPlotData: EejPlotData) => {
-  const { values, minuteLabels, singularEejDates } = eejPlotData;
+  const {
+    values,
+    minuteLabels,
+    peculiarEejDates: peculiarEejDates,
+  } = eejPlotData;
   const dipEuel = values.dipEuel;
   const offdipEuel = values.offdipEuel;
 
@@ -97,7 +101,7 @@ const EejChart = (eejPlotData: EejPlotData) => {
   const backgroundPlugin: Plugin<"line"> = {
     id: "eejBackgroundPlugin",
     afterDatasetsDraw: (chart) => {
-      if (!singularEejDates?.length) return;
+      if (!peculiarEejDates?.length) return;
 
       const ctx = chart.ctx;
       const xAxis = chart.scales.x;
@@ -107,7 +111,7 @@ const EejChart = (eejPlotData: EejPlotData) => {
       ctx.save();
       ctx.fillStyle = "rgba(255, 165, 0, 0.3)";
 
-      singularEejDates.forEach((dateStr) => {
+      peculiarEejDates.forEach((dateStr) => {
         const startIndex = chartLabels.findIndex((label) =>
           label.includes(dateStr)
         );
@@ -134,7 +138,7 @@ const EejChart = (eejPlotData: EejPlotData) => {
   return (
     <div className="w-[800px] h-[400px]">
       <ReactChartJS
-        key={singularEejDates.join(",")}
+        key={peculiarEejDates.join(",")}
         type="line"
         data={chartData}
         options={chartOptions}
