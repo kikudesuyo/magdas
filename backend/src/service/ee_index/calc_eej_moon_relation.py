@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 from matplotlib import pyplot as plt
 from src.domain.magdas_station import EeIndexStation
+from src.service.calc_moon_phase import calc_moon_phase
 from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej, EejDetection
-from src.service.ee_index.calc_moon_phase import calc_moon_phase
 
 anc = EeIndexStation.ANC
 hua = EeIndexStation.HUA

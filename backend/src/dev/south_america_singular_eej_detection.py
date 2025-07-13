@@ -19,7 +19,7 @@ offdips = [eus]
 year = 2015
 
 
-period = Period(start=datetime(2019, 8, 26), end=datetime(2022, 12, 31))
+period = Period(start=datetime(2014, 1, 1), end=datetime(2014, 12, 31))
 
 
 # write_peculiar_eej_to_csv(
@@ -33,7 +33,7 @@ write_eej_category_to_csv(
     period,
     dip_stations=dips,
     offdip_stations=offdips,
-    path="data/south_america_eej_category.csv",
+    path="data/t.csv",
 )
 
 
