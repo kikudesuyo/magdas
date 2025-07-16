@@ -20,26 +20,15 @@ class MoonPhaseData(BaseModel):
 
 def aggregate_peculiar_ratio(
     period: Period,
-    csv_path: Optional[str] = None,
+    csv_path: str,
 ) -> Tuple[List[float], List[float]]:
     BIN_SIZE = 1
-
-    if csv_path is None:
-        csv_path = generate_parent_abs_path(
-            "/src/dev/moon_phase/south_america_eej_category.csv"
-        )
-
-    # CSV読み込み & 日付パース
     df = pd.read_csv(csv_path, parse_dates=["date"])
-
-    # 期間でフィルタ
     df = df[(df["date"] >= period.start) & (df["date"] <= period.end)]
 
-    # 月齢計算 & BIN化
     df["moon_age"] = df["date"].apply(calc_moon_phase)
     df["moon_age_bin"] = (df["moon_age"] / BIN_SIZE).round() * BIN_SIZE
 
-    # 各カテゴリごとのカウント
     grouped = df.groupby(["moon_age_bin", "category"]).size().unstack(fill_value=0)
 
     bins = sorted(grouped.index.tolist())
@@ -79,7 +68,8 @@ def plot_peculiar_ratio(
 
 
 period = Period(start=datetime(2014, 1, 1), end=datetime(2020, 12, 31))
-x, y = aggregate_peculiar_ratio(period)
+path = generate_parent_abs_path("/src/dev/moon_phase/south_america_eej_category.csv")
+x, y = aggregate_peculiar_ratio(period, path)
 
 
 plot_peculiar_ratio(
