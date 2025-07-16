@@ -1,6 +1,5 @@
 import csv
 from datetime import datetime, timedelta
-from typing import List
 
 import numpy as np
 from numpy.typing import NDArray
@@ -8,11 +7,7 @@ from src.domain.station_params import EeIndexStation, Period
 from src.service.ee_index.calc_eej_detection import (
     BestEuelSelectorForEej,
     DaytimeInterval,
-    EejDetection,
 )
-
-# facory = EeFactory()
-# facory.create_euel(ut_params)
 
 
 def get_timestamp(start: datetime, end: datetime) -> NDArray[np.datetime64]:
@@ -74,15 +69,11 @@ ut_param = Period(
 )
 
 
-# ama = EeIndexStation.AMA
 bcl = EeIndexStation.BCL
-# bkl = EeIndexStation.BKL
 cdo = EeIndexStation.CDO
 ceb = EeIndexStation.CEB
 dav = EeIndexStation.DAV
-# daw = EeIndexStation.DAW
 gsi = EeIndexStation.GSI
-# hln = EeIndexStation.HLN
 lgz = EeIndexStation.LGZ
 lkw = EeIndexStation.LKW
 lwa = EeIndexStation.LWA
@@ -93,19 +84,17 @@ tgg = EeIndexStation.TGG
 yap = EeIndexStation.YAP
 
 
-# dip_stations = [bcl, cdo, ceb, dav, lkw, yap]
-# dip_path = "data/southeast_asia_dip_station_peak_euel.csv"
-# with open(dip_path, "a", newline="", buffering=1) as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["date", "station_code", "peak_euel"])
-#     for station in dip_stations:
-#         write_dip_station_peak_euel_to_csv(writer, ut_param, station)
+dip_stations = [bcl, cdo, ceb, dav, lkw, yap]
+dip_path = "data/southeast_asia_dip_station_peak_euel.csv"
+with open(dip_path, "a", newline="", buffering=1) as f:
+    writer = csv.writer(f)
+    writer.writerow(["date", "station_code", "peak_euel"])
+    for station in dip_stations:
+        write_dip_station_peak_euel_to_csv(writer, ut_param, station)
 
 
-# offdip_stations = [gsi, lgz, mnd, mut, scn, tgg]
+offdip_stations = [gsi, lgz, mnd, mut, scn, tgg]
 
-
-offdip_stations = [tgg]
 
 offdip_path = "data/southeast_asia_offdip_station_peak_euel.csv"
 with open(offdip_path, "a", newline="", buffering=1) as f:
