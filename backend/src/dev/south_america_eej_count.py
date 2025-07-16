@@ -38,7 +38,7 @@ def count_categories(csv_path, start_date=None, end_date=None):
 
 if __name__ == "__main__":
     # 例: 2015-01-01 から 2015-01-10 まで
-    path = generate_parent_abs_path("/data/south_america_eej_category.csv")
+    path = generate_parent_abs_path("/src/dev/south_america_eej_category.csv")
     start_date = "2014-01-01"
     end_date = "2020-12-31"
 
