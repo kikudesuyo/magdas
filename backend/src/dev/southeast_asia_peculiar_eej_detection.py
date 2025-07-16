@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.dev.save_peculiar_eej import (
+from src.dev.write_peculiar_eej import (
     write_eej_category_to_csv,
     write_peculiar_eej_to_csv,
 )
