@@ -1,8 +1,8 @@
-import csv
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import matplotlib.pyplot as plt
+import pandas as pd
 from pydantic import BaseModel
 from src.domain.station_params import Period
 from src.service.calc_moon_phase import calc_moon_phase
@@ -22,58 +22,37 @@ def aggregate_peculiar_ratio(
     period: Period,
     csv_path: Optional[str] = None,
 ) -> Tuple[List[float], List[float]]:
-    """
-    CSVを読み込んで期間内のデータを集計し、月齢binごとのpeculiar EEJ割合(%)を返す。
-    """
-    BIN_SIZE = 1  # 月齢の区切り幅（例: 0.5日ごとに集計）
+    BIN_SIZE = 1
 
     if csv_path is None:
         csv_path = generate_parent_abs_path(
             "/src/dev/moon_phase/south_america_eej_category.csv"
         )
 
-    moon_phase_d: Dict[float, MoonPhaseData] = {}
+    # CSV読み込み & 日付パース
+    df = pd.read_csv(csv_path, parse_dates=["date"])
 
-    with open(csv_path, newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            date_str = row["date"]
-            category = row["category"]
+    # 期間でフィルタ
+    df = df[(df["date"] >= period.start) & (df["date"] <= period.end)]
 
-            dt = datetime.strptime(date_str, "%Y-%m-%d")
+    # 月齢計算 & BIN化
+    df["moon_age"] = df["date"].apply(calc_moon_phase)
+    df["moon_age_bin"] = (df["moon_age"] / BIN_SIZE).round() * BIN_SIZE
 
-            if dt < period.start:
-                continue
-            if dt > period.end:
-                continue
-            moon_age_bin = calc_moon_phase(dt)
-            moon_age_bin = round(moon_age_bin / BIN_SIZE) * BIN_SIZE
+    # 各カテゴリごとのカウント
+    grouped = df.groupby(["moon_age_bin", "category"]).size().unstack(fill_value=0)
 
-            if moon_age_bin not in moon_phase_d:
-                moon_phase_d[moon_age_bin] = MoonPhaseData(moon_age=moon_age_bin)
-
-            data = moon_phase_d[moon_age_bin]
-            if category == "missing":
-                data.nan_cnt += 1
-            elif category == "disturbance":
-                data.disturbance_cnt += 1
-            elif category == "normal":
-                data.normal_eej_cnt += 1
-            elif category == "peculiar":
-                data.peculiar_eej_cnt += 1
-            data.total_cnt += 1
-
-    sorted_bins = sorted(moon_phase_d.items())
-    bins = [bin_key for bin_key, _ in sorted_bins]
-
+    bins = sorted(grouped.index.tolist())
     peculiar_ratios = []
-    for _, data in sorted_bins:
-        valid_total = data.normal_eej_cnt + data.peculiar_eej_cnt
-        if valid_total == 0:
-            peculiar_ratios.append(0)
-        else:
-            ratio = data.peculiar_eej_cnt / valid_total * 100
-            peculiar_ratios.append(ratio)
+
+    for bin_val in bins:
+        normal = grouped.at[bin_val, "normal"] if "normal" in grouped.columns else 0
+        peculiar = (
+            grouped.at[bin_val, "peculiar"] if "peculiar" in grouped.columns else 0
+        )
+        valid_total = normal + peculiar
+        ratio = (peculiar / valid_total * 100) if valid_total > 0 else 0
+        peculiar_ratios.append(ratio)
 
     return bins, peculiar_ratios
 
