@@ -3,22 +3,12 @@ from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from pydantic import BaseModel
 from src.domain.station_params import Period
 from src.service.calc_moon_phase import calc_moon_phase
 from utils.path import generate_parent_abs_path
 
 
-class MoonPhaseData(BaseModel):
-    moon_age: float
-    nan_cnt: int = 0
-    disturbance_cnt: int = 0
-    normal_eej_cnt: int = 0
-    peculiar_eej_cnt: int = 0
-    total_cnt: int = 0
-
-
-def aggregate_peculiar_ratio(
+def aggregate_peculiar_ratio_by_moon_age(
     period: Period,
     csv_path: str,
 ) -> Tuple[List[float], List[float]]:
@@ -68,8 +58,8 @@ def plot_peculiar_ratio(
 
 
 period = Period(start=datetime(2014, 1, 1), end=datetime(2020, 12, 31))
-path = generate_parent_abs_path("/src/dev/moon_phase/south_america_eej_category.csv")
-x, y = aggregate_peculiar_ratio(period, path)
+path = generate_parent_abs_path("/src/dev/south_america_eej_category.csv")
+x, y = aggregate_peculiar_ratio_by_moon_age(period, path)
 
 
 plot_peculiar_ratio(

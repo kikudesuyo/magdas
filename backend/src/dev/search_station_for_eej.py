@@ -24,13 +24,11 @@ class StationData:
         return df.reset_index(drop=True)
 
 
-# 使い方例
 if __name__ == "__main__":
     path = generate_parent_abs_path(
         "/Storage/peak_euel/southeast_asia_dip_station_peak_euel.csv"
     )
     data = StationData(path)
-    # 例: 2000年1月1日から2000年1月2日まで、BCL観測点
     result = data.query(
         start_date="2000-01-01", end_date="2000-01-10", station_code="BCL"
     )
