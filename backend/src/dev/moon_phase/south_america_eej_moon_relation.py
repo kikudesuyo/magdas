@@ -24,9 +24,6 @@ def aggregate_peculiar_ratio(
 ) -> Tuple[List[float], List[float]]:
     """
     CSVを読み込んで期間内のデータを集計し、月齢binごとのpeculiar EEJ割合(%)を返す。
-
-    Returns:
-        Tuple[x: List[moon_age_bin], y: List[peculiar_ratio_percent]]
     """
     BIN_SIZE = 1  # 月齢の区切り幅（例: 0.5日ごとに集計）
 
@@ -88,7 +85,7 @@ def plot_peculiar_ratio(
     plt.bar(
         x,
         peculiar_ratio,
-        width=0.4,  # 固定幅
+        width=0.4,
         color="deepskyblue",
         label="Peculiar EEJ Ratio",
     )
