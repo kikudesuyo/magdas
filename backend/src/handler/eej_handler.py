@@ -6,14 +6,11 @@ from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
 from src.service.ee_index.calc_eej_detection import (
     BestEuelSelectorForEej,
     EejDetection,
     calc_euel_peak_diff,
 )
-from src.service.ee_index.factory_ee import EeFactory
-from src.service.nan_calculator import NanCalculator
 from src.utils.date import str_to_datetime
 
 
@@ -54,9 +51,7 @@ class EejResp(BaseModel):
     peculiarEejDates: List[str]
 
 
-def handle_get_eej_by_range(
-    req: EejReq = Depends(EejReq.from_query),
-):
+def handle_get_eej_by_range(req: EejReq = Depends(EejReq.from_query)):
     str_date, days, region = (req.start_date, req.days, req.region)
     start_lt = str_to_datetime(str_date)
 
@@ -68,24 +63,8 @@ def handle_get_eej_by_range(
     ]
     offdip_stations = [EeIndexStation.EUS]
 
-    factory = EeFactory()
-    anc_param = StationParams(
-        EeIndexStation.ANC, Period(start_lt, start_lt + timedelta(days=days))
-    ).to_ut_params()
-    anc_euel = factory.create_euel(anc_param).calc_euel()
-    hua_param = StationParams(
-        EeIndexStation.HUA, Period(start_lt, start_lt + timedelta(days=days))
-    ).to_ut_params()
-    hua_euel = factory.create_euel(hua_param).calc_euel()
-
-    dip_euel = sanitize_np(
-        NanCalculator.nanmean(np.array([anc_euel, hua_euel]), axis=0)
-    )
-
-    eus_param = StationParams(
-        EeIndexStation.EUS, Period(start_lt, start_lt + timedelta(days=days))
-    ).to_ut_params()
-    offdip_euel = sanitize_np(factory.create_euel(eus_param).calc_euel())
+    dip_euel = []
+    offdip_euel = []
 
     peculiar_eej_dates = []
     current_lt = start_lt
@@ -100,6 +79,9 @@ def handle_get_eej_by_range(
 
         dip_euel_data = dip_euel_selector.select_euel_data()
         offdip_euel_data = offdip_euel_selector.select_euel_data()
+
+        dip_euel.extend(sanitize_np(dip_euel_data.array))
+        offdip_euel.extend(sanitize_np(offdip_euel_data.array))
 
         peak_diff = calc_euel_peak_diff(
             dip_euel_data,
