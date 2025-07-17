@@ -4,7 +4,7 @@ from src.constants.ee_index import MAX_ER, MIN_ER
 from src.constants.time_relation import DawnAndDusk, TimeUnit
 from src.service.ee_index.calc_h_component import HData
 from src.service.nan_calculator import NanCalculator
-from src.utils.period import get_minute_list
+from src.utils.date import get_minute_list
 
 
 class Er:
