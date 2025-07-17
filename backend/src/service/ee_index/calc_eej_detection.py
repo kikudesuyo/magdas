@@ -133,23 +133,26 @@ class EejCategory(BaseModel):
     ]
 
 
+def calc_euel_peak_diff(
+    dip_euel: EuelData, offdip_euel: EuelData, local_date: date
+) -> float:
+    timestamp = np.array(
+        [
+            datetime(local_date.year, local_date.month, local_date.day, 0, 0)
+            + timedelta(minutes=i)
+            for i in range(TimeUnit.ONE_DAY.min)
+        ]
+    )
+    is_noon = np.array([DaytimeInterval.contains(dt.time()) for dt in timestamp])
+    dip_max = np.max(dip_euel.array[is_noon])
+    offdip_max = np.max(offdip_euel.array[is_noon])
+    return float(dip_max - offdip_max)
+
+
 class EejDetection:
-    def __init__(self, dip_euel: EuelData, offdip_euel: EuelData, local_date: date):
+    def __init__(self, peak_diff: float, local_date: date):
         self.local_date = local_date
-
-        self.dip_euel_data = dip_euel
-        self.offdip_euel_data = offdip_euel
-
-        self.eej_peak_diff = self.calc_euel_peak_diff()
-
-    def calc_euel_peak_diff(self) -> float:
-        """EEJピーク差を計算。データ欠損が著しい場合はNaNを返す。"""
-
-        timestamp = self._get_timestamp()
-        is_noon = np.array([DaytimeInterval.contains(dt.time()) for dt in timestamp])
-        dip_max = np.max(self.dip_euel_data.array[is_noon])
-        offdip_max = np.max(self.offdip_euel_data.array[is_noon])
-        return float(dip_max - offdip_max)
+        self.eej_peak_diff = peak_diff
 
     def _get_timestamp(self) -> NDArray[np.datetime64]:
         start_lt = datetime(

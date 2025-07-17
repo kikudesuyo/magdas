@@ -1,86 +1,81 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from src.dev.write_peculiar_eej import (
-    write_eej_category_to_csv,
-    write_peculiar_eej_to_csv,
-)
-from src.domain.magdas_station import EeIndexStation
+import numpy as np
+import pandas as pd
 from src.domain.station_params import Period
-from src.plot.plot_ee_index import EeIndexPlotter
-from src.plot.plot_eej_detection import EejDetectionPlotter
-from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej, EejDetection
-
-# ama = EeIndexStation.AMA
-bcl = EeIndexStation.BCL
-# bkl = EeIndexStation.BKL
-cdo = EeIndexStation.CDO
-ceb = EeIndexStation.CEB
-dav = EeIndexStation.DAV
-# daw = EeIndexStation.DAW
-gsi = EeIndexStation.GSI
-# hln = EeIndexStation.HLN
-lgz = EeIndexStation.LGZ
-lkw = EeIndexStation.LKW
-lwa = EeIndexStation.LWA
-mnd = EeIndexStation.MND
-mut = EeIndexStation.MUT
-scn = EeIndexStation.SCN
-tgg = EeIndexStation.TGG
-yap = EeIndexStation.YAP
+from src.service.ee_index.calc_eej_detection import EejDetection
+from src.utils.path import generate_parent_abs_path
 
 
-dips = [bcl, cdo, ceb, dav, lkw, yap]
-offdips = [gsi, lgz, mnd, mut, scn, tgg]
+def load_and_prepare_df(path: str, station_code: str, period: Period) -> dict:
+    # 'nan'などの文字列を欠損値(NaN)として認識させる
+    df = pd.read_csv(
+        path,
+        parse_dates=["date"],
+        na_values=["nan", "NaN", "NULL", ""],
+    )
+    # 数値化しておく（文字列だったら強制NaN）
+    df["peak_euel"] = pd.to_numeric(df["peak_euel"], errors="coerce")
+    df = df[
+        (df["date"] >= period.start)
+        & (df["date"] <= period.end)
+        & (df["station_code"] == station_code)
+    ][["date", "peak_euel"]]
 
-period = Period(start=datetime(2019, 11, 16), end=datetime(2022, 12, 31))
-
-
-"""dip, offDipのEUELの値を確認する"""
-
-# dip_ee_plotter = EeIndexPlotter(period)
-# dip_ee_plotter.plot_euel(bcl, color="red")
-# dip_ee_plotter.plot_euel(cdo, color="orange")
-# dip_ee_plotter.plot_euel(ceb, color="yellow")
-# dip_ee_plotter.plot_euel(dav, color="green")
-# dip_ee_plotter.plot_euel(lkw, color="blue")
-# dip_ee_plotter.plot_euel(yap, color="purple")
-# dip_ee_plotter.set_title("Dip Stations EUEL")
-# dip_ee_plotter.show()
-
-# offdip_ee_plotter = EeIndexPlotter(period)
-# offdip_ee_plotter.plot_euel(gsi, color="red")
-# offdip_ee_plotter.plot_euel(lgz, color="orange")
-# offdip_ee_plotter.plot_euel(mnd, color="yellow")
-# offdip_ee_plotter.plot_euel(mut, color="green")
-# offdip_ee_plotter.plot_euel(scn, color="blue")
-# offdip_ee_plotter.plot_euel(tgg, color="purple")
-# offdip_ee_plotter.set_title("OffDip Stations EUEL")
-# offdip_ee_plotter.show()
+    # 日付をキーに辞書化（datetime.date -> float）
+    return {row["date"].date(): row["peak_euel"] for _, row in df.iterrows()}
 
 
-write_eej_category_to_csv(
-    period,
-    dip_stations=dips,
-    offdip_stations=offdips,
-    path="data/southeast_asia_eej_category.csv",
-)
+def main():
+    dip_path = generate_parent_abs_path(
+        "/Storage/peak_euel/southeast_asia_dip_station_peak_euel.csv"
+    )
+    offdip_path = generate_parent_abs_path(
+        "/Storage/peak_euel/southeast_asia_offdip_station_peak_euel.csv"
+    )
+
+    period = Period(start=datetime(2016, 1, 1), end=datetime(2016, 12, 31))
+
+    dip_dict = load_and_prepare_df(dip_path, "DAV", period)
+    offdip_dict = load_and_prepare_df(offdip_path, "MND", period)
+
+    results = []
+
+    dt = period.start
+    while dt <= period.end:
+        key = dt.date()
+        dip_val = dip_dict.get(key)
+        offdip_val = offdip_dict.get(key)
+
+        if dip_val is None or offdip_val is None:
+            dt += timedelta(days=1)
+            continue
+
+        if pd.isna(dip_val) or pd.isna(offdip_val):
+            peak_diff = np.nan
+        else:
+            peak_diff = dip_val - offdip_val
+
+        eej_detection = EejDetection(peak_diff=peak_diff, local_date=dt)
+        category = eej_detection.eej_category()
+
+        if category.category == "peculiar":
+            print(f"{key} is a peculiar EEJ")
+
+        results.append(
+            {
+                "date": key,
+                "peak_diff": peak_diff,
+                "eej_category": category.category,
+            }
+        )
+
+        dt += timedelta(days=1)
+
+    # 必要に応じてCSVに保存
+    result_df = pd.DataFrame(results)
+    result_df.to_csv("eej_detection_results.csv", index=False)
 
 
-# s = datetime(2015, 1, 1, 0, 0)  # Local time for the start of the period
-# e = datetime(2015, 1, 10, 23, 59)  # Local time for the end of the period
-# p = Period(start=s, end=e)
-
-
-# best_dip_euel_selector = BestEuelSelectorForEej(dips, s, is_dip=True)
-# best_offdip_euel_selector = BestEuelSelectorForEej(offdips, s, is_dip=False)
-
-# dip_euel = best_dip_euel_selector.select_euel_data()
-# offdip_euel = best_offdip_euel_selector.select_euel_data()
-
-# eej_detection_plotter = EejDetectionPlotter(p)
-# eej_detection_plotter.plot_euel_to_detect_eej(stations=dips, color="red", is_dip=True)
-# eej_detection_plotter.plot_euel_to_detect_eej(
-#     stations=offdips, color="blue", is_dip=False
-# )
-# eej_detection_plotter.set_title("Southeast Asia EEJ Detection")
-# eej_detection_plotter.show()
+if __name__ == "__main__":
+    main()

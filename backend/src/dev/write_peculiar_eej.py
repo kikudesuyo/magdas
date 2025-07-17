@@ -7,6 +7,7 @@ from src.service.ee_index.calc_eej_detection import (
     BestEuelSelectorForEej,
     EeIndexStation,
     EejDetection,
+    calc_euel_peak_diff,
 )
 
 
@@ -34,7 +35,10 @@ def write_peculiar_eej_to_csv(
 
             dip_euel = dip_euel_selector.select_euel_data()
             offdip_euel = offdip_euel_selector.select_euel_data()
-            eej = EejDetection(dip_euel, offdip_euel, current_date)
+
+            peak_diff = calc_euel_peak_diff(dip_euel, offdip_euel, current_date)
+
+            eej = EejDetection(peak_diff, current_date)
             if eej.is_peculiar_eej():
                 writer.writerow(
                     [
@@ -81,7 +85,8 @@ def write_eej_category_to_csv(
 
             dip_euel = dip_euel_selector.select_euel_data()
             offdip_euel = offdip_euel_selector.select_euel_data()
-            eej = EejDetection(dip_euel, offdip_euel, current_date)
+            peak_diff = calc_euel_peak_diff(dip_euel, offdip_euel, current_date)
+            eej = EejDetection(peak_diff, current_date)
             category = eej.eej_category()
             writer.writerow(
                 [

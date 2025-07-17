@@ -7,7 +7,11 @@ from pydantic import BaseModel, Field
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParams
-from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej, EejDetection
+from src.service.ee_index.calc_eej_detection import (
+    BestEuelSelectorForEej,
+    EejDetection,
+    calc_euel_peak_diff,
+)
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.nan_calculator import NanCalculator
 from src.utils.date import str_to_datetime
@@ -84,19 +88,28 @@ def handle_get_eej_by_range(
     offdip_euel = sanitize_np(factory.create_euel(eus_param).calc_euel())
 
     peculiar_eej_dates = []
+    current_lt = start_lt
     for i in range(days):
-        str_date = start_lt + timedelta(days=i)
-        dip_euel_selector = BestEuelSelectorForEej(dip_stations, str_date, is_dip=True)
+        current_lt += timedelta(days=i)
+        dip_euel_selector = BestEuelSelectorForEej(
+            dip_stations, current_lt, is_dip=True
+        )
         offdip_euel_selector = BestEuelSelectorForEej(
-            offdip_stations, str_date, is_dip=False
+            offdip_stations, current_lt, is_dip=False
         )
 
         dip_euel_data = dip_euel_selector.select_euel_data()
         offdip_euel_data = offdip_euel_selector.select_euel_data()
 
-        eej_detection = EejDetection(dip_euel_data, offdip_euel_data, str_date)
+        peak_diff = calc_euel_peak_diff(
+            dip_euel_data,
+            offdip_euel_data,
+            current_lt,
+        )
+
+        eej_detection = EejDetection(peak_diff, current_lt)
         if eej_detection.is_peculiar_eej():
-            peculiar_eej_dates.append(str_date)
+            peculiar_eej_dates.append(current_lt.date())
 
     minute_labels = [
         (start_lt + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")

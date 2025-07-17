@@ -18,7 +18,7 @@ offdips = [eus]
 year = 2015
 
 
-period = Period(start=datetime(2014, 1, 1), end=datetime(2014, 12, 31))
+period = Period(start=datetime(2014, 1, 1), end=datetime(2020, 12, 31))
 
 
 # write_peculiar_eej_to_csv(
