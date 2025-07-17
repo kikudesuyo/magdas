@@ -28,16 +28,9 @@ class EejReq(BaseModel):
             default=1,
             description="Number of days to fetch (1, 3, 7, or 30)",
         ),
-        region: str = Query(
-            alias="region",
-            default="south-america",
-        ),
+        region: str = Query(alias="region", default="south-america"),
     ):
-        return cls(
-            start_date=start_date,
-            days=days,
-            region=region,
-        )
+        return cls(start_date=start_date, days=days, region=region)
 
 
 class EejRow(BaseModel):
