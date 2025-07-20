@@ -98,10 +98,31 @@ if __name__ == "__main__":
     offdip_stations = [EeIndexStation.EUS]
 
     # date = datetime(2018, 12, 20, 0, 0)
-    date = datetime(2015, 6, 23, 0, 0)
+    # date = datetime(2017, 2, 7, 0, 0)
 
-    lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
-    plotter = EejDetectionPlotter(lt_period)
-    plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
-    plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
-    plotter.show()
+    dates = [
+        "2016-02-06",
+        "2017-11-27",
+        "2017-12-13",
+        "2019-04-30",
+        "2019-07-13",
+        "2019-11-10",
+        "2019-12-24",
+        "2020-11-01",
+    ]
+
+    for date_str in dates:
+        date = datetime.strptime(date_str, "%Y-%m-%d")
+        lt_period = Period(
+            start=date, end=date + timedelta(days=1) - timedelta(minutes=1)
+        )
+        plotter = EejDetectionPlotter(lt_period)
+        plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
+        plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
+        plotter.show()
+
+    # lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
+    # plotter = EejDetectionPlotter(lt_period)
+    # plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
+    # plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
+    # plotter.show()

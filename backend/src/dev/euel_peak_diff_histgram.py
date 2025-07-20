@@ -71,6 +71,26 @@ def main(period: Period):
     plt.xlabel("Peak EUEL Difference")
     plt.ylabel("Frequency")
     plt.grid(True)
+
+    # Calculate and plot 80% confidence interval
+    lower_bound = merged_df["peak_euel_diff"].quantile(0.10)
+    upper_bound = merged_df["peak_euel_diff"].quantile(0.90)
+    plt.axvline(
+        lower_bound,
+        color="r",
+        linestyle="--",
+        linewidth=2,
+        label=f"10th percentile: {lower_bound:.2f}",
+    )
+    plt.axvline(
+        upper_bound,
+        color="r",
+        linestyle="--",
+        linewidth=2,
+        label=f"90th percentile: {upper_bound:.2f}",
+    )
+    plt.legend()
+
     plt.savefig("data/south_america_euel_peak_diff_histgram.png")
     plt.close()
 

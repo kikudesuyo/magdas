@@ -59,7 +59,7 @@ if __name__ == "__main__":
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
 
-    for year in range(2015, 2024):
+    for year in range(2015, 2022):
         start = datetime(year, 11, 1, 0, 0)
         end = datetime(year + 1, 2, 28, 23, 59)
         ut_period = Period(start, end)
