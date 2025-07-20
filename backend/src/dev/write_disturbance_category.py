@@ -17,7 +17,7 @@ def calc_daily_min_edst(local_date: date):
     return np.min(edst.calc_edst())
 
 
-start = datetime(2000, 1, 1)
+start = datetime(2022, 12, 31)
 end = datetime(2022, 12, 31)
 
 OUTPUT_FILE_PATH = "eej_category_results.csv"
