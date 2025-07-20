@@ -34,10 +34,10 @@ class SswPlotter:
         x, y = event.xdata, event.ydata
         if x is None or y is None:
             return
-        time_str = (self.lt_period.start + timedelta(minutes=int(x))).strftime(
-            "%m/%d %H:%M"
-        )
-        self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
+        minute_offset = int(x)
+        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
+        time_str = current_time.strftime("%Y/%m/%d %H:%M")
+        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
     def set_title(self, title):

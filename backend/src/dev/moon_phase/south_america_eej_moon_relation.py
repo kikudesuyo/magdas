@@ -39,25 +39,25 @@ def aggregate_peculiar_ratio_by_moon_age(
 def plot_peculiar_ratio(
     x: List[float], peculiar_ratio: List[float], title_suffix: str = ""
 ):
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(10, 6))
+    import matplotlib.ticker as mticker
+
     plt.bar(
         x,
         peculiar_ratio,
-        width=0.4,
-        color="deepskyblue",
-        label="Peculiar EEJ Ratio",
+        width=1,
+        edgecolor="black",
     )
-
+    plt.gca().yaxis.set_major_locator(mticker.MaxNLocator(integer=True))
+    plt.title(f"Peculiar EEJ Ratio by Moon Phase {title_suffix}")
     plt.xlabel("Moon Age (days)")
     plt.ylabel("Peculiar EEJ Ratio (%)")
-    plt.title(f"Peculiar EEJ Ratio by Moon Phase {title_suffix}")
-    plt.grid(axis="y", linestyle="--", alpha=0.5)
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+    plt.grid(True)
+    plt.savefig("south_america_eej_moon_relation.png")
+    plt.close()
 
 
-period = Period(start=datetime(2014, 1, 1), end=datetime(2020, 12, 31))
+period = Period(start=datetime(2016, 1, 1), end=datetime(2020, 12, 31))
 path = generate_parent_abs_path("/src/dev/south_america_eej_category.csv")
 x, y = aggregate_peculiar_ratio_by_moon_age(period, path)
 

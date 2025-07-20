@@ -18,6 +18,10 @@ def main(period: Period):
     dip_df["date"] = pd.to_datetime(dip_df["date"])
     offdip_df["date"] = pd.to_datetime(offdip_df["date"])
 
+    disturbance_df = pd.read_csv("Storage/disturbance.csv", skipinitialspace=True)
+    disturbance_df["date"] = pd.to_datetime(disturbance_df["date"])
+    quiet_df = disturbance_df[disturbance_df["category"] == "quiet"]
+
     dip_df = dip_df[(dip_df["date"] >= period.start) & (dip_df["date"] <= period.end)]
     offdip_df = offdip_df[
         (offdip_df["date"] >= period.start) & (offdip_df["date"] <= period.end)
@@ -29,6 +33,7 @@ def main(period: Period):
     merged_df = pd.merge(
         dip_df_mean, offdip_df, on="date", suffixes=("_dip_mean", "_offdip")
     )
+    merged_df = pd.merge(merged_df, quiet_df, on="date")
 
     peak_euel_dip = merged_df["peak_euel_dip_mean"]
     peak_euel_offdip = merged_df["peak_euel_offdip"]
@@ -41,6 +46,11 @@ def main(period: Period):
     print("Dates with negative peak EUEL difference:")
     for date in negative_diff_dates:
         print(date.strftime("%Y-%m-%d"))
+
+    print("\nDates with peak EUEL difference < -25:")
+    large_negative_diff_df = merged_df[merged_df["peak_euel_diff"] < -25]
+    for index, row in large_negative_diff_df.iterrows():
+        print(f"{row['date'].strftime('%Y-%m-%d')}: {row['peak_euel_diff']}")
 
     plt.figure(figsize=(10, 6))
     import matplotlib.ticker as mticker
@@ -55,17 +65,19 @@ def main(period: Period):
         edgecolor="black",
     )
     plt.gca().yaxis.set_major_locator(mticker.MaxNLocator(integer=True))
-    plt.title("Peak EUEL Difference Distribution (Dip Mean vs Off-Dip)")
+    plt.title(
+        f"Peak EUEL Difference Distribution({period.start.strftime('%Y-%m-%d')} to {period.end.strftime('%Y-%m-%d')})"
+    )
     plt.xlabel("Peak EUEL Difference")
     plt.ylabel("Frequency")
     plt.grid(True)
-    plt.savefig("euel_peak_diff_histgram.png")
+    plt.savefig("data/south_america_euel_peak_diff_histgram.png")
     plt.close()
 
 
 if __name__ == "__main__":
     period = Period(
-        start=datetime(2015, 1, 1, 0, 0),
+        start=datetime(2016, 1, 1, 0, 0),
         end=datetime(2020, 12, 31, 23, 59),
     )
     main(period)

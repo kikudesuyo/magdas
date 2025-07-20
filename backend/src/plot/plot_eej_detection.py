@@ -69,10 +69,10 @@ class EejDetectionPlotter:
         x, y = event.xdata, event.ydata
         if x is None or y is None:
             return
-        time_str = (self.lt_period.start + timedelta(minutes=int(x))).strftime(
-            "%m/%d %H:%M"
-        )
-        self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
+        minute_offset = int(x)
+        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
+        time_str = current_time.strftime("%Y/%m/%d %H:%M")
+        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
     def set_title(self, title):
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
 
-    # date = datetime(2016, 2, 6, 0, 0)
+    # date = datetime(2018, 12, 20, 0, 0)
     date = datetime(2015, 6, 23, 0, 0)
 
     lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
@@ -105,20 +105,3 @@ if __name__ == "__main__":
     plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
     plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
     plotter.show()
-
-    # dt = start
-
-    # while dt <= end:
-    #     print(f"Processing date: {dt}")
-
-    #     dt_s = dt
-    #     dt_e = dt.replace(hour=23, minute=59)
-
-    #     plotter = EejDetectionPlotter(Period(dt_s, dt_e))
-    #     plotter.plot_euel_to_detect_eej(dip_stations, color="blue", is_dip=True)
-    #     plotter.plot_euel_to_detect_eej(offdip_stations, color="green", is_dip=False)
-
-    #     plotter.set_title("EEJ Detection Plot")
-    #     plotter.show()
-
-    #     dt += timedelta(days=1)
