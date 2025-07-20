@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 from src.domain.station_params import Period
-from src.service.ee_index.calc_eej_detection import EejDetection
+from src.service.calc_eej_detection import EejDetection
 from src.utils.path import generate_parent_abs_path
 
 
@@ -59,14 +59,14 @@ def main():
         eej_detection = EejDetection(peak_diff=peak_diff, local_date=dt)
         category = eej_detection.eej_category()
 
-        if category.category == "peculiar":
+        if category.label == "peculiar":
             print(f"{key} is a peculiar EEJ")
 
         results.append(
             {
                 "date": key,
                 "peak_diff": peak_diff,
-                "eej_category": category.category,
+                "eej_category": category.label,
             }
         )
 

@@ -7,7 +7,7 @@ from matplotlib.dates import DateFormatter, DayLocator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
 from src.plot.config import PlotConfig
-from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej
+from src.service.calc_eej_detection import BestEuelSelectorForEej
 from src.service.sunspot import Sunspot
 
 

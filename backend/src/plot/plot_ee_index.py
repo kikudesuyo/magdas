@@ -124,16 +124,19 @@ if __name__ == "__main__":
     from datetime import datetime
 
     from src.domain.station_params import Period, StationParams
-    from src.utils.period import create_month_period
 
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
-    ut_period = Period(datetime(2023, 10, 1, 10, 0), datetime(2023, 10, 1, 22, 0))
+    # dav = EeIndexStation.DAV
+
+    # date = datetime(2016, 2, 6, 0, 0)
+    date = datetime(2015, 6, 23, 0, 0)
+    ut_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
     p = EeIndexPlotter(ut_period)
-    p.plot_er(anc, "red")
-    p.plot_er(hua, "red")
-    p.plot_er(eus, "purple")
+    p.plot_euel(anc, "red")
+    p.plot_euel(hua, "red")
+    p.plot_euel(eus, "purple")
 
     p.plot_edst()
     p.show()

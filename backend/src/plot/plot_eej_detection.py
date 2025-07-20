@@ -7,7 +7,7 @@ from matplotlib.backend_bases import MouseEvent
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
 from src.plot.config import PlotConfig
-from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej
+from src.service.calc_eej_detection import BestEuelSelectorForEej
 
 
 class EejDetectionPlotter:
@@ -86,3 +86,39 @@ class EejDetectionPlotter:
         self.ax.legend(loc="lower left", fontsize=18)
         plt.savefig(path)
         plt.close(self.fig)
+
+
+if __name__ == "__main__":
+    from datetime import datetime
+
+    from src.domain.magdas_station import EeIndexStation
+    from src.domain.station_params import Period
+
+    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
+    offdip_stations = [EeIndexStation.EUS]
+
+    # date = datetime(2016, 2, 6, 0, 0)
+    date = datetime(2015, 6, 23, 0, 0)
+
+    lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
+    plotter = EejDetectionPlotter(lt_period)
+    plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
+    plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
+    plotter.show()
+
+    # dt = start
+
+    # while dt <= end:
+    #     print(f"Processing date: {dt}")
+
+    #     dt_s = dt
+    #     dt_e = dt.replace(hour=23, minute=59)
+
+    #     plotter = EejDetectionPlotter(Period(dt_s, dt_e))
+    #     plotter.plot_euel_to_detect_eej(dip_stations, color="blue", is_dip=True)
+    #     plotter.plot_euel_to_detect_eej(offdip_stations, color="green", is_dip=False)
+
+    #     plotter.set_title("EEJ Detection Plot")
+    #     plotter.show()
+
+    #     dt += timedelta(days=1)

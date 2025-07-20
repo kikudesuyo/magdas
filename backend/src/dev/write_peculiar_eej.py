@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import List
 
 from src.domain.station_params import Period
-from src.service.ee_index.calc_eej_detection import (
+from src.service.calc_eej_detection import (
     BestEuelSelectorForEej,
     EeIndexStation,
     EejDetection,
@@ -93,7 +93,7 @@ def write_eej_category_to_csv(
                     current_date,
                     dip_euel.station.code,
                     offdip_euel.station.code,
-                    category.category,
+                    category.label,
                 ]
             )
             print(f"Processed {current_date} ")

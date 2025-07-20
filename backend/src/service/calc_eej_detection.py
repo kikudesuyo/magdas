@@ -125,12 +125,47 @@ class BestEuelSelectorForEej:
 
 
 class EejCategory(BaseModel):
-    category: Literal[
+    label: Literal[
         "peculiar",  # 特異型EEJ: peculiar
         "normal",  # 通常型EEJ: normal
         "disturbance",  # 擾乱(Kp指数とEDstで判断): disturbance
         "missing",  # データ欠測: missing
     ]
+
+    @classmethod
+    def from_conditions(
+        cls,
+        peak_diff: float,
+        daily_max_kp: float,
+        daily_min_edst: float,
+    ) -> "EejCategory":
+        if daily_max_kp >= 4 or daily_min_edst < -30:
+            return cls(label="disturbance")
+        if np.isnan(peak_diff):
+            return cls(label="missing")
+        if peak_diff >= EEJ_THRESHOLD:
+            return cls(label="normal")
+        return cls(label="peculiar")
+
+
+class DisturbanceCategory(BaseModel):
+    label: Literal[
+        "disturbance",  # 擾乱
+        "quiet",  # 静穏
+        "missing",  # データ欠測
+    ]
+
+    @classmethod
+    def from_conditions(
+        cls,
+        daily_max_kp: float,
+        daily_min_edst: float,
+    ) -> "DisturbanceCategory":
+        if np.isnan(daily_max_kp) or np.isnan(daily_min_edst):
+            return cls(label="missing")
+        if daily_max_kp >= 4 or daily_min_edst < -30:
+            return cls(label="disturbance")
+        return cls(label="quiet")
 
 
 def calc_euel_peak_diff(
@@ -188,21 +223,13 @@ class EejDetection:
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
     def is_peculiar_eej(self):
-        if self._get_daily_max_kp() >= 4:
-            return False
-        if self._calc_daily_min_edst() < -30:
-            return False
-        if self.is_eej_peak_diff_nan():
-            return False
-        return not self.is_eej_present()
+        return self.eej_category().label == "peculiar"
 
     def eej_category(self) -> EejCategory:
-        if self._get_daily_max_kp() >= 4:
-            return EejCategory(category="disturbance")
-        if self._calc_daily_min_edst() < -30:
-            return EejCategory(category="disturbance")
-        if self.is_eej_peak_diff_nan():
-            return EejCategory(category="missing")
-        if self.is_eej_present():
-            return EejCategory(category="normal")
-        return EejCategory(category="peculiar")
+        daily_max_kp = self._get_daily_max_kp()
+        daily_min_edst = self._calc_daily_min_edst()
+        return EejCategory.from_conditions(
+            peak_diff=self.eej_peak_diff,
+            daily_max_kp=daily_max_kp,
+            daily_min_edst=daily_min_edst,
+        )

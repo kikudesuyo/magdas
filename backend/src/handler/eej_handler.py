@@ -6,7 +6,7 @@ from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.service.ee_index.calc_eej_detection import (
+from src.service.calc_eej_detection import (
     BestEuelSelectorForEej,
     EejDetection,
     calc_euel_peak_diff,
