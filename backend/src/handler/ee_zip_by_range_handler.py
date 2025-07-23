@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from src.domain.magdas_station import EeIndexStation
 from src.service.file_exporter.export_ee_zip import export_ee_as_iaga_zip
+from src.usecase.ee_zip_by_range import EeIndexZipByRange
 from src.utils.date import str_to_datetime
 
 
@@ -25,22 +26,18 @@ def handle_get_ee_zip_content_by_range(
     request: DownloadEeIndexReq = Depends(DownloadEeIndexReq.from_query),
 ):
     # TODO 現在のファイルははIAGA形式、もし他の形式を実装する場合は、クエリパラメータでフォーマットを指定させる
-    start_date = request.start_date
-    end_date = request.end_date
+    start_date = str_to_datetime(request.start_date)
+    end_date = str_to_datetime(request.end_date)
     station = EeIndexStation[request.station_code]
-    start_ut = str_to_datetime(start_date).replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-    end_ut = str_to_datetime(end_date).replace(
-        hour=23, minute=59, second=59, microsecond=0
-    )
 
-    zip_base64 = export_ee_as_iaga_zip(station, start_ut, end_ut)
+    ee_zip_usecase = EeIndexZipByRange(start_date, end_date, station)
+    zip_base64 = ee_zip_usecase.get_ee_as_iaga_zip()
+    filename = ee_zip_usecase.get_filename()
 
     return JSONResponse(
         content={
             "base64Zip": zip_base64,
-            "fileName": f"ee_index_{start_date}_to_{end_date}.zip",
+            "fileName": filename,
             "contentType": "application/zip",
         }
     )
