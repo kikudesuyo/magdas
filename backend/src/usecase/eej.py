@@ -17,6 +17,8 @@ class EejUsecase:
     def __init__(self, start_lt, days, region: Region):
         self.start_lt = start_lt
         self.days = days
+        if not isinstance(region, Region):
+            raise ValueError("region must be an instance of Region Enum")
         self.region = region
 
     def get_peculiar_eej_dates(self) -> List[date]:
@@ -45,9 +47,9 @@ class EejUsecase:
         ]
 
     def get_local_euel(self) -> tuple[List[float | None], List[float | None]]:
-        if self.region.code != "south_america":
+        if self.region != Region.SOUTH_AMERICA:
             raise ValueError(
-                "Only 'south_america' region is supported for EEJ detection."
+                "Only SOUTH_AMERICA region is supported for local euel calculation"
             )
         dip_stations = [
             EeIndexStation.ANC,
@@ -57,7 +59,6 @@ class EejUsecase:
 
         dip_euel = self._calc_avg_euel(dip_stations)
         offdip_euel = self._calc_avg_euel(offdip_stations)
-
         dip_euel = calc_moving_avg(dip_euel, 180, 90)
         offdip_euel = calc_moving_avg(offdip_euel, 180, 90)
         return sanitize_np(dip_euel), sanitize_np(offdip_euel)
