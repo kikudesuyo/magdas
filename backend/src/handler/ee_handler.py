@@ -1,6 +1,3 @@
-from typing import Iterable, List
-
-import numpy as np
 from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
