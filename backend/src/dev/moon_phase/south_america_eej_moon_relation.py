@@ -4,7 +4,7 @@ from typing import List, Tuple
 import matplotlib.pyplot as plt
 import pandas as pd
 from src.domain.station_params import Period
-from src.service.calc_moon_phase import calc_moon_phase
+from src.service.moon_phase import get_moon_phase
 from utils.path import generate_parent_abs_path
 
 
@@ -16,7 +16,7 @@ def aggregate_peculiar_ratio_by_moon_age(
     df = pd.read_csv(csv_path, parse_dates=["date"])
     df = df[(df["date"] >= period.start) & (df["date"] <= period.end)]
 
-    df["moon_age"] = df["date"].apply(calc_moon_phase)
+    df["moon_age"] = df["date"].apply(get_moon_phase)
     df["moon_age_bin"] = (df["moon_age"] / BIN_SIZE).round() * BIN_SIZE
 
     grouped = df.groupby(["moon_age_bin", "category"]).size().unstack(fill_value=0)
