@@ -11,7 +11,7 @@ matplotlib.rcParams["font.family"] = get_font_prop().get_name()
 from scipy.signal import find_peaks
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
+from src.domain.station_params import Period, StationParam
 from src.service.calc_eej_detection import BestEuelSelectorForEej, EuelData
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.moving_avg import calc_moving_avg
@@ -188,13 +188,13 @@ if __name__ == "__main__":
 
         # dip_best_euel.station
         factory = EeFactory()
-        dip_ut_param = StationParams(dip_best_euel.station, lt_period).to_ut_params()
+        dip_ut_param = StationParam(dip_best_euel.station, lt_period).to_ut_params()
         dip_euel = factory.create_euel(dip_ut_param).calc_euel()
         dip_smoothed_euel = calc_moving_avg(
             dip_euel, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
         )
 
-        offdip_ut_param = StationParams(
+        offdip_ut_param = StationParam(
             offdip_best_euel.station, lt_period
         ).to_ut_params()
         offdip_euel = factory.create_euel(offdip_ut_param).calc_euel()

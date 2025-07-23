@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.backend_bases import MouseEvent
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
+from src.domain.station_params import Period, StationParam
 from src.plot.config import PlotConfig
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.moving_avg import calc_moving_avg
@@ -32,7 +32,7 @@ class LocalEeIndexPlotter:
         )
 
     def plot_euel(self, station: EeIndexStation, color):
-        ut_param = StationParams(station, self.lt_period).to_ut_params()
+        ut_param = StationParam(station, self.lt_period).to_ut_params()
         euel = self.factory.create_euel(ut_param)
         euel_values = euel.calc_euel()
         smoothed_euel = calc_moving_avg(
@@ -41,12 +41,12 @@ class LocalEeIndexPlotter:
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(x_axis, smoothed_euel, label=f"{station.code}_EUEL", color=color)
 
-        # self._plot_peak_point(
-        #     x_axis[np.nanargmax(smoothed_euel)],
-        #     np.nanmax(smoothed_euel),
-        #     color="black",
-        #     d=50,
-        # )
+        self._plot_peak_point(
+            x_axis[np.nanargmax(smoothed_euel)],
+            np.nanmax(smoothed_euel),
+            color="black",
+            d=50,
+        )
 
     def _plot_peak_point(self, index, value, color, d):
         self.ax.plot(index, value, marker="o", markersize=5, color=color)
@@ -117,53 +117,56 @@ class LocalEeIndexPlotter:
 if __name__ == "__main__":
     from datetime import datetime
 
-    from src.domain.station_params import Period, StationParams
+    from src.domain.station_params import Period, StationParam
 
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
 
+    # dates = [
+    #     # "2016-05-10",
+    #     "2017-06-05",
+    #     "2017-06-27",
+    #     # "2017-07-19",
+    #     "2017-08-30",
+    #     # "2017-11-25",
+    #     # "2018-01-26",
+    #     # "2018-01-27",
+    #     # "2018-01-29",
+    #     # "2018-01-30",
+    #     # "2018-02-05",
+    #     # "2018-02-06",
+    #     "2018-02-11",
+    #     # "2018-05-11",
+    #     # "2018-05-23",
+    #     # "2018-06-27",
+    #     # "2018-07-06",
+    #     # "2018-08-11",
+    #     # "2018-09-06",
+    #     # "2018-11-17",
+    #     # "2018-12-13",
+    #     # "2019-02-16",
+    #     # "2019-05-24",
+    #     # "2019-07-01",
+    #     # "2019-08-08",
+    #     # "2019-08-14",
+    #     # "2019-12-08",
+    #     # "2020-03-09",
+    #     # "2020-04-13",
+    #     # "2020-05-04",
+    #     # "2020-05-06",
+    #     # "2020-05-07",
+    #     # "2020-05-24",
+    #     "2020-05-28",
+    #     # "2020-06-11",
+    #     # "2020-06-18",
+    #     # "2020-07-08",
+    #     # "2020-07-15",
+    #     # "2020-07-21",
+    #     # "2020-07-29",
+    # ]
     dates = [
-        # "2016-05-10",
-        # "2017-06-05",
-        # "2017-06-27",
-        # "2017-07-19",
-        # "2017-08-30",
-        # "2017-11-25",
-        # "2018-01-26",
-        # "2018-01-27",
-        # "2018-01-29",
-        # "2018-01-30",
-        # "2018-02-05",
-        # "2018-02-06",
-        "2018-02-11",
-        # "2018-05-11",
-        # "2018-05-23",
-        # "2018-06-27",
-        # "2018-07-06",
-        # "2018-08-11",
-        # "2018-09-06",
-        # "2018-11-17",
-        # "2018-12-13",
-        # "2019-02-16",
-        # "2019-05-24",
-        # "2019-07-01",
-        # "2019-08-08",
-        # "2019-08-14",
-        # "2019-12-08",
-        # "2020-03-09",
-        # "2020-04-13",
-        # "2020-05-04",
-        # "2020-05-06",
-        # "2020-05-07",
-        # "2020-05-24",
-        # "2020-05-28",
-        # "2020-06-11",
-        # "2020-06-18",
-        # "2020-07-08",
-        # "2020-07-15",
-        # "2020-07-21",
-        # "2020-07-29",
+        "2018-01-27",
     ]
 
     for date_str in dates:
@@ -172,11 +175,12 @@ if __name__ == "__main__":
             start=date, end=date + timedelta(days=1) - timedelta(minutes=1)
         )
         p = LocalEeIndexPlotter(lt_period)
-        # p.plot_euel(anc, "red")
-        p.plot_euel(hua, "red")
+        p.plot_euel(anc, "red")
+        # p.plot_euel(hua, "red")
         p.plot_euel(eus, "purple")
         p.set_title(f"EUEL ({date.strftime('%Y-%m-%d')})")
-        p.save(f"img/only_by_auto_detection/{date.strftime('%Y-%m-%d')}.png")
+        # p.save(f"img/only_by_auto_detection/{date.strftime('%Y-%m-%d')}.png")
+        p.show()
 
     # date = datetime(2019, 11, 10, 0, 0)
     # lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))

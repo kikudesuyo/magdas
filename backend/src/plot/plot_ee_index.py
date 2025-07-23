@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.backend_bases import MouseEvent
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
+from src.domain.station_params import Period, StationParam
 from src.plot.config import PlotConfig
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.moving_avg import calc_moving_avg
@@ -32,7 +32,7 @@ class EeIndexPlotter:
         )
 
     def plot_er(self, station: EeIndexStation, color):
-        er = self.factory.create_er(StationParams(station, self.ut_period))
+        er = self.factory.create_er(StationParam(station, self.ut_period))
         er_values = er.calc_er()
         x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label=f"{station.code}_ER", color=color)
@@ -47,7 +47,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
     def plot_euel(self, station: EeIndexStation, color):
-        p = StationParams(station, self.ut_period)
+        p = StationParam(station, self.ut_period)
         euel = self.factory.create_euel(p)
         euel_values = euel.calc_euel()
         smoothed_euel = calc_moving_avg(
@@ -57,7 +57,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, smoothed_euel, label=f"{station.code}_EUEL", color=color)
 
     def plot_ee(self, station: EeIndexStation):
-        params = StationParams(station, self.ut_period)
+        params = StationParam(station, self.ut_period)
         er = self.factory.create_er(params)
         edst = self.factory.create_edst(self.ut_period)
         euel = self.factory.create_euel(params)
@@ -123,7 +123,7 @@ class EeIndexPlotter:
 if __name__ == "__main__":
     from datetime import datetime
 
-    from src.domain.station_params import Period, StationParams
+    from src.domain.station_params import Period, StationParam
 
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA

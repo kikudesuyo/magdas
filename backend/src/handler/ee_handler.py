@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
+from src.domain.station_params import Period, StationParam
 from src.service.ee_index.factory_ee import EeFactory
 from src.utils.date import str_to_datetime
 
@@ -39,7 +39,7 @@ def handle_get_ee_by_range(
     start_ut = str_to_datetime(date)
 
     period = Period(start_ut, start_ut + timedelta(days=days))
-    params = StationParams(station=station, period=period)
+    params = StationParam(station=station, period=period)
 
     factory = EeFactory()
     er = factory.create_er(params)

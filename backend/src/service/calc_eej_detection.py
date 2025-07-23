@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict
 from src.constants.ee_index import EEJ_THRESHOLD
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
+from src.domain.station_params import Period, StationParam
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.kp import Kp
 from src.service.linear_completion import interpolate_nan
@@ -81,7 +81,7 @@ class BestEuelSelectorForEej:
             self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
         )
         e_lt = s_lt.replace(hour=23, minute=59)
-        lt_params = StationParams(station, Period(s_lt, e_lt))
+        lt_params = StationParam(station, Period(s_lt, e_lt))
         ut_params = lt_params.to_ut_params()
 
         factory = EeFactory()

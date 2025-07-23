@@ -1,16 +1,9 @@
-from datetime import timedelta
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
-import numpy as np
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field
-from src.constants.time_relation import TimeUnit
-from src.domain.magdas_station import EeIndexStation
-from src.service.calc_eej_detection import (
-    BestEuelSelectorForEej,
-    EejDetection,
-    calc_euel_peak_diff,
-)
+from src.domain.region import Region
+from src.usecase.eej import EejUsecase
 from src.utils.date import str_to_datetime
 
 
@@ -28,7 +21,7 @@ class EejReq(BaseModel):
             default=1,
             description="Number of days to fetch (1, 3, 7, or 30)",
         ),
-        region: str = Query(alias="region", default="south-america"),
+        region: str = Query(alias="region", default="south_america"),
     ):
         return cls(start_date=start_date, days=days, region=region)
 
@@ -45,51 +38,17 @@ class EejResp(BaseModel):
 
 
 def handle_get_eej_by_range(req: EejReq = Depends(EejReq.from_query)):
-    str_date, days, region = (req.start_date, req.days, req.region)
-    start_lt = str_to_datetime(str_date)
+    start_lt = str_to_datetime(req.start_date)
+    days = req.days
+    region = Region.from_code(req.region)
 
-    if region != "south-america":
+    if region.code != "south_america":
         raise ValueError("Only 'south_america' region is supported for EEJ detection.")
-    dip_stations = [
-        EeIndexStation.ANC,
-        EeIndexStation.HUA,
-    ]
-    offdip_stations = [EeIndexStation.EUS]
 
-    dip_euel = []
-    offdip_euel = []
-
-    peculiar_eej_dates = []
-    current_lt = start_lt
-    for i in range(days):
-        current_lt += timedelta(days=i)
-        dip_euel_selector = BestEuelSelectorForEej(
-            dip_stations, current_lt, is_dip=True
-        )
-        offdip_euel_selector = BestEuelSelectorForEej(
-            offdip_stations, current_lt, is_dip=False
-        )
-
-        dip_euel_data = dip_euel_selector.select_euel_data()
-        offdip_euel_data = offdip_euel_selector.select_euel_data()
-
-        dip_euel.extend(sanitize_np(dip_euel_data.array))
-        offdip_euel.extend(sanitize_np(offdip_euel_data.array))
-
-        peak_diff = calc_euel_peak_diff(
-            dip_euel_data,
-            offdip_euel_data,
-            current_lt,
-        )
-
-        eej_detection = EejDetection(peak_diff, current_lt)
-        if eej_detection.is_peculiar_eej():
-            peculiar_eej_dates.append(current_lt.date())
-
-    minute_labels = [
-        (start_lt + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
-        for i in range(days * TimeUnit.ONE_DAY.min)
-    ]
+    eejUsecase = EejUsecase(start_lt, days, region)
+    peculiar_eej_dates = eejUsecase.get_peculiar_eej_dates()
+    minute_labels = eejUsecase.get_minute_labels()
+    dip_euel, offdip_euel = eejUsecase.get_local_euel()
 
     return EejResp(
         data=[
@@ -102,15 +61,3 @@ def handle_get_eej_by_range(req: EejReq = Depends(EejReq.from_query)):
         ],
         peculiarEejDates=[date.strftime("%Y-%m-%d") for date in peculiar_eej_dates],
     )
-
-
-def np_nan_to_none(values: np.ndarray) -> List[float | None]:
-    return [None if np.isnan(x) else x for x in values]
-
-
-def to_float(values: Iterable[float | None]) -> List[float | None]:
-    return [float(x) if x is not None else None for x in values]
-
-
-def sanitize_np(values: np.ndarray) -> List[float | None]:
-    return to_float(np_nan_to_none(values))
