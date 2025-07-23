@@ -1,17 +1,11 @@
-from datetime import date, datetime, timedelta
-from typing import Iterable, List, Optional
+from datetime import datetime, timedelta
+from typing import List
 
-import numpy as np
-from fastapi import Depends, Query
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.ee_index.factory_ee import EeFactory
-from src.service.nan_calculator import NanCalculator
 from src.service.sanitize_np import sanitize_np
-from src.utils.date import str_to_datetime
 
 
 class EeIndexByDays:
