@@ -44,7 +44,7 @@ class Period:
 
 
 @dataclass
-class StationParams:
+class StationParam:
     station: EeIndexStation
     period: Period
 
@@ -56,4 +56,4 @@ class StationParams:
         end_ut = DateUtils.to_ut(self.station, self.period.end).replace(
             second=0, microsecond=0
         )
-        return StationParams(self.station, Period(start_ut, end_ut))
+        return StationParam(self.station, Period(start_ut, end_ut))
