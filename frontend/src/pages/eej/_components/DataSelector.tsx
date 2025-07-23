@@ -5,7 +5,7 @@ type DataSelectorProps = {
   onSelect: (startDate: string, days: number, region: string) => void;
 };
 
-const REGIONS = ["south-america"];
+const REGIONS = ["south_america"];
 
 const DAYS_OPTIONS = [
   { value: 1, label: "1 day" },
@@ -17,9 +17,9 @@ const DAYS_OPTIONS = [
 const DEFAULT_DAYS = 3;
 
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
-  const [startDate, setStartDate] = useState("2018-01-26");
+  const [startDate, setStartDate] = useState("2020-02-22");
   const [days, setDays] = useState(DEFAULT_DAYS);
-  const [region, setRegion] = useState("south-america");
+  const [region, setRegion] = useState("south_america");
 
   const handleSelect = () => {
     if (!startDate) {

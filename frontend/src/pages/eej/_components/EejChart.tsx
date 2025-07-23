@@ -79,6 +79,8 @@ const EejChart = (eejPlotData: EejPlotData) => {
         },
       },
       y: {
+        min: -100,
+        max: 200,
         beginAtZero: true,
       },
     },
