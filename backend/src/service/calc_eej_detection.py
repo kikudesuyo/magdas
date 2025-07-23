@@ -117,13 +117,12 @@ class BestEuelSelectorForEej:
         )
         baseline = interpolate_nan(euel_for_baseline)
         euel_for_eej_detection = daily_euel_values - baseline
-        return euel_for_eej_detection
 
-        # return calc_moving_avg(
-        #     euel_for_eej_detection,
-        #     window=TimeUnit.ONE_HOUR.min,
-        #     nan_threshold=TimeUnit.THIRTY_MINUTES.min,
-        # )
+        return calc_moving_avg(
+            euel_for_eej_detection,
+            window=TimeUnit.ONE_HOUR.min,
+            nan_threshold=TimeUnit.THIRTY_MINUTES.min,
+        )
 
 
 class EejCategory(BaseModel):
