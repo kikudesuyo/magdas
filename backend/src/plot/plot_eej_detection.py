@@ -101,14 +101,46 @@ if __name__ == "__main__":
     # date = datetime(2017, 2, 7, 0, 0)
 
     dates = [
-        "2016-02-06",
-        "2017-11-27",
-        "2017-12-13",
-        "2019-04-30",
-        "2019-07-13",
-        "2019-11-10",
-        "2019-12-24",
-        "2020-11-01",
+        "2016-05-10",
+        "2017-06-05",
+        "2017-06-27",
+        "2017-07-19",
+        "2017-08-30",
+        "2017-11-25",
+        "2018-01-26",
+        "2018-01-27",
+        "2018-01-29",
+        "2018-01-30",
+        "2018-02-05",
+        "2018-02-06",
+        "2018-02-11",
+        "2018-05-11",
+        "2018-05-23",
+        "2018-06-27",
+        "2018-07-06",
+        "2018-08-11",
+        "2018-09-06",
+        "2018-11-17",
+        "2018-12-13",
+        "2019-02-16",
+        "2019-05-24",
+        "2019-07-01",
+        "2019-08-08",
+        "2019-08-14",
+        "2019-12-08",
+        "2020-03-09",
+        "2020-04-13",
+        "2020-05-04",
+        "2020-05-06",
+        "2020-05-07",
+        "2020-05-24",
+        "2020-05-28",
+        "2020-06-11",
+        "2020-06-18",
+        "2020-07-08",
+        "2020-07-15",
+        "2020-07-21",
+        "2020-07-29",
     ]
 
     for date_str in dates:
@@ -119,7 +151,8 @@ if __name__ == "__main__":
         plotter = EejDetectionPlotter(lt_period)
         plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
         plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
-        plotter.show()
+        plotter.save(f"img/only_by_auto_detection/{date.strftime('%Y-%m-%d')}.png")
+        # plotter.show()
 
     # lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
     # plotter = EejDetectionPlotter(lt_period)
