@@ -25,9 +25,20 @@ class EeIndexDateRangeReq(BaseModel):
         return cls(start_date=start_date, station_code=station_code, days=days)
 
 
+class EeIndex(BaseModel):
+    er: list[float | None] = Field(..., description="Energy index for ER")
+    edst: list[float | None] = Field(..., description="Energy index for EDST")
+    euel: list[float | None] = Field(..., description="Energy index for EUEL")
+
+
+class EeIndexByRangeResp(BaseModel):
+    values: EeIndex
+    minuteLabels: list[str]
+
+
 def handle_get_ee_by_range(
     req: EeIndexDateRangeReq = Depends(EeIndexDateRangeReq.from_query),
-):
+) -> EeIndexByRangeResp:
     start_ut = str_to_datetime(req.start_date)
     days = req.days
     station = EeIndexStation[req.station_code]
@@ -36,13 +47,7 @@ def handle_get_ee_by_range(
     er, edst, euel = ee_index.get_ee_index()
     minute_labels = ee_index.get_minute_labels()
 
-    return JSONResponse(
-        content={
-            "values": {
-                "er": er,
-                "edst": edst,
-                "euel": euel,
-            },
-            "minuteLabels": minute_labels,
-        }
+    return EeIndexByRangeResp(
+        values=EeIndex(er=er, edst=edst, euel=euel),
+        minuteLabels=minute_labels,
     )
