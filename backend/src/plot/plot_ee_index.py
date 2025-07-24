@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.backend_bases import MouseEvent
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
+from src.domain.station_params import Period, StationParam
 from src.plot.config import PlotConfig
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.moving_avg import calc_moving_avg
@@ -32,7 +32,7 @@ class EeIndexPlotter:
         )
 
     def plot_er(self, station: EeIndexStation, color):
-        er = self.factory.create_er(StationParams(station, self.ut_period))
+        er = self.factory.create_er(StationParam(station, self.ut_period))
         er_values = er.calc_er()
         x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label=f"{station.code}_ER", color=color)
@@ -47,7 +47,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, y_axis, label="EDst", color="green", lw=1.3)
 
     def plot_euel(self, station: EeIndexStation, color):
-        p = StationParams(station, self.ut_period)
+        p = StationParam(station, self.ut_period)
         euel = self.factory.create_euel(p)
         euel_values = euel.calc_euel()
         smoothed_euel = calc_moving_avg(
@@ -57,7 +57,7 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, smoothed_euel, label=f"{station.code}_EUEL", color=color)
 
     def plot_ee(self, station: EeIndexStation):
-        params = StationParams(station, self.ut_period)
+        params = StationParam(station, self.ut_period)
         er = self.factory.create_er(params)
         edst = self.factory.create_edst(self.ut_period)
         euel = self.factory.create_euel(params)
@@ -95,10 +95,10 @@ class EeIndexPlotter:
         x, y = event.xdata, event.ydata
         if x is None or y is None:
             return
-        time_str = (self.ut_period.start + timedelta(minutes=int(x))).strftime(
-            "%m/%d %H:%M"
-        )
-        self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
+        minute_offset = int(x)
+        current_time = self.ut_period.start + timedelta(minutes=minute_offset)
+        time_str = current_time.strftime("%Y/%m/%d %H:%M")
+        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
     def set_title(self, title):
@@ -123,17 +123,20 @@ class EeIndexPlotter:
 if __name__ == "__main__":
     from datetime import datetime
 
-    from src.domain.station_params import Period, StationParams
-    from src.utils.period import create_month_period
+    from src.domain.station_params import Period, StationParam
 
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
-    ut_period = Period(datetime(2023, 10, 1, 10, 0), datetime(2023, 10, 1, 22, 0))
+    # dav = EeIndexStation.DAV
+
+    # date = datetime(2016, 2, 6, 0, 0)
+    date = datetime(2015, 6, 23, 0, 0)
+    ut_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
     p = EeIndexPlotter(ut_period)
-    p.plot_er(anc, "red")
-    p.plot_er(hua, "red")
-    p.plot_er(eus, "purple")
+    p.plot_euel(anc, "red")
+    p.plot_euel(hua, "red")
+    p.plot_euel(eus, "purple")
 
     p.plot_edst()
     p.show()

@@ -1,8 +1,8 @@
 from datetime import time, timedelta
 
+import matplotlib.dates as mdates
 from matplotlib import pyplot as plt
 from matplotlib.backend_bases import MouseEvent
-from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
 from src.plot.config import PlotConfig
 from src.service.ssw import Ssw
@@ -25,7 +25,10 @@ class SswPlotter:
         ssw_data = Ssw().get_ssw_by_range(start, end)
         self.ax.set_ylabel("K", rotation=0)
         self.ax.plot(ssw_data["Date"], ssw_data["T_90N_K"], label="SSW", color=color)
-        self.fig.autofmt_xdate()
+
+        date_format = mdates.DateFormatter("%m/%d")
+        self.ax.xaxis.set_major_formatter(date_format)
+
         return self.ax
 
     def _on_move(self, event: MouseEvent):
@@ -34,21 +37,21 @@ class SswPlotter:
         x, y = event.xdata, event.ydata
         if x is None or y is None:
             return
-        time_str = (self.lt_period.start + timedelta(minutes=int(x))).strftime(
-            "%m/%d %H:%M"
-        )
-        self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
+        minute_offset = int(x)
+        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
+        time_str = current_time.strftime("%Y/%m/%d %H:%M")
+        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
     def set_title(self, title):
         self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=10)
 
     def show(self):
-        self.ax.legend(loc="lower left", fontsize=18)
+        self.ax.legend(loc="lower left", fontsize=12)
         plt.show()
 
     def save(self, path):
-        self.ax.legend(loc="lower left", fontsize=18)
+        self.ax.legend(loc="lower left", fontsize=12)
         plt.savefig(path)
         plt.close(self.fig)
 
@@ -56,15 +59,13 @@ class SswPlotter:
 if __name__ == "__main__":
     from datetime import datetime
 
-    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
-    offdip_stations = [EeIndexStation.EUS]
+    year = 2018
 
-    for year in range(2015, 2024):
-        start = datetime(year, 11, 1, 0, 0)
-        end = datetime(year + 1, 2, 28, 23, 59)
-        ut_period = Period(start, end)
-        d = SswPlotter(ut_period)
-        d.plot_ssw("blue")
-        d.set_title(f"SSW Temperature Plot {year}")
-        filename = f"img/ssw_plot_{year}.png"
-        d.save(filename)
+    start = datetime(year, 12, 1, 0, 0)
+    end = datetime(year, 12, 31, 23, 59)
+    ut_period = Period(start, end)
+    d = SswPlotter(ut_period)
+    d.plot_ssw("blue")
+    d.set_title(f"SSW Temperature Plot {year}")
+    filename = f"img/ssw_plot_{year}.png"
+    d.save(filename)

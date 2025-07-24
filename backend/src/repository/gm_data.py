@@ -6,7 +6,7 @@ from typing import Literal
 import numpy as np
 from src.constants.ee_index import MAX_RAW_H, MIN_RAW_H
 from src.constants.time_relation import TimeUnit
-from src.domain.station_params import StationParams
+from src.domain.station_params import StationParam
 from src.repository.raw_file_reader import read_raw_min_data
 from src.utils.path import generate_parent_abs_path
 
@@ -75,7 +75,7 @@ class GMDataLoader:
 
 
 class GMPeriodRepository:
-    def __init__(self, params: StationParams):
+    def __init__(self, params: StationParam):
         self.station = params.station
         self.start_ut = params.period.start
         self.end_ut = params.period.end

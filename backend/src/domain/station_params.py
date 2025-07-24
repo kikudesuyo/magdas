@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+import numpy as np
+from numpy.typing import NDArray
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.utils.date import DateUtils
@@ -32,9 +34,17 @@ class Period:
         minutes, _ = divmod(r, TimeUnit.ONE_MINUTE.sec)
         return days, hours, minutes
 
+    def get_minute_list(self) -> NDArray[np.datetime64]:
+        start = np.datetime64(self.start, "m")
+        length = self.total_minutes() + 1  # include start and end
+        return np.array(
+            [start + np.timedelta64(i, "m") for i in range(length)],
+            dtype="datetime64[m]",
+        )
+
 
 @dataclass
-class StationParams:
+class StationParam:
     station: EeIndexStation
     period: Period
 
@@ -46,4 +56,4 @@ class StationParams:
         end_ut = DateUtils.to_ut(self.station, self.period.end).replace(
             second=0, microsecond=0
         )
-        return StationParams(self.station, Period(start_ut, end_ut))
+        return StationParam(self.station, Period(start_ut, end_ut))

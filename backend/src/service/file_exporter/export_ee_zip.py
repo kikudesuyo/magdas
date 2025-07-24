@@ -3,7 +3,7 @@ from datetime import datetime
 
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period, StationParams
+from src.domain.station_params import Period, StationParam
 from src.service.ee_index.factory_ee import EeFactory
 from src.service.file_exporter.build_iaga import (
     build_iaga_data,
@@ -31,7 +31,7 @@ def export_ee_as_iaga_zip(
         Base64 encoded zip file containing the data
     """
     period = Period(start_ut, end_ut)
-    params = StationParams(station, period)
+    params = StationParam(station, period)
 
     factory = EeFactory()
     er = factory.create_er(params)

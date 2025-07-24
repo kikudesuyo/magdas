@@ -7,7 +7,7 @@ from matplotlib.backend_bases import MouseEvent
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
 from src.plot.config import PlotConfig
-from src.service.ee_index.calc_eej_detection import BestEuelSelectorForEej
+from src.service.calc_eej_detection import BestEuelSelectorForEej
 
 
 class EejDetectionPlotter:
@@ -69,10 +69,10 @@ class EejDetectionPlotter:
         x, y = event.xdata, event.ydata
         if x is None or y is None:
             return
-        time_str = (self.lt_period.start + timedelta(minutes=int(x))).strftime(
-            "%m/%d %H:%M"
-        )
-        self.ax.set_title(f"Time: {time_str}, Value: {y:.2f}")
+        minute_offset = int(x)
+        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
+        time_str = current_time.strftime("%Y/%m/%d %H:%M")
+        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
         self.ax.figure.canvas.draw()
 
     def set_title(self, title):
@@ -86,3 +86,22 @@ class EejDetectionPlotter:
         self.ax.legend(loc="lower left", fontsize=18)
         plt.savefig(path)
         plt.close(self.fig)
+
+
+if __name__ == "__main__":
+    from datetime import datetime
+
+    from src.domain.magdas_station import EeIndexStation
+    from src.domain.station_params import Period
+
+    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
+    offdip_stations = [EeIndexStation.EUS]
+
+    date = datetime(2018, 12, 20, 0, 0)
+    date = datetime(2017, 2, 7, 0, 0)
+
+    lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
+    plotter = EejDetectionPlotter(lt_period)
+    plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
+    plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
+    plotter.show()

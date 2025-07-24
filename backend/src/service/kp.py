@@ -14,7 +14,7 @@ class Kp:
     def get_max_of_day(self, start_dt: datetime, end_dt: datetime) -> float:
         if start_dt > end_dt:
             raise ValueError("開始日は終了日よりも前の日付である必要があります")
-        if start_dt < datetime(2000, 1, 1) or end_dt > datetime(2022, 12, 31):
+        if start_dt <= datetime(2000, 1, 1) or end_dt >= datetime(2023, 1, 1):
             raise ValueError("KP指数は2000年から2022年までのデータしか取得できません")
         df_filterd = self.df[
             (self.df["DATETIME_UT"] >= start_dt) & (self.df["DATETIME_UT"] <= end_dt)

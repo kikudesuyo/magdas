@@ -4,7 +4,6 @@ from src.constants.ee_index import MAX_ER, MIN_ER
 from src.constants.time_relation import DawnAndDusk, TimeUnit
 from src.service.ee_index.calc_h_component import HData
 from src.service.nan_calculator import NanCalculator
-from src.utils.period import get_minute_list
 
 
 class Er:
@@ -22,7 +21,7 @@ class Er:
         return filtered_er
 
     def _get_lt_timestamps(self) -> NDArray[np.datetime64]:
-        ut_timestamps = get_minute_list(self.h_data.ut_params.period)
+        ut_timestamps = self.h_data.ut_params.period.get_minute_list()
         time_diff_hour = self.h_data.ut_params.station.time_diff
         time_diff_min = int(time_diff_hour * TimeUnit.ONE_HOUR.min)
         lt_timestamps = ut_timestamps + np.timedelta64(time_diff_min, "m")

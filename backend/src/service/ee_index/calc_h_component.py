@@ -2,18 +2,18 @@ from dataclasses import dataclass
 
 import numpy as np
 from numpy.typing import NDArray
-from src.domain.station_params import StationParams
+from src.domain.station_params import StationParam
 from src.repository.gm_data import GMPeriodRepository
 
 
 @dataclass
 class HData:
-    ut_params: StationParams
+    ut_params: StationParam
     h_values: NDArray[np.float64]
 
 
 class HComponent:
-    def __init__(self, ut_params: StationParams):
+    def __init__(self, ut_params: StationParam):
         self.gm_repo = GMPeriodRepository(ut_params)
         self.ut_params = ut_params
 

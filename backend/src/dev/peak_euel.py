@@ -4,10 +4,7 @@ from datetime import datetime, timedelta
 import numpy as np
 from numpy.typing import NDArray
 from src.domain.station_params import EeIndexStation, Period
-from src.service.ee_index.calc_eej_detection import (
-    BestEuelSelectorForEej,
-    DaytimeInterval,
-)
+from src.service.calc_eej_detection import BestEuelSelectorForEej, DaytimeInterval
 
 
 def get_timestamp(start: datetime, end: datetime) -> NDArray[np.datetime64]:
@@ -69,23 +66,31 @@ ut_param = Period(
 )
 
 
-bcl = EeIndexStation.BCL
-cdo = EeIndexStation.CDO
-ceb = EeIndexStation.CEB
-dav = EeIndexStation.DAV
-gsi = EeIndexStation.GSI
-lgz = EeIndexStation.LGZ
-lkw = EeIndexStation.LKW
-lwa = EeIndexStation.LWA
-mnd = EeIndexStation.MND
-mut = EeIndexStation.MUT
-scn = EeIndexStation.SCN
-tgg = EeIndexStation.TGG
-yap = EeIndexStation.YAP
+# bcl = EeIndexStation.BCL
+# cdo = EeIndexStation.CDO
+# ceb = EeIndexStation.CEB
+# dav = EeIndexStation.DAV
+# gsi = EeIndexStation.GSI
+# lgz = EeIndexStation.LGZ
+# lkw = EeIndexStation.LKW
+# lwa = EeIndexStation.LWA
+# mnd = EeIndexStation.MND
+# mut = EeIndexStation.MUT
+# scn = EeIndexStation.SCN
+# tgg = EeIndexStation.TGG
+# yap = EeIndexStation.YAP
+# dip_stations = [bcl, cdo, ceb, dav, lkw, yap]
+# offdip_stations = [gsi, lgz, mnd, mut, scn, tgg]
 
 
-dip_stations = [bcl, cdo, ceb, dav, lkw, yap]
-dip_path = "data/southeast_asia_dip_station_peak_euel.csv"
+anc = EeIndexStation.ANC
+hua = EeIndexStation.HUA
+eus = EeIndexStation.EUS
+
+dip_stations = [anc, hua]
+offdip_stations = [eus]
+
+dip_path = "data/south_america_dip_station_peak_euel.csv"
 with open(dip_path, "a", newline="", buffering=1) as f:
     writer = csv.writer(f)
     writer.writerow(["date", "station_code", "peak_euel"])
@@ -93,10 +98,7 @@ with open(dip_path, "a", newline="", buffering=1) as f:
         write_dip_station_peak_euel_to_csv(writer, ut_param, station)
 
 
-offdip_stations = [gsi, lgz, mnd, mut, scn, tgg]
-
-
-offdip_path = "data/southeast_asia_offdip_station_peak_euel.csv"
+offdip_path = "data/south_america_offdip_station_peak_euel.csv"
 with open(offdip_path, "a", newline="", buffering=1) as f:
     writer = csv.writer(f)
     # writer.writerow(["date", "station_code", "peak_euel"])

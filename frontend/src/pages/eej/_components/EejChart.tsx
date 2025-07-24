@@ -79,6 +79,8 @@ const EejChart = (eejPlotData: EejPlotData) => {
         },
       },
       y: {
+        min: -100,
+        max: 200,
         beginAtZero: true,
       },
     },
@@ -112,20 +114,16 @@ const EejChart = (eejPlotData: EejPlotData) => {
       ctx.fillStyle = "rgba(255, 165, 0, 0.3)";
 
       peculiarEejDates.forEach((dateStr) => {
-        const startIndex = chartLabels.findIndex((label) =>
-          label.includes(dateStr)
-        );
-        let endIndex = -1;
-        for (let i = chartLabels.length - 1; i >= startIndex; i--) {
-          if (chartLabels[i].startsWith(dateStr)) {
-            endIndex = i;
-            break;
+        const indices = chartLabels.reduce((acc, label, index) => {
+          if (label.startsWith(dateStr)) {
+            acc.push(index);
           }
-        }
+          return acc;
+        }, [] as number[]);
 
-        if (startIndex !== -1 && endIndex !== -1) {
-          const startX = xAxis.getPixelForValue(startIndex);
-          const endX = xAxis.getPixelForValue(endIndex);
+        if (indices.length > 0) {
+          const startX = xAxis.getPixelForValue(indices[0]);
+          const endX = xAxis.getPixelForValue(indices[indices.length - 1]);
           const width = Math.max(endX - startX, 1);
           ctx.fillRect(startX, yAxis.top, width, yAxis.height);
         }
