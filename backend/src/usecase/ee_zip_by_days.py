@@ -4,7 +4,7 @@ from src.domain.magdas_station import EeIndexStation
 from src.service.file_exporter.export_ee_zip import export_ee_as_iaga_zip
 
 
-class EeIndexZipByDays:
+class EeIndexZipByDaysUsecase:
     def __init__(self, ut_date: datetime, days: int, station: EeIndexStation):
         self.ut_date = ut_date
         self.days = days
