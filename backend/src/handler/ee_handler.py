@@ -2,7 +2,7 @@ from fastapi import Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from src.domain.magdas_station import EeIndexStation
-from src.usecase.ee_by_days import EeIndexByDays
+from src.usecase.ee_by_days import EeIndexByDaysUsecase
 from src.utils.date import str_to_datetime
 
 
@@ -32,7 +32,7 @@ def handle_get_ee_by_range(
     days = req.days
     station = EeIndexStation[req.station_code]
 
-    ee_index = EeIndexByDays(start_ut, days, station)
+    ee_index = EeIndexByDaysUsecase(start_ut, days, station)
     er, edst, euel = ee_index.get_ee_index()
     minute_labels = ee_index.get_minute_labels()
 

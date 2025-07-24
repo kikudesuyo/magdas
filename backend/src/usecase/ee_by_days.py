@@ -8,7 +8,7 @@ from src.service.ee_index.factory_ee import EeFactory
 from src.service.sanitize_np import sanitize_np
 
 
-class EeIndexByDays:
+class EeIndexByDaysUsecase:
     def __init__(self, start_ut: datetime, days: int, station: EeIndexStation):
         self.start_ut = start_ut
         self.days = days

@@ -1,7 +1,7 @@
 from fastapi import Depends, Query
 from pydantic import BaseModel
 from src.domain.magdas_station import EeIndexStation
-from src.usecase.ee_zip_by_range import EeIndexZipByRange
+from src.usecase.ee_zip_by_range import EeIndexZipByRangeUsecase
 from src.utils.date import str_to_datetime
 
 
@@ -34,7 +34,7 @@ def handle_get_ee_zip_content_by_range(
     end_date = str_to_datetime(request.end_date)
     station = EeIndexStation[request.station_code]
 
-    ee_zip_usecase = EeIndexZipByRange(start_date, end_date, station)
+    ee_zip_usecase = EeIndexZipByRangeUsecase(start_date, end_date, station)
     zip_base64 = ee_zip_usecase.get_ee_as_iaga_zip()
     filename = ee_zip_usecase.get_filename()
 

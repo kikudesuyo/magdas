@@ -4,7 +4,7 @@ from src.domain.magdas_station import EeIndexStation
 from src.service.file_exporter.export_ee_zip import export_ee_as_iaga_zip
 
 
-class EeIndexZipByRange:
+class EeIndexZipByRangeUsecase:
     def __init__(self, ut_date: datetime, end_ut: datetime, station: EeIndexStation):
         self.ut_date = ut_date
         self.end_ut = end_ut
