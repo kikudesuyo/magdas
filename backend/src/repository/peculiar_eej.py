@@ -21,7 +21,6 @@ class PeculiarEejRepository:
             with open(self.csv_path, mode="r", newline="", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    print(row)
                     region_enum = Region.from_code(row["region"])
                     date = datetime.strptime(row["date"], "%Y-%m-%d").date()
                     data.append(PeculiarEej(date=date, region=region_enum))
