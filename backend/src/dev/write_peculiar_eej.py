@@ -87,7 +87,7 @@ def write_eej_category_to_csv(
             offdip_euel = offdip_euel_selector.select_euel_data()
             peak_diff = calc_euel_peak_diff(dip_euel, offdip_euel, current_date)
             eej = EejDetection(peak_diff, current_date)
-            category = eej.eej_category()
+            category = eej.classify_eej_category()
             writer.writerow(
                 [
                     current_date,

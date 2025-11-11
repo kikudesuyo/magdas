@@ -138,6 +138,55 @@ inv test-all
 - dev 層で統計的な調査を行う
   - service 層で定義された関数を利用して、統計的な調査を行います。
 
+Storage ディレクトリは、データを保存するためのディレクトリです。
+Storage/magdas には生データが保存されます。
+
+Storage/\*\_table.csv には、解析結果や中間データが保存されます。
+こちらは、DB のテーブルに相当するため、リポジトリ層での利用を想定しています。
+
+## テーブル設計
+
+kp_data_table.csv
+| カラム名 | 型 | 説明 |
+| -------- | ----- | ------------------ |
+| date_time(3 時間値) | str | 日付 (YYYY-MM-DD) |
+| kp_index | float | Kp インデックス値 |
+
+ssw_table.csv
+| カラム名 | 型 | 説明 |
+| ----------------- | ----- | ----------------- |
+| Date(1 日値) | str | 日付 (YYYY-MM-DD) |
+| Tmin_50-90N_K | float | 50-90N の最低温度 |
+| T_90N_K | float | 90N の平均温度 |
+| T_50N_K | float | 50N の平均温度 |
+| T_60-90N_K | float | 60-90N の平均温度 |
+| U_60N_m/s | float | 60N の平均風速 |
+
+sunspot_table.csv
+
+| カラム名     | 型    | 説明                                |
+| ------------ | ----- | ----------------------------------- |
+| Date(1 日値) | str   | 日付 (YYYY-MM-DD)                   |
+| SN           | int   | 国際黒点数                          |
+| F10.7        | float | 10.7cm 太陽放射フラックス           |
+| SN_MA        | float | 国際黒点数の移動平均                |
+| F10.7_MA     | float | 10.7cm 太陽放射フラックスの移動平均 |
+
+eej_events_table.csv
+| カラム名 | 型 | 説明 |
+| --------------- | ----- | ----------------------------------- |
+| id | int | ID (自動採番) |
+| date(1 日値) | str | 日付 (YYYY-MM-DD) |
+| region | str | 地域 |
+| category | str | EEJ のカテゴリ (normal, peculiar, disturbance, missing) |
+
+peculiar_eej_table.csv
+| カラム名 | 型 | 説明 |
+| --------------- | ----- | ----------------------------------- |
+| eej_event_id | int | eej_events_table の外部キー |
+| date(1 日値) | str | 日付 (YYYY-MM-DD) |
+| peculiar_type | str | 特異型 EEJ のタイプ (undev, sudden) |
+
 ## 命名規則
 
 以下の Prefix/Suffix を守って開発を行ってください。（随時追記予定）

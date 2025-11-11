@@ -224,9 +224,9 @@ class EejDetection:
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
     def is_peculiar_eej(self):
-        return self.eej_category().label == "peculiar"
+        return self.classify_eej_category().label == "peculiar"
 
-    def eej_category(self) -> EejCategory:
+    def classify_eej_category(self) -> EejCategory:
         daily_max_kp = self._get_daily_max_kp()
         daily_min_edst = self._calc_daily_min_edst()
         return EejCategory.from_conditions(

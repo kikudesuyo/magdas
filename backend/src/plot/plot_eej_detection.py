@@ -97,7 +97,6 @@ if __name__ == "__main__":
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
 
-    date = datetime(2018, 12, 20, 0, 0)
     date = datetime(2017, 2, 7, 0, 0)
 
     lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))

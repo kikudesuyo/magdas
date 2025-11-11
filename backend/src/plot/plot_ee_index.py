@@ -50,9 +50,10 @@ class EeIndexPlotter:
         p = StationParam(station, self.ut_period)
         euel = self.factory.create_euel(p)
         euel_values = euel.calc_euel()
-        smoothed_euel = calc_moving_avg(
-            euel_values, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min
-        )
+        # smoothed_euel = calc_moving_avg(
+        #     euel_values, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min
+        # )
+        smoothed_euel = euel_values
         x_axis = np.arange(0, len(smoothed_euel), 1)
         self.ax.plot(x_axis, smoothed_euel, label=f"{station.code}_EUEL", color=color)
 
@@ -128,15 +129,19 @@ if __name__ == "__main__":
     anc = EeIndexStation.ANC
     hua = EeIndexStation.HUA
     eus = EeIndexStation.EUS
-    # dav = EeIndexStation.DAV
+    dav = EeIndexStation.DAV
+    lkw = EeIndexStation.LKW
 
     # date = datetime(2016, 2, 6, 0, 0)
-    date = datetime(2015, 6, 23, 0, 0)
-    ut_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
+    date = datetime(2018, 12, 16, 0, 0)
+    ut_period = Period(start=date, end=date + timedelta(days=7) - timedelta(minutes=1))
     p = EeIndexPlotter(ut_period)
     p.plot_euel(anc, "red")
     p.plot_euel(hua, "red")
     p.plot_euel(eus, "purple")
 
-    p.plot_edst()
+    p.plot_euel(dav, "orange")
+    p.plot_euel(lkw, "green")
+
+    # p.plot_edst()
     p.show()

@@ -11,6 +11,7 @@ class PeculiarEej(BaseModel):
     region: Region
 
 
+# 特異型EEJを保存・取得するリポジトリ層
 class PeculiarEejRepository:
     def __init__(self):
         self.csv_path = "Storage/peculiar.csv"
