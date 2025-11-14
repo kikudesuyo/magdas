@@ -1,40 +1,58 @@
 import csv
-from datetime import date, datetime
+from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel
 from src.domain.region import Region
-
-
-class PeculiarEej(BaseModel):
-    date: date
-    region: Region
+from src.model.peculiar_eej import PeculiarEejModel
 
 
 # 特異型EEJを保存・取得するリポジトリ層
 class PeculiarEejRepository:
     def __init__(self):
-        self.csv_path = "Storage/peculiar.csv"
+        self.csv_path = "Storage/peculiar_eej_classification.csv"
 
-    def select_all(self) -> List[PeculiarEej]:
-        data: List[PeculiarEej] = []
+    def _fetch_all_from_storage(self) -> List[PeculiarEejModel]:
+        data: List[PeculiarEejModel] = []
         try:
             with open(self.csv_path, mode="r", newline="", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    region_enum = Region.from_code(row["region"])
-                    date = datetime.strptime(row["date"], "%Y-%m-%d").date()
-                    data.append(PeculiarEej(date=date, region=region_enum))
+                    region_enum = Region.from_code(row["Region"])
+                    date = datetime.strptime(row["Date"], "%Y-%m-%d").date()
+                    data.append(
+                        PeculiarEejModel(
+                            date=date, region=region_enum, type=row["Type"]
+                        )
+                    )
 
         except FileNotFoundError:
             raise FileNotFoundError(f"{self.csv_path} not found.")
         return data
 
-    def select_by_region(self, region: Region) -> List[date]:
-        data = self.select_all()
-        return [row.date for row in data if row.region == region]
+    def select(
+        self,
+        region: Region | None = None,
+        type_: str | None = None,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ) -> list[PeculiarEejModel]:
+        """条件に応じて絞り込み"""
+        data = self._fetch_all_from_storage()  # ← CSV/DB/Firestore など、取得元は自由
+        result = []
 
-    def insert(self, row: PeculiarEej) -> None:
+        for row in data:
+            if region is not None and row.region != region:
+                continue
+            if type_ is not None and row.type != type_:
+                continue
+            if start_date is not None and row.date < start_date.date():
+                continue
+            if end_date is not None and row.date > end_date.date():
+                continue
+            result.append(row)
+        return result
+
+    def insert(self, row: PeculiarEejModel) -> None:
         file_exists = False
         try:
             with open(self.csv_path, "r", encoding="utf-8"):
@@ -43,8 +61,10 @@ class PeculiarEejRepository:
             pass
 
         with open(self.csv_path, mode="a", newline="", encoding="utf-8") as f:
-            fieldnames = ["date", "region"]
+            fieldnames = ["Date", "Region", "Type"]
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             if not file_exists:
                 writer.writeheader()
-            writer.writerow({"date": row.date, "region": row.region.code})
+            writer.writerow(
+                {"Date": row.date, "Region": row.region.code, "Type": row.type}
+            )

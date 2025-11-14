@@ -2,18 +2,14 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
-from src.plot.config import get_font_prop
+from src.dev.plot.config import get_font_prop
 from src.repository.peculiar_eej import PeculiarEejRepository
-from src.service.moon_phase import get_lunar_age
 
 # 日本語フォント（例: IPAexGothic）を指定して警告を消す
 matplotlib.rcParams["font.family"] = get_font_prop().get_name()
-from scipy.signal import find_peaks
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
@@ -22,7 +18,7 @@ from src.service.ee_index.factory_ee import EeFactory
 from src.service.moving_avg import calc_moving_avg
 
 
-class PeculiarEej(BaseModel):
+class EuelForPeculiarEej(BaseModel):
     dip_euel: EuelData
     offdip_euel: EuelData
 
@@ -77,7 +73,7 @@ class ClassificationPeculiarEej:
         dip_stations = [anc, hua]
         offdip_stations = [eus]
 
-        peculiar_eej_data = PeculiarEejRepository().select_all()
+        peculiar_eej_data = PeculiarEejRepository().select()
 
         undev_dates = []
         sudden_dates = []
@@ -127,7 +123,7 @@ class ClassificationPeculiarEej:
             results.append(
                 {
                     "Date": date,
-                    "Station": "south_america",
+                    "Region": "south_america",
                     "Type": PeculiarEejType.UNDEVELOPED.value,
                 }
             )
@@ -135,12 +131,12 @@ class ClassificationPeculiarEej:
             results.append(
                 {
                     "Date": date,
-                    "Station": "south_america",
+                    "Region": "south_america",
                     "Type": PeculiarEejType.SUDDEN.value,
                 }
             )
         df = pd.DataFrame(results)
-        df.to_csv("peculiar_eej_classification.csv", index=False, encoding="utf-8-sig")
+        df.to_csv("peculiar_eej_classification.csv", index=False, encoding="utf-8")
 
     # def get_undev_dates(self) -> list[datetime]:
     #     return self.undev_dates
