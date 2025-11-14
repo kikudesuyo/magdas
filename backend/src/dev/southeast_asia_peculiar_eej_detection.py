@@ -57,7 +57,7 @@ def main():
             peak_diff = dip_val - offdip_val
 
         eej_detection = EejDetection(peak_diff=peak_diff, local_date=dt)
-        category = eej_detection.eej_category()
+        category = eej_detection.classify_eej_category()
 
         if category.label == "peculiar":
             print(f"{key} is a peculiar EEJ")

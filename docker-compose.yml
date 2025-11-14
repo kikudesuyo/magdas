@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    container_name: magdas-backend
+    ports:
+      - "8000:8000"
+    networks:
+      - app_net
+
+  frontend:
+    build: ./frontend
+    container_name: magdas-frontend
+    ports:
+      - "8080:80"
+    networks:
+      - app_net
+    depends_on:
+      - backend
+
+networks:
+  app_net:
+    driver: bridge

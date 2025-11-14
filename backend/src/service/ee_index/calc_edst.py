@@ -21,3 +21,6 @@ class Edst:
             night_er_list = np.vstack((night_er_list, night_er_val))
         edst = NanCalculator.nanmean(night_er_list)
         return edst
+
+    def get_min_edst(self) -> float:
+        return np.nanmin(self.calc_edst())

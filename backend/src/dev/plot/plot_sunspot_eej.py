@@ -4,9 +4,9 @@ from typing import List
 from matplotlib import pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from matplotlib.dates import DateFormatter, DayLocator
+from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
-from src.plot.config import PlotConfig
 from src.service.calc_eej_detection import BestEuelSelectorForEej
 from src.service.sunspot import Sunspot
 

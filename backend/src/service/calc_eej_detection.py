@@ -209,11 +209,15 @@ class EejDetection:
         return np.min(edst.calc_edst())
 
     def _get_daily_max_kp(self):
-        s_dt = datetime(
-            self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
+        ut_period = Period(
+            datetime(
+                self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
+            ),
+            datetime(
+                self.local_date.year, self.local_date.month, self.local_date.day, 23, 59
+            ),
         )
-        e_dt = s_dt.replace(hour=23, minute=59)
-        kp = Kp().get_max_of_day(s_dt, e_dt)
+        kp = Kp().get_max_of_day(ut_period)
         return kp
 
     def is_eej_peak_diff_nan(self):
@@ -224,9 +228,9 @@ class EejDetection:
         return self.eej_peak_diff >= EEJ_THRESHOLD
 
     def is_peculiar_eej(self):
-        return self.eej_category().label == "peculiar"
+        return self.classify_eej_category().label == "peculiar"
 
-    def eej_category(self) -> EejCategory:
+    def classify_eej_category(self) -> EejCategory:
         daily_max_kp = self._get_daily_max_kp()
         daily_min_edst = self._calc_daily_min_edst()
         return EejCategory.from_conditions(

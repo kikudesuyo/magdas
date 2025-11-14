@@ -23,6 +23,19 @@ def server(c):
 
 
 @task
+def debug(c, filename):
+    path = os.path.abspath(os.path.dirname(__file__))
+    if os.name == "nt":
+        c.run(
+            f'set "pythonpath=%PATH%;{path}" && python -m debugpy --listen 5678 --wait-for-client {filename}'
+        )
+    else:
+        c.run(
+            f'export PYTHONPATH="$PYTHONPATH:{path}" && python -m debugpy --listen 5678 --wait-for-client {filename}'
+        )
+
+
+@task
 def test(c, filename):
     path = os.path.abspath(os.path.dirname(__file__))
     if os.name == "nt":

@@ -32,10 +32,12 @@ with open(OUTPUT_FILE_PATH, "a", newline="", buffering=1) as f:
 
     while current_date <= end:
         min_edst = calc_daily_min_edst(current_date)
-        max_kp = Kp().get_max_of_day(
+        ut_period = Period(
             datetime(current_date.year, current_date.month, current_date.day, 0, 0),
             datetime(current_date.year, current_date.month, current_date.day, 23, 59),
         )
+
+        max_kp = Kp().get_max_of_day(ut_period)
         eej_category = DisturbanceCategory.from_conditions(
             daily_max_kp=max_kp, daily_min_edst=min_edst
         )

@@ -164,3 +164,4 @@ cython_debug/
 img
 data
 Storage/magdas
+Storage/kato
