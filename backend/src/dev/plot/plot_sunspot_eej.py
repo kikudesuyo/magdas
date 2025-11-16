@@ -1,3 +1,5 @@
+"""太陽活動度と特異型EEJの関係をプロット"""
+
 from datetime import datetime, time, timedelta
 from typing import List
 
@@ -80,7 +82,8 @@ class SunspotPlotter:
                 dt = datetime.combine(date, time(0, 0)) + timedelta(minutes=minute)
                 datetime_data.append(dt)
 
-        # 全データをプロット（圧縮なし）
+        """_summary_
+        """  # 全データをプロット（圧縮なし）
         label = (
             f"{'dip' if is_dip else 'offdip'}({', '.join([s.code for s in stations])})"
         )
@@ -97,7 +100,8 @@ class SunspotPlotter:
         # X軸の設定（EEJ用）
         self.ax_eej.set_xlim(self.lt_period.start, self.lt_period.end)
 
-        # EEJ用の日付フォーマット設定
+        """_summary_
+        """  # EEJ用の日付フォーマット設定
         if (self.lt_period.end - self.lt_period.start).days > 60:
             self.ax_eej.xaxis.set_major_locator(DayLocator(interval=7))
             self.ax_eej.xaxis.set_major_formatter(DateFormatter("%m/%d"))

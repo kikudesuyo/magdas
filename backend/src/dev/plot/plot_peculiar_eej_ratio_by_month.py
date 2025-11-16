@@ -1,3 +1,5 @@
+"""月ごとの特異型EEJ発生割合をプロット"""
+
 from datetime import datetime, time
 from typing import Dict, List, Tuple
 

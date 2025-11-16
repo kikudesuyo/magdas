@@ -1,3 +1,5 @@
+"""SSWのプロット"""
+
 from datetime import time, timedelta
 
 import matplotlib.dates as mdates

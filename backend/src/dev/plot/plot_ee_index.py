@@ -1,3 +1,5 @@
+"""EE-indexのプロット"""
+
 from datetime import timedelta
 
 import matplotlib.pyplot as plt

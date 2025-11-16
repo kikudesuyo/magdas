@@ -1,6 +1,6 @@
 """Kp指数とEDSTの散布図を作成
 目的:
-特異型EEJの傾向を把握するため
+特異型EEJの傾向を把握する
 """
 
 from datetime import datetime
