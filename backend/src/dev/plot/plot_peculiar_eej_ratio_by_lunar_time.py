@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from src.dev.plot.config import PlotConfig
 from src.domain.region import Region
 from src.model.peculiar_eej import PeculiarEejModel
-from src.service.moon_phase import get_lunar_time
+from src.service.lunar_phase import get_lunar_time
 from src.service.peculiar_eej import PeculiarEejService
 
 
