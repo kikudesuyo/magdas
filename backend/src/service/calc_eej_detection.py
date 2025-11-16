@@ -40,6 +40,8 @@ class EuelData(BaseModel):
 
 
 class BestEuelSelectorForEej:
+    """EEJ検知する上で、一番良いデータを持つ観測点を判定しそのEUELデータを返すクラス"""
+
     def __init__(self, stations: List[EeIndexStation], local_date: date, is_dip: bool):
         self.stations = stations
         self.local_date = local_date

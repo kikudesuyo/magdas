@@ -1,4 +1,5 @@
 import csv
+import os
 from datetime import datetime
 from typing import List
 
@@ -52,19 +53,14 @@ class PeculiarEejRepository:
             result.append(row)
         return result
 
-    def insert(self, row: PeculiarEejModel) -> None:
-        file_exists = False
-        try:
-            with open(self.csv_path, "r", encoding="utf-8"):
-                file_exists = True
-        except FileNotFoundError:
-            pass
+    def insert(self, rows: List[PeculiarEejModel]) -> None:
+        # 既存データのチェック
+        if os.path.exists(self.csv_path):
+            raise FileExistsError(f"{self.csv_path} already exists.")
 
         with open(self.csv_path, mode="a", newline="", encoding="utf-8") as f:
-            fieldnames = ["Date", "Region", "Type"]
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            if not file_exists:
-                writer.writeheader()
-            writer.writerow(
-                {"Date": row.date, "Region": row.region.code, "Type": row.type}
-            )
+            writer = csv.DictWriter(f, fieldnames=["Date", "Region", "Type"])
+            for row in rows:
+                writer.writerow(
+                    {"Date": row.date, "Region": row.region.code, "Type": row.type}
+                )
