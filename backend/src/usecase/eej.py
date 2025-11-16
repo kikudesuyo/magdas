@@ -6,11 +6,11 @@ from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period, StationParam
+from src.service.calc_utils.moving_avg import calc_moving_avg
+from src.service.calc_utils.nan_calculator import NanCalculator
+from src.service.calc_utils.sanitize_np import sanitize_np
 from src.service.ee_index.factory_ee import EeFactory
-from src.service.eej import PeculiarEejService
-from src.service.moving_avg import calc_moving_avg
-from src.service.nan_calculator import NanCalculator
-from src.service.sanitize_np import sanitize_np
+from src.service.peculiar_eej import PeculiarEejService
 
 
 class EejUsecase:
@@ -23,7 +23,8 @@ class EejUsecase:
 
     def get_peculiar_eej_dates(self) -> List[date]:
         service = PeculiarEejService()
-        return service.get_dates_by_region(self.region)
+        peculiar_eej_data = service.get_by_region(self.region)
+        return [data.date for data in peculiar_eej_data]
 
     def _calc_avg_euel(self, stations: List[EeIndexStation]) -> np.ndarray:
         f = EeFactory()

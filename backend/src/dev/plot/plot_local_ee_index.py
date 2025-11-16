@@ -8,8 +8,8 @@ from matplotlib.backend_bases import MouseEvent
 from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
+from src.service.calc_utils.moving_avg import calc_moving_avg
 from src.service.ee_index.factory_ee import EeFactory
-from src.service.moving_avg import calc_moving_avg
 
 
 class LocalEeIndexPlotter:

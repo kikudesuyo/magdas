@@ -4,8 +4,8 @@ from typing import List
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
+from src.service.calc_utils.sanitize_np import sanitize_np
 from src.service.ee_index.factory_ee import EeFactory
-from src.service.sanitize_np import sanitize_np
 
 
 class EeIndexByDaysUsecase:

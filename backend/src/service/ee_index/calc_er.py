@@ -2,8 +2,8 @@ import numpy as np
 from numpy.typing import NDArray
 from src.constants.ee_index import MAX_ER, MIN_ER
 from src.constants.time_relation import DawnAndDusk, TimeUnit
+from src.service.calc_utils.nan_calculator import NanCalculator
 from src.service.ee_index.calc_h_component import HData
-from src.service.nan_calculator import NanCalculator
 
 
 class Er:
