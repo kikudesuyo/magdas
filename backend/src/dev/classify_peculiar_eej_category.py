@@ -73,6 +73,7 @@ class ClassificationPeculiarEej:
                 (self.lt_period.end.date() - self.lt_period.start.date()).days + 1
             )
         ):
+            print(f"[Debug] Processing date: {lt_date}")
             # 使用するEUELのデータを取得
             dip_euel_selector = BestEuelSelectorForEej(dip_stations, lt_date, True)
             offdip_euel_selector = BestEuelSelectorForEej(

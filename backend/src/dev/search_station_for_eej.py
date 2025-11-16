@@ -1,3 +1,5 @@
+"""Magdasの観測データが存在するか確認するコード"""
+
 from typing import Optional
 
 import pandas as pd
