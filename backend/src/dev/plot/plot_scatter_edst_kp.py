@@ -15,7 +15,7 @@ from src.service.peculiar_eej import PeculiarEejService
 
 peculiar_eej_service = PeculiarEejService()
 sudden_eej_data = peculiar_eej_service.get_by_region_and_type(
-    Region.SOUTH_AMERICA, type="突発型"
+    Region.SOUTH_AMERICA, peculiar_eej_type="突発型"
 )
 
 sudden_kp_edst = []  # (kp, edst)
@@ -35,7 +35,7 @@ for sudden_eej in sudden_eej_data:
 
 
 undeveloped_eej_data = peculiar_eej_service.get_by_region_and_type(
-    Region.SOUTH_AMERICA, type="未発達型"
+    Region.SOUTH_AMERICA, peculiar_eej_type="未発達型"
 )
 
 undevelop_kp_edst = []  # (kp, edst)
@@ -93,5 +93,8 @@ ax.axvline(0, color="gray", linestyle="--", linewidth=1)
 ax.legend(fontsize=12)
 
 ax.grid(True, linestyle="--", alpha=0.5)
+ax.set_ylim(-40, 20)
+ax.set_title("特異型EEJのイベントにおけるKp指数とEDst", fontsize=16)
 fig.tight_layout()
-plt.show()
+plt.savefig("img/kp_edst_scatter_of_peculiar_eej.png")
+plt.close()

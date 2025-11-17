@@ -3,11 +3,15 @@ from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Literal
 
 import numpy as np
-from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict
 from src.constants.ee_index import EEJ_THRESHOLD
-from src.constants.time_relation import TimeUnit
+from src.constants.time_relation import (
+    EEJ_DETECTION_END_TIME,
+    EEJ_DETECTION_START_TIME,
+    TimeUnit,
+)
 from src.domain.magdas_station import EeIndexStation
+from src.domain.region import Region
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.linear_completion import interpolate_nan
 from src.service.calc_utils.moving_avg import calc_moving_avg
@@ -16,12 +20,9 @@ from src.service.kp import Kp
 
 
 class DaytimeInterval:
-    START = time(9, 0)
-    END = time(14, 59)
-
     @classmethod
     def contains(cls, t: time) -> bool:
-        return cls.START <= t <= cls.END
+        return EEJ_DETECTION_START_TIME <= t <= EEJ_DETECTION_END_TIME
 
 
 @dataclass
@@ -31,7 +32,7 @@ class NanRatioData:
 
 
 class EuelData(BaseModel):
-    # TODO Regionを定義してgm_lonでバリデーションできるようにする
+    region: Region
     station: EeIndexStation
     array: np.ndarray
 
@@ -42,7 +43,14 @@ class EuelData(BaseModel):
 class BestEuelSelectorForEej:
     """EEJ検知する上で、一番良いデータを持つ観測点を判定しそのEUELデータを返すクラス"""
 
-    def __init__(self, stations: List[EeIndexStation], local_date: date, is_dip: bool):
+    def __init__(
+        self,
+        region: Region,
+        stations: List[EeIndexStation],
+        local_date: date,
+        is_dip: bool,
+    ):
+        self.region = region
         self.stations = stations
         self.local_date = local_date
 
@@ -74,6 +82,7 @@ class BestEuelSelectorForEej:
 
         best_station, best_euel = min(eej_euels.items(), key=lambda x: x[1].nan_ratio)
         return EuelData(
+            region=self.region,
             station=best_station,
             array=best_euel.array,
         )
@@ -191,14 +200,6 @@ class EejDetection:
     def __init__(self, peak_diff: float, local_date: date):
         self.local_date = local_date
         self.eej_peak_diff = peak_diff
-
-    def _get_timestamp(self) -> NDArray[np.datetime64]:
-        start_lt = datetime(
-            self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
-        )
-        return np.array(
-            [start_lt + timedelta(minutes=i) for i in range(TimeUnit.ONE_DAY.min)]
-        )
 
     def _calc_daily_min_edst(self):
         s_dt = datetime(

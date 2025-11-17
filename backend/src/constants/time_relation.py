@@ -44,6 +44,11 @@ class TimeRange:
             return self.start <= time or time <= self.end
 
 
+EEJ_DETECTION_START_TIME = datetime.time(9, 0)
+EEJ_DETECTION_END_TIME = datetime.time(14, 59)
+
+MOON_CYCLE_DAYS = 29.53058867
+
 class DawnAndDusk(TimeRange, Enum):
     DAYSIDE = (datetime.time(6, 0, 0), datetime.time(17, 59, 59))
     NIGHTSIDE = (datetime.time(18, 0, 0), datetime.time(5, 59, 59))

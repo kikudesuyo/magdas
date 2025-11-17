@@ -75,9 +75,11 @@ class ClassificationPeculiarEej:
         ):
             print(f"[Debug] Processing date: {lt_date}")
             # 使用するEUELのデータを取得
-            dip_euel_selector = BestEuelSelectorForEej(dip_stations, lt_date, True)
+            dip_euel_selector = BestEuelSelectorForEej(
+                self.region, dip_stations, lt_date, True
+            )
             offdip_euel_selector = BestEuelSelectorForEej(
-                offdip_stations, lt_date, False
+                self.region, offdip_stations, lt_date, False
             )
             dip_euel = dip_euel_selector.select_euel_data()
             offdip_euel = offdip_euel_selector.select_euel_data()
