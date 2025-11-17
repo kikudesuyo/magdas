@@ -1,3 +1,5 @@
+"""Magdasの観測データが存在するか確認するコード"""
+
 from typing import Optional
 
 import pandas as pd
@@ -32,3 +34,4 @@ if __name__ == "__main__":
     result = data.query(
         start_date="2000-01-01", end_date="2000-01-10", station_code="BCL"
     )
+    print(result)

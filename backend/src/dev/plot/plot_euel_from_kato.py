@@ -1,3 +1,5 @@
+"""加藤さんからいただいたデータからEUELのプロット"""
+
 from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt

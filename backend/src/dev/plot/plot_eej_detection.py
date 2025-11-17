@@ -1,3 +1,5 @@
+"""EEJ検知のためのプロット"""
+
 from datetime import time, timedelta
 from typing import List
 

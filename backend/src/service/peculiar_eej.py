@@ -1,13 +1,19 @@
+from typing import List
+
 from src.domain.region import Region
+from src.model.peculiar_eej import PeculiarEejModel
 from src.repository.peculiar_eej import PeculiarEejRepository
 
 
 class PeculiarEejService:
     def __init__(self):
-        self.repository = PeculiarEejRepository()
+        self.repo = PeculiarEejRepository()
 
     def get_by_region(self, region: Region):
-        return self.repository.select(region=region)
+        return self.repo.select(region=region)
 
-    def get_by_region_and_type(self, region: Region, type: str):
-        return self.repository.select(region=region, type_=type)
+    def get_by_region_and_type(self, region: Region, peculiar_eej_type: str):
+        return self.repo.select(region=region, type_=peculiar_eej_type)
+
+    def add_peculiar_eej(self, peculiar_eej: List[PeculiarEejModel]):
+        self.repo.insert(peculiar_eej)

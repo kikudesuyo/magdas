@@ -1,9 +1,9 @@
 import numpy as np
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
+from src.service.calc_utils.nan_calculator import NanCalculator
 from src.service.ee_index.calc_er import Er
 from src.service.ee_index.calc_h_component import HComponent
-from src.service.nan_calculator import NanCalculator
 
 
 class Edst:

@@ -1,3 +1,5 @@
+"""前後10%にラインを引いてヒストグラムを描画"""
+
 from datetime import datetime
 
 import matplotlib.pyplot as plt

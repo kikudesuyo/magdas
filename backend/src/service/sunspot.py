@@ -8,6 +8,7 @@ class Sunspot:
     def __init__(self):
         path = generate_parent_abs_path("/Storage/sunspot.csv")
         self.df = pd.read_csv(path, parse_dates=["Date"])
+        self.df["Date"] = pd.to_datetime(self.df["Date"], format="mixed")
 
     def get_sunspot_by_range(
         self, start_dt: datetime, end_dt: datetime
@@ -18,7 +19,6 @@ class Sunspot:
             raise ValueError(
                 "太陽黒点数は1700年から2024年までのデータしか取得できません"
             )
-        self.df["Date"] = pd.to_datetime(self.df["Date"], format="mixed")
 
         return self.df[
             (self.df["Date"] >= start_dt) & (self.df["Date"] <= end_dt)
