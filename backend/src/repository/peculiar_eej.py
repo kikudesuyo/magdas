@@ -10,7 +10,7 @@ from src.model.peculiar_eej import PeculiarEejModel
 # 特異型EEJを保存・取得するリポジトリ層
 class PeculiarEejRepository:
     def __init__(self):
-        self.csv_path = "Storage/test_from_2009_to_2020.csv"
+        self.csv_path = "Storage/peculiar_eej_classification.csv"
 
     def _fetch_all_from_storage(self) -> List[PeculiarEejModel]:
         data: List[PeculiarEejModel] = []
