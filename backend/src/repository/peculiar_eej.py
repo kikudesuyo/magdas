@@ -1,6 +1,6 @@
 import csv
 import os
-from datetime import datetime
+from datetime import date, datetime
 from typing import List
 
 from src.domain.region import Region
@@ -54,14 +54,53 @@ class PeculiarEejRepository:
         return result
 
     def insert(self, rows: List[PeculiarEejModel]) -> None:
-        # 既存データのチェック
-        if os.path.exists(self.csv_path):
-            raise FileExistsError(f"{self.csv_path} already exists.")
+        # 既存データの取得
+        try:
+            existing_data = self._fetch_all_from_storage()
+        except FileNotFoundError:
+            existing_data = []
 
-        with open(self.csv_path, mode="a", newline="", encoding="utf-8") as f:
+        existing_map: dict[tuple[date, Region], str] = {
+            (row.date, row.region): row.type for row in existing_data
+        }
+        new_data: List[PeculiarEejModel] = []
+
+        for row in rows:
+            key = (row.date, row.region)
+
+            if key in existing_map:
+                # 既存データとタイプが異なる場合はエラー
+                if existing_map[key] != row.type:
+                    raise ValueError(
+                        f"Conflicting data found: "
+                        f"Date={row.date}, Region={row.region.code}, "
+                        f"Existing Type={existing_map[key]}, New Type={row.type}"
+                    )
+                # 既存のデータと同じ
+                print("[Info] Duplicate skipping:", row.date, row.region.code, row.type)
+                continue
+
+            # 新しいデータ
+            new_data.append(row)
+
+        # 追加なしなら終了
+        if not new_data:
+            return
+
+        file_exists = os.path.exists(self.csv_path)
+
+        with open(
+            self.csv_path,
+            mode="a" if file_exists else "w",
+            newline="",
+            encoding="utf-8",
+        ) as f:
             writer = csv.DictWriter(f, fieldnames=["Date", "Region", "Type"])
-            writer.writeheader()
-            for row in rows:
+
+            if not file_exists:
+                writer.writeheader()
+
+            for row in new_data:
                 writer.writerow(
                     {"Date": row.date, "Region": row.region.code, "Type": row.type}
                 )

@@ -92,7 +92,7 @@ class PeculiarEejMonthPlotter:
                 f"{bin_data.peculiar_eej_count}/{bin_data.quiet_count}",
                 ha="center",
                 va="bottom",
-                fontsize=8,
+                fontsize=14,
             )
 
         plt.margins(x=0)
@@ -114,11 +114,11 @@ if __name__ == "__main__":
     # 突発型のプロット
     sudden_plotter = PeculiarEejMonthPlotter(Region.SOUTH_AMERICA, "突発型")
     sudden_plotter.plot_peculiar_ratio(title="南アメリカ地域 突発型EEJ発生割合")
-    # sudden_plotter.save(filename="2009-2020_南アメリカ_突発型_月.png")
-    sudden_plotter.show()
+    sudden_plotter.save(filename="2009-2020_南アメリカ_突発型_月.png")
+    # sudden_plotter.show()
 
     # 未発達型のプロット
     undev_plotter = PeculiarEejMonthPlotter(Region.SOUTH_AMERICA, "未発達型")
     undev_plotter.plot_peculiar_ratio(title="南アメリカ地域 未発達型EEJ発生割合")
-    # undev_plotter.save(filename="2009-2020_南アメリカ_未発達型_月.png")
-    undev_plotter.show()
+    undev_plotter.save(filename="2009-2020_南アメリカ_未発達型_月.png")
+    # undev_plotter.show()

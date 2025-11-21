@@ -41,9 +41,6 @@ def classify_peculiar_eej_type(
     off_noon = offdip_euel_val[mask_noon]
     corr = pd.Series(dip_noon).corr(pd.Series(off_noon))  # nanを無視して相関を計算
 
-    # x: 時間やサンプル番号など、y: 観測値
-    x = np.arange(len(dip_noon))
-
     if corr > 0.6:
         return PeculiarEejType.UNDEVELOPED
 
@@ -116,7 +113,7 @@ if __name__ == "__main__":
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
     region = Region.SOUTH_AMERICA
-    lt_period = Period(datetime(2009, 1, 1, 0, 0), datetime(2020, 12, 31, 23, 59))
+    lt_period = Period(datetime(2008, 1, 1, 0, 0), datetime(2008, 1, 31, 23, 59))
     classification = ClassificationPeculiarEej(
         lt_period, dip_stations, offdip_stations, region=region
     )
