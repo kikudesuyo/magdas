@@ -4,16 +4,11 @@ from datetime import datetime
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
+from src.model.file import FileModel
 from src.service.calc_utils.moving_avg import calc_moving_avg
 from src.service.ee_index.factory_ee import EeFactory
-from src.service.file_exporter.build_iaga import (
-    build_iaga_data,
-    build_iaga_meta_data,
-    save_as_iaga,
-)
-from src.service.file_exporter.remove_files import TMP_DIR_PATH, remove_tmp_files
-from src.service.file_exporter.zip_create import create_zip_buffer
-from src.utils.path import generate_parent_abs_path
+from src.service.file_exporter.build_iaga import EeIndexIagaService
+from src.service.file_exporter.zip_create import ZipService
 
 
 def export_ee_as_iaga_zip(
@@ -47,17 +42,17 @@ def export_ee_as_iaga_zip(
 
     euel_values = euel.calc_euel()
 
-    iaga_meta_data = build_iaga_meta_data(station, "EEI", 8888.88)
-    iaga_data = build_iaga_data(
+    ee_index_iaga_service = EeIndexIagaService()
+    iaga_meta_data = ee_index_iaga_service.build_iaga_meta_data(station, "EEI", 8888.88)
+    iaga_data = ee_index_iaga_service.build_iaga_records(
         start_ut, end_ut, edst_1h_values, edst_6h_values, er_values, euel_values
     )
-    save_as_iaga(
-        iaga_meta_data, iaga_data, generate_parent_abs_path("/tmp/iaga_format.txt")
+    iaga_content = ee_index_iaga_service.build_iaga_content(iaga_meta_data, iaga_data)
+    iaga_filename = f"{station.code.lower()}{start_ut.strftime('%Y%m%d')}.iaga"
+
+    zip_service = ZipService()
+    zip_buffer = zip_service.create(
+        [FileModel(filename=iaga_filename, content=iaga_content)]
     )
-
-    dir_path = generate_parent_abs_path(TMP_DIR_PATH)
-    zip_buffer = create_zip_buffer(dir_path)
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
-    remove_tmp_files()
-
     return zip_base64
