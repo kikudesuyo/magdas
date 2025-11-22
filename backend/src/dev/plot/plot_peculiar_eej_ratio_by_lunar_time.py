@@ -11,12 +11,12 @@ from src.dev.plot.config import PlotConfig
 from src.domain.region import Region
 from src.domain.station_params import Period
 from src.service.eej_category import EejCategoryService
-from src.service.lunar_phase import get_lunar_time
+from src.service.lunar_phase import get_lunar_age
 from src.service.peculiar_eej import PeculiarEejService
 
 
 class LunarBinData(BaseModel):
-    lunar_time: int  # 月齢(0~23)
+    lunar_age: int  # 月齢(0~23)
     peculiar_eej_count: int  # 特異型EEJ件数
     quiet_count: int  # 静穏日件数
 
@@ -29,15 +29,11 @@ class LunarBinData(BaseModel):
 
 
 class PeculiarEejLunarTimePlotter:
-    def __init__(self, region: Region, peculiar_eej_type: str):
-        period = Period(
-            start=datetime(2009, 1, 1),
-            end=datetime(2020, 12, 31),
-        )
+    def __init__(self, period: Period, region: Region, peculiar_eej_type: str):
 
         peculiar_eej_service = PeculiarEejService()
-        self.peculiar_eej_data = peculiar_eej_service.get_by_region_and_type(
-            region=region, peculiar_eej_type=peculiar_eej_type
+        self.peculiar_eej_data = peculiar_eej_service.get_by_period_and_region_and_type(
+            period=period, region=region, peculiar_eej_type=peculiar_eej_type
         )
 
         # 静穏日の月齢の分母を取得するためにEejCategoryServiceを呼び出す
@@ -56,13 +52,13 @@ class PeculiarEejLunarTimePlotter:
         # 分母：静穏日の月齢 bin
         quiet_counter: defaultdict[int, int] = defaultdict(int)
         for date in self.quiet_dates:
-            lunar_hour = int(get_lunar_time(datetime.combine(date, time.min)))
+            lunar_hour = int(get_lunar_age(datetime.combine(date, time.min)))
             quiet_counter[lunar_hour] += 1
 
         # 分子：特異型EEJの月齢 bin
         peculiar_counter: defaultdict[int, int] = defaultdict(int)
         for eej in self.peculiar_eej_data:
-            lunar_hour = int(get_lunar_time(datetime.combine(eej.date, time.min)))
+            lunar_hour = int(get_lunar_age(datetime.combine(eej.date, time.min)))
             peculiar_counter[lunar_hour] += 1
 
         # すべての bin を統合
@@ -71,7 +67,7 @@ class PeculiarEejLunarTimePlotter:
         # LunarBinData のリストを作成
         return [
             LunarBinData(
-                lunar_time=b,
+                lunar_age=b,
                 quiet_count=quiet_counter.get(b, 0),
                 peculiar_eej_count=peculiar_counter.get(b, 0),
             )
@@ -80,7 +76,7 @@ class PeculiarEejLunarTimePlotter:
 
     def plot_peculiar_ratio(self, title: str):
         lunar_bins = self.build_lunar_bins()
-        x = [d.lunar_time for d in lunar_bins]
+        x = [d.lunar_age for d in lunar_bins]
         ratio = [d.ratio for d in lunar_bins]
 
         PlotConfig.rcparams()
@@ -95,7 +91,7 @@ class PeculiarEejLunarTimePlotter:
                 f"{bin_data.peculiar_eej_count}/{bin_data.quiet_count}",
                 ha="center",
                 va="bottom",
-                fontsize=8,
+                fontsize=11,
             )
 
         plt.margins(x=0)
@@ -113,22 +109,19 @@ class PeculiarEejLunarTimePlotter:
 
 
 if __name__ == "__main__":
+    p = Period(
+        start=datetime(2009, 1, 1),
+        end=datetime(2020, 12, 31),
+    )
 
     # 未発達型のプロット"""
-    undev_plotter = PeculiarEejLunarTimePlotter(Region.SOUTH_AMERICA, "未発達型")
-    undev_plotter.plot_peculiar_ratio(
-        title="南アメリカ地域 未発達型EEJ発生割合",
-    )
+    undev_plotter = PeculiarEejLunarTimePlotter(p, Region.SOUTH_AMERICA, "未発達型")
+    undev_plotter.plot_peculiar_ratio(title="南アメリカ地域 未発達型EEJ発生割合")
     undev_plotter.show()
-    # undev_plotter.save(
-    #     filename="2009-2020_南アメリカ_未発達型_月齢.png",
-    # )
+    # undev_plotter.save(filename="2009-2020_南アメリカ_未発達型_月齢.png")
+
     # 突発型のプロット"""
-    sudden_plotter = PeculiarEejLunarTimePlotter(Region.SOUTH_AMERICA, "突発型")
-    sudden_plotter.plot_peculiar_ratio(
-        title="南アメリカ地域 突発型EEJ発生割合",
-    )
-    # sudden_plotter.save(
-    #     filename="2009-2020_南アメリカ_突発型_月齢.png",
-    # )
+    sudden_plotter = PeculiarEejLunarTimePlotter(p, Region.SOUTH_AMERICA, "突発型")
+    sudden_plotter.plot_peculiar_ratio(title="南アメリカ地域 突発型EEJ発生割合")
+    # sudden_plotter.save(filename="2009-2020_南アメリカ_突発型_月齢.png")
     sudden_plotter.show()
