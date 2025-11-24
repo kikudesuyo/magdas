@@ -7,7 +7,7 @@ from src.domain.station_params import Period, StationParam
 from src.model.file import FileModel
 from src.service.calc_utils.moving_avg import calc_moving_avg
 from src.service.ee_index.factory_ee import EeFactory
-from src.service.file_exporter.build_iaga import EeIndexIagaService
+from src.service.file_exporter.build_iaga import EeIndexIagaService, IagaValues
 from src.service.file_exporter.zip_create import ZipService
 
 
@@ -43,16 +43,19 @@ def export_ee_as_iaga_zip(
     euel_values = euel.calc_euel()
 
     ee_index_iaga_service = EeIndexIagaService()
-    iaga_meta_data = ee_index_iaga_service.build_iaga_meta_data(station, "EEI", 8888.88)
-    iaga_data = ee_index_iaga_service.build_iaga_records(
-        start_ut, end_ut, edst_1h_values, edst_6h_values, er_values, euel_values
+    values = IagaValues(
+        edst_1h=edst_1h_values.tolist(),
+        edst_6h=edst_6h_values.tolist(),
+        er=er_values.tolist(),
+        euel=euel_values.tolist(),
     )
-    iaga_content = ee_index_iaga_service.build_iaga_content(iaga_meta_data, iaga_data)
-    iaga_filename = f"{station.code.lower()}{start_ut.strftime('%Y%m%d')}.iaga"
-
+    iaga_byte_file = ee_index_iaga_service.build_iaga_file(
+        station, start_ut, end_ut, values
+    )
+    filename = f"{station.code.lower()}{start_ut.strftime('%Y%m%d')}.iaga"
     zip_service = ZipService()
     zip_buffer = zip_service.create(
-        [FileModel(filename=iaga_filename, content=iaga_content)]
+        [FileModel(filename=filename, content=iaga_byte_file)]
     )
     zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     return zip_base64

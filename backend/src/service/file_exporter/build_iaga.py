@@ -1,6 +1,7 @@
 import io
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import List
 
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
@@ -17,8 +18,28 @@ class EeIndexIagaRecord:
     euel: float
 
 
+@dataclass
+class IagaValues:
+    edst_1h: List[float]
+    edst_6h: List[float]
+    er: List[float]
+    euel: List[float]
+
+
 class EeIndexIagaService:
-    def build_iaga_meta_data(
+
+    def build_iaga_file(
+        self,
+        station: EeIndexStation,
+        start_ut: datetime,
+        end_ut: datetime,
+        iaga_values: IagaValues,
+    ) -> bytes:
+        meta = self._build_iaga_meta_data(station, "EEI", 8888.88)
+        records = self._build_iaga_records(start_ut, end_ut, iaga_values)
+        return self._build_iaga_content(meta, records)
+
+    def _build_iaga_meta_data(
         self, station: EeIndexStation, iaga_code, elevation
     ) -> dict:
         return {
@@ -36,19 +57,13 @@ class EeIndexIagaService:
             "Data Type": "Provisional EE-index:230202",
         }
 
-    def build_iaga_records(
-        self,
-        start_ut: datetime,
-        end_ut: datetime,
-        edst_1h_values,
-        edst_6h_values,
-        er_values,
-        euel_values,
-    ) -> list[EeIndexIagaRecord]:
+    def _build_iaga_records(
+        self, start_ut: datetime, end_ut: datetime, iaga_values: IagaValues
+    ) -> List[EeIndexIagaRecord]:
         minutes = TimeUnit.ONE_DAY.min
         days = (end_ut - start_ut).days + 1
 
-        records = []
+        records: List[EeIndexIagaRecord] = []
         idx = 0
 
         for day in range(days):
@@ -67,16 +82,16 @@ class EeIndexIagaService:
                         date=date_str,
                         time=time_str,
                         doy=doy,
-                        edst_1h=edst_1h_values[idx],
-                        edst_6h=edst_6h_values[idx],
-                        er=er_values[idx],
-                        euel=euel_values[idx],
+                        edst_1h=iaga_values.edst_1h[idx],
+                        edst_6h=iaga_values.edst_6h[idx],
+                        er=iaga_values.er[idx],
+                        euel=iaga_values.euel[idx],
                     )
                 )
                 idx += 1
         return records
 
-    def build_iaga_content(self, meta, records: list[EeIndexIagaRecord]) -> bytes:
+    def _build_iaga_content(self, meta, records: List[EeIndexIagaRecord]) -> bytes:
         buf = io.StringIO()
         for k, v in meta.items():
             buf.write(f"{k:<25} {v:<40}\n")
