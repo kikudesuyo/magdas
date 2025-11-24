@@ -1,4 +1,3 @@
-import base64
 from datetime import datetime
 
 from src.constants.time_relation import TimeUnit
@@ -35,12 +34,12 @@ def export_ee_as_iaga_zip(
 
     er_values = er.calc_er()
     edst_raw = edst.calc_edst()
+    euel_values = euel.calc_euel()
+
     edst_1h_values = calc_moving_avg(edst_raw, TimeUnit.ONE_HOUR.min, 30)
     edst_6h_values = calc_moving_avg(
         edst_raw, TimeUnit.SIX_HOURS.min, TimeUnit.THREE_HOURS.min
     )
-
-    euel_values = euel.calc_euel()
 
     ee_index_iaga_service = EeIndexIagaService()
     values = IagaValues(
@@ -54,8 +53,7 @@ def export_ee_as_iaga_zip(
     )
     filename = f"{station.code.lower()}{start_ut.strftime('%Y%m%d')}.iaga"
     zip_service = ZipService()
-    zip_buffer = zip_service.create(
+    zip_base64 = zip_service.create_base64(
         [FileModel(filename=filename, content=iaga_byte_file)]
     )
-    zip_base64 = base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
     return zip_base64

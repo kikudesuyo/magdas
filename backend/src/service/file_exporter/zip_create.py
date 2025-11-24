@@ -1,15 +1,9 @@
+import base64
 from io import BytesIO
 from typing import List
 from zipfile import ZipFile
 
 from src.model.file import FileModel
-
-
-class FileService:
-    def create(self, file_bytes: bytes) -> BytesIO:
-        buffer = BytesIO(file_bytes)
-        buffer.seek(0)
-        return buffer
 
 
 class ZipService:
@@ -20,3 +14,7 @@ class ZipService:
                 zipf.writestr(file.filename, file.content)
         zip_buffer.seek(0)
         return zip_buffer
+
+    def create_base64(self, files: List[FileModel]) -> str:
+        zip_bytes = self.create(files).getvalue()
+        return base64.b64encode(zip_bytes).decode("utf-8")
