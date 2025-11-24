@@ -1,9 +1,7 @@
 import io
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import List
 
-from pydantic import BaseModel
 from src.constants.time_relation import TimeUnit
 from src.domain.magdas_station import EeIndexStation
 
@@ -17,17 +15,6 @@ class EeIndexIagaRecord:
     edst_6h: float
     er: float
     euel: float
-
-
-class EeIndexIagaModel(BaseModel):
-    iaga_meta_data: dict
-    dates: List[str]
-    times: List[str]
-    doys: List[int]
-    edst_1h: List[float]
-    edst_6h: List[float]
-    er: List[float]
-    euel: List[float]
 
 
 class EeIndexIagaService:
