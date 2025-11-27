@@ -38,7 +38,7 @@ def handle_get_ee_zip_content_by_range(
     ee_zip_data = ee_zip_usecase.get_ee_zip_by_range(start_date, end_date)
 
     return DownloadEeIndexResp(
-        base64Zip=ee_zip_data.zip_data,
+        base64Zip=ee_zip_data.zip_base64,
         fileName=ee_zip_data.filename,
         contentType="application/zip",
     )

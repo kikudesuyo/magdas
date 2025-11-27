@@ -44,10 +44,9 @@ def handle_get_ee_by_range(
     station = EeIndexStation[req.station_code]
 
     ee_index = EeIndexByDaysUsecase(start_ut, days, station)
-    er, edst, euel = ee_index.get_ee_index()
-    minute_labels = ee_index.get_minute_labels()
+    ee_data = ee_index.get_ee_data()
 
     return EeIndexByRangeResp(
-        values=EeIndex(er=er, edst=edst, euel=euel),
-        minuteLabels=minute_labels,
+        values=EeIndex(er=ee_data.er, edst=ee_data.edst, euel=ee_data.euel),
+        minuteLabels=ee_data.minuteLabels,
     )
