@@ -1,15 +1,20 @@
-import glob
-import io
-import os
+import base64
+from io import BytesIO
+from typing import List
 from zipfile import ZipFile
 
+from src.model.file import FileModel
 
-def create_zip_buffer(dir_path: str) -> io.BytesIO:
-    zip_buffer = io.BytesIO()
-    with ZipFile(zip_buffer, "w") as zipf:
-        files = glob.glob(os.path.join(dir_path, "**"))
-        for file in files:
-            if os.path.isfile(file):
-                zipf.write(file, arcname=os.path.basename(file))
-    zip_buffer.seek(0)
-    return zip_buffer
+
+class ZipService:
+    def create(self, files: List[FileModel]) -> BytesIO:
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, "w") as zipf:
+            for file in files:
+                zipf.writestr(file.filename, file.content)
+        zip_buffer.seek(0)
+        return zip_buffer
+
+    def create_base64(self, files: List[FileModel]) -> str:
+        zip_bytes = self.create(files).getvalue()
+        return base64.b64encode(zip_bytes).decode("utf-8")
