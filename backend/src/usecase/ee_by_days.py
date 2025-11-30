@@ -34,10 +34,10 @@ class EeIndexByDaysUsecase:
             er=sanitize_np(er.calc_er()),
             edst=sanitize_np(edst.calc_edst()),
             euel=sanitize_np(euel.calc_euel()),
-            minuteLabels=self._get_minute_labels(),
+            minuteLabels=self._minute_labels(),
         )
 
-    def _get_minute_labels(self) -> List[str]:
+    def _minute_labels(self) -> List[str]:
         return [
             (self.start_ut + timedelta(minutes=i)).strftime("%Y-%m-%d %H:%M")
             for i in range(self.days * TimeUnit.ONE_DAY.min)

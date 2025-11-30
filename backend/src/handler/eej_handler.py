@@ -1,9 +1,9 @@
-from typing import List, Optional
+from typing import List
 
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 from src.domain.region import Region
-from src.usecase.eej import EejUsecase
+from src.usecase.eej import EejRow, EejUsecase
 from src.utils.date import str_to_datetime
 
 
@@ -26,12 +26,6 @@ class EejReq(BaseModel):
         return cls(start_date=start_date, days=days, region=region)
 
 
-class EejRow(BaseModel):
-    time: str
-    dip_euel: Optional[float] = Field(alias="dipEuel")
-    offdip_euel: Optional[float] = Field(alias="offdipEuel")
-
-
 class EejResp(BaseModel):
     data: List[EejRow]
     peculiarEejDates: List[str]
@@ -42,22 +36,6 @@ def handle_get_eej_by_range(req: EejReq = Depends(EejReq.from_query)):
     days = req.days
     region = Region.from_code(req.region)
 
-    if region.code != "south_america":
-        raise ValueError("Only 'south_america' region is supported for EEJ detection.")
-
-    eejUsecase = EejUsecase(start_lt, days, region)
-    peculiar_eej_dates = eejUsecase.get_peculiar_eej_dates()
-    minute_labels = eejUsecase.get_minute_labels()
-    dip_euel, offdip_euel = eejUsecase.get_local_euel()
-
-    return EejResp(
-        data=[
-            EejRow(
-                time=minute_labels[i],
-                dipEuel=dip_euel[i],
-                offdipEuel=offdip_euel[i],
-            )
-            for i in range(len(minute_labels))
-        ],
-        peculiarEejDates=[date.strftime("%Y-%m-%d") for date in peculiar_eej_dates],
-    )
+    eej_usecase = EejUsecase(start_lt, days, region)
+    eej_result = eej_usecase.execute()
+    return EejResp(data=eej_result.data, peculiarEejDates=eej_result.peculiarEejDates)
