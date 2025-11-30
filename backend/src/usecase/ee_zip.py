@@ -13,7 +13,7 @@ from src.service.file_exporter.zip_create import ZipService
 
 @dataclass
 class ZipData:
-    zip_data: str
+    zip_base64: str
     filename: str
 
 
@@ -21,13 +21,13 @@ class EeIndexZipUsecase:
     def __init__(self, station: EeIndexStation):
         self.station = station
 
-    def get_ee_zip_by_range(self, ut_date: datetime, end_ut: datetime):
+    def get_ee_zip_by_range(self, ut_date: datetime, end_ut: datetime) -> ZipData:
         start_ut = ut_date.replace(hour=0, minute=0)
         end_ut = end_ut.replace(hour=23, minute=59)
 
         return self._build_zip(start_ut, end_ut)
 
-    def get_ee_zip_by_days(self, ut_date: datetime, days: int):
+    def get_ee_zip_by_days(self, ut_date: datetime, days: int) -> ZipData:
         start_ut = ut_date.replace(hour=0, minute=0)
         end_ut = start_ut + timedelta(days=days - 1, hours=23, minutes=59)
 
@@ -36,7 +36,7 @@ class EeIndexZipUsecase:
     def _build_zip(self, start_ut: datetime, end_ut: datetime) -> ZipData:
         zip_data = self._export_ee_as_iaga_zip(self.station, start_ut, end_ut)
         filename = f"ee_index_{start_ut.strftime('%Y-%m-%d')}_to_{end_ut.strftime('%Y-%m-%d')}.zip"
-        return ZipData(zip_data=zip_data, filename=filename)
+        return ZipData(zip_base64=zip_data, filename=filename)
 
     def _export_ee_as_iaga_zip(
         self, station: EeIndexStation, start_ut: datetime, end_ut: datetime
