@@ -61,13 +61,13 @@ class BestEuelSelectorForEej:
             for station in stations:
                 if not station.is_dip():
                     raise ValueError(
-                        f"{station.code} is {station.gm_lat}. It is not in dip region"
+                        f"{station.code} is {station.dip_lat}. It is not in dip region"
                     )
         else:
             for station in stations:
                 if not station.is_offdip():
                     raise ValueError(
-                        f"{station.code} is {station.gm_lat}. It is not in off-dip region"
+                        f"{station.code} is {station.dip_lat}. It is not in off-dip region"
                     )
 
     def select_euel_data(self) -> EuelData:

@@ -12,10 +12,13 @@ class Organization(Enum):
 @dataclass(frozen=True)
 class Station:
     code: str
+    name: str
+    nation: str
     organization: Organization
-    time_diff: float
-    gm_lat: float
+    gg_lon: float
+    gm_lat: Optional[float]
     gm_lon: Optional[float]
+    dip_lat: float
 
 
 class EeIndexStation(Enum):
@@ -24,42 +27,244 @@ class EeIndexStation(Enum):
     """
 
     # MAGDAS観測点 藤本論文2015での観測点データ
-    AAB = Station("AAB", Organization.MAGDAS, 2.585333333333333, 0.18, 110.47)
-    ABU = Station("ABU", Organization.MAGDAS, 0.49266666666666664, -1.53, 79.4)
-    AMA = Station("AMA", Organization.MAGDAS, 8.622, 21.11, 200.88)
-    ANC = Station("ANC", Organization.MAGDAS, -5.143333333333333, 0.77, 354.33)
-    BCL = Station("BCL", Organization.MAGDAS, 7.047333333333333, -0.66, 177.96)
-    BKL = Station("BKL", Organization.MAGDAS, 6.820666666666667, -15.13, 173.6)
-    CDO = Station("CDO", Organization.MAGDAS, 8.308666666666667, -1.1, 196.66)
-    CEB = Station("CEB", Organization.MAGDAS, 8.260666666666667, 2.53, 195.06)
-    DAV = Station("DAV", Organization.MAGDAS, 8.36, -1.02, 196.54)
-    DAW = Station("DAW", Organization.MAGDAS, 8.728, -21.91, 202.81)
-    EUS = Station("EUS", Organization.MAGDAS, -2.562000000000003, -3.64, 34.21)
-    EWA = Station("EWA", Organization.MAGDAS, -10.5333333333333, 21.67, 269.52)
-    GSI = Station("GSI", Organization.MAGDAS, 6.507333333333333, -7.53, 169.49)
-    HLN = Station("HLN", Organization.MAGDAS, 8.103333333333333, 16.86, 193.05)
-    HUA = Station("HUA", Organization.MAGDAS, -5.01933333333333, -2.34, 357.39)
-    ICA = Station("ICA", Organization.MAGDAS, -5.04933333333333, -1.56, 356.16)
-    ILR = Station("ILR", Organization.MAGDAS, 0.312, -1.82, 76.8)
-    KRT = Station("KRT", Organization.MAGDAS, 2.1546666666666665, 5.69, 103.8)
-    LAG = Station("LAG", Organization.MAGDAS, 0.218, -3.04, 75.33)
-    LGZ = Station("LGZ", Organization.MAGDAS, 8.249333333333333, 3.54, 195.56)
-    LKW = Station("LKW", Organization.MAGDAS, 6.652, -2.32, 171.29)
-    LWA = Station("LWA", Organization.MAGDAS, 6.937333333333333, -16.19, 175.33)
-    MND = Station("MND", Organization.MAGDAS, 8.322666666666666, -6.91, 196.06)
-    MUT = Station("MUT", Organization.MAGDAS, 8.068, 6.79, 192.25)
-    NAB = Station("NAB", Organization.MAGDAS, 2.432, -10.65, 108.18)
-    PRP = Station("PRP", Organization.MAGDAS, 7.96, -12.38, 190.75)
-    SCN = Station("SCN", Organization.MAGDAS, 6.6866666666666665, -12.11, 171.66)
-    TGG = Station("TGG", Organization.MAGDAS, 8.117333333333334, 10.26, 193.05)
-    TIR = Station("TIR", Organization.MAGDAS, 5.13, -0.37, 149.11)
-    YAP = Station("YAP", Organization.MAGDAS, 9.205333333333333, 1.49, 209.06)
+    AAB = Station(
+        "AAB",
+        "Adis Ababa",
+        "Ethiopia",
+        Organization.MAGDAS,
+        38.77,
+        5.41,
+        112.54,
+        1.21,
+    )
+    ABU = Station(
+        "ABU",
+        "Abuja",
+        "Nigeria",
+        Organization.MAGDAS,
+        7.39,
+        -0.54,
+        81.31,
+        -3.36,
+    )
+    AMA = Station(
+        "AMA",
+        "Amami-Oh-shima",
+        "Japan",
+        Organization.MAGDAS,
+        129.33,
+        21.11,
+        200.88,
+        23.39,
+    )
+    ANC = Station(
+        "ANC", "Ancon", "Peru", Organization.MAGDAS, -77.15, -2.11, 355.57, 0.13
+    )
+    BCL = Station(
+        "BCL", "Bac Lieu", "Vietnam", Organization.MAGDAS, 105.71, -0.36, 178.36, 2.5
+    )
+    BKL = Station(
+        "BKL",
+        "Bengkulu",
+        "Indonesia",
+        Organization.MAGDAS,
+        102.31,
+        -15.13,
+        173.6,
+        -13.64,
+    )
+    CDO = Station(
+        "CDO",
+        "Cagayan De Oro",
+        "Philippines",
+        Organization.MAGDAS,
+        124.63,
+        -0.8,
+        197.06,
+        1.41,
+    )
+    CEB = Station(
+        "CEB",
+        "Cebu",
+        "Philippines",
+        Organization.MAGDAS,
+        123.91,
+        1.06,
+        196.26,
+        3.59,
+    )
+    DAV = Station(
+        "DAV", "Davao", "Philippines", Organization.MAGDAS, 125.4, -2.22, 197.9, -0.27
+    )
+    DAW = Station(
+        "DAW", "Darwin", "Australia", Organization.MAGDAS, 130.92, -21.91, 202.81, -22.4
+    )
+    EUS = Station(
+        "EUS",
+        "Eusebio",
+        "Brazil",
+        Organization.MAGDAS,
+        -38.43,
+        4.14,
+        34.21,
+        -9.41,
+    )
+    EWA = Station(
+        "EWA",
+        "Ewa beach",
+        "USA",
+        Organization.MAGDAS,
+        -158.0,
+        21.63,
+        269.45,
+        21.37,
+    )
+    GSI = Station(
+        "GSI",
+        "Gunung Sitoli",
+        "Indonesia",
+        Organization.MAGDAS,
+        97.58,
+        -8.25,
+        170.1,
+        -7.65,
+    )
+    HLN = Station(
+        "HLN",
+        "Hualien",
+        "Taiwan",
+        Organization.MAGDAS,
+        121.55,
+        16.86,
+        193.05,
+        19.37,
+    )
+    HUA = Station(
+        "HUA",
+        "Huancayo",
+        "Peru",
+        Organization.MAGDAS,
+        -75.29,
+        -2.34,
+        357.39,
+        -0.17,
+    )
+    ICA = Station(
+        "ICA",
+        "Ica",
+        "Peru",
+        Organization.MAGDAS,
+        -75.74,
+        -4.42,
+        356.97,
+        -2.07,
+    )
+    ILR = Station(
+        "ILR", "Ilorin", "Nigeria", Organization.MAGDAS, 4.68, 10.5, 78.9, -4.16
+    )
+    KRT = Station(
+        "KRT",
+        "Khartoum",
+        "Sudan",
+        Organization.MAGDAS,
+        32.32,
+        12.64,
+        107.27,
+        7.91,
+    )
+    LAG = Station(
+        "LAG", "Lagos", "Nigeria", Organization.MAGDAS, 3.27, -3.04, 75.33, -6.93
+    )
+    LGZ = Station(
+        "LGZ",
+        "Legazpi",
+        "Philippines",
+        Organization.MAGDAS,
+        123.74,
+        3.84,
+        195.96,
+        6.76,
+    )
+    LKW = Station(
+        "LKW", "Langkawi", "Malaysia", Organization.MAGDAS, 99.78, -3.3, 172.44, -1.41
+    )
+    LWA = Station(
+        "LWA", "Liwa", "Indonesia", Organization.MAGDAS, 104.06, -16.19, 175.33, -14.99
+    )
+    MND = Station(
+        "MND",
+        "Manado",
+        "Indonesia",
+        Organization.MAGDAS,
+        124.84,
+        -7.8,
+        197.63,
+        -6.5,
+    )
+    MUT = Station(
+        "MUT",
+        "Muntinlupa",
+        "Philippines",
+        Organization.MAGDAS,
+        121.02,
+        4.95,
+        193.26,
+        8.32,
+    )
+    NAB = Station(
+        "NAB", "Nairobi", "Kenya", Organization.MAGDAS, 36.48, -10.65, 108.18, -12.23
+    )
+    PRP = Station(
+        "PRP",
+        "Pare Pare",
+        "Indonesia",
+        Organization.MAGDAS,
+        119.4,
+        -12.38,
+        190.75,
+        -12.23,
+    )
+    SCN = Station(
+        "SCN",
+        "Sicincin",
+        "Indonesia",
+        Organization.MAGDAS,
+        100.3,
+        -10.16,
+        172.81,
+        -9.78,
+    )
+    TGG = Station(
+        "TGG",
+        "Tuguegarao",
+        "Philippines",
+        Organization.MAGDAS,
+        121.76,
+        10.26,
+        193.05,
+        12.06,
+    )
+    TIR = Station(
+        "TIR", "Tirunelveli", "India", Organization.MAGDAS, 77.8, 0.25, 150.8, 1.74
+    )
+    YAP = Station(
+        "YAP",
+        "Yap Island",
+        "FSM",
+        Organization.MAGDAS,
+        138.08,
+        1.14,
+        210.25,
+        1.97,
+    )
 
     # SUPERMAG観測点
 
     #  gm_lat は dip_latを参照
     # gm_lon は不明のため None とする
-    TTB = Station("TTB", Organization.SUPERMAG, -3.234, -0.72, None)
+    TTB = Station(
+        "TTB", "Tatuoca", "Brazil", Organization.SUPERMAG, -48.51, None, None, -0.72
+    )
 
     @property
     def code(self):
@@ -67,7 +272,8 @@ class EeIndexStation(Enum):
 
     @property
     def time_diff(self):
-        return self.value.time_diff
+        ONE_HOUR = 15
+        return self.value.gg_lon / ONE_HOUR
 
     @property
     def gm_lat(self):
@@ -77,16 +283,16 @@ class EeIndexStation(Enum):
     def gm_lon(self):
         return self.value.gm_lon
 
+    @property
+    def dip_lat(self):
+        return self.value.dip_lat
+
     def is_dip(self) -> bool:
-        return abs(self.gm_lat) < 3
+        return abs(self.dip_lat) < 3
 
     def is_offdip(self) -> bool:
         """
         In the referenced paper, offdip is defined as 3 <= |gm_lat| <= 10,
         but due to limited station data, the range is extended to 15 degrees.
         """
-        return 3 <= abs(self.gm_lat) <= 15
-
-    @classmethod
-    def is_included(cls, station_code: str) -> bool:
-        return station_code in [station.code for station in cls]
+        return 3 <= abs(self.dip_lat) <= 15

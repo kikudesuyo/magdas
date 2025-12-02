@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
+from src.domain.region import Region
 from src.domain.station_params import Period
 from src.service.calc_eej_detection import BestEuelSelectorForEej
 
@@ -27,7 +28,7 @@ class EejDetectionPlotter:
             raise ValueError("start_lt must be 00:00 and end_lt must be 23:59.")
 
     def plot_euel_to_detect_eej(
-        self, stations: List[EeIndexStation], color, is_dip: bool
+        self, region: Region, stations: List[EeIndexStation], color, is_dip: bool
     ):
         """EEJを検知するためのプロット
         注意:
@@ -40,7 +41,9 @@ class EejDetectionPlotter:
         ]
         euel = np.hstack(
             [
-                BestEuelSelectorForEej(stations, d, is_dip).select_euel_data().array
+                BestEuelSelectorForEej(region, stations, d, is_dip)
+                .select_euel_data()
+                .array
                 for d in date_range
             ]
         )
@@ -96,13 +99,26 @@ if __name__ == "__main__":
     from src.domain.magdas_station import EeIndexStation
     from src.domain.station_params import Period
 
+    region = Region.SOUTH_AMERICA
+
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
 
-    date = datetime(2017, 2, 7, 0, 0)
+    start_date = datetime(2017, 2, 1, 0, 0)
+    end_date = datetime(2017, 2, 28, 23, 59)
 
-    lt_period = Period(start=date, end=date + timedelta(days=1) - timedelta(minutes=1))
-    plotter = EejDetectionPlotter(lt_period)
-    plotter.plot_euel_to_detect_eej(dip_stations, color="red", is_dip=True)
-    plotter.plot_euel_to_detect_eej(offdip_stations, color="blue", is_dip=False)
-    plotter.show()
+    current_date = start_date
+    while current_date <= end_date:
+        lt_period = Period(
+            start=current_date,
+            end=current_date + timedelta(days=1) - timedelta(minutes=1),
+        )
+        plotter = EejDetectionPlotter(lt_period)
+        plotter.plot_euel_to_detect_eej(region, dip_stations, color="red", is_dip=True)
+        plotter.plot_euel_to_detect_eej(
+            region, offdip_stations, color="blue", is_dip=False
+        )
+        plotter.set_title(f"EEJ Detection Plot for {current_date.strftime('%Y-%m-%d')}")
+        # plotter.show()
+        plotter.save(f"refactor/eej_detection_{current_date.strftime('%Y%m%d')}.png")
+        current_date += timedelta(days=1)
