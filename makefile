@@ -8,3 +8,9 @@ be-dev:
 fe-dev:
 	cd frontend && npm run dev
 
+
+up:
+	docker-compose up -d --build
+
+down:
+		docker-compose down

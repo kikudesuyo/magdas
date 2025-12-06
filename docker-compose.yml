@@ -2,16 +2,22 @@ services:
   backend:
     build: ./backend
     container_name: magdas-backend
+    working_dir: /app
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
     networks:
       - app_net
 
   frontend:
     build: ./frontend
     container_name: magdas-frontend
+    working_dir: /app
     ports:
-      - "8080:80"
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
     networks:
       - app_net
     depends_on:

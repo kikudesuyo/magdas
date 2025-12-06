@@ -1,18 +1,13 @@
-# Build stage
-FROM node:20-alpine AS build
+FROM node:20-slim
 
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+
+COPY package*.json ./
+
+RUN npm install
 
 COPY . .
-RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+CMD ["npm", "run", "dev:docker"]
 
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
