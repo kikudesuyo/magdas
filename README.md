@@ -1,18 +1,50 @@
 # MAGDAS
 
+本プロジェクトは、九州大学国際宇宙惑星環境研究センターが提供する
+
+## リポジトリ構成
+
+- backend: バックエンド (API サーバー、データベース、統計解析)
+- frontend: フロントエンド (ユーザーインターフェース)
+
 ## 環境構築
 
-### 仮想環境の導入
+本プロジェクトの backend では uv を使用しています。
 
-仮想環境を有効化
+#### 1. uv のインストール
 
-`source .venv/bin/activate`
-
-環境変数の登録
-
-`.venv/bin/activate`にて`YOUR_PATH`を指定して下記を記述してください
-
-```.sh
-#環境変数を追加
-export PYTHONPATH="YOUR_PATH/magdas/backend/src:$PYTHONPATH"
+```bash
+brew install uv
 ```
+
+#### 2. ライブラリのインストール
+
+```bash
+make init
+```
+
+## 開発サーバー起動
+
+※ 今後は Docker 環境での起動も想定しています。
+
+#### バックエンド
+
+```bash
+make be-dev
+```
+
+#### フロントエンド
+
+```bash
+make fe-dev
+```
+
+## 統計解析を行う場合
+
+統計解析関連の操作は backend ディレクトリで行います。
+
+```bash
+cd backend
+```
+
+詳細は `backend/README.md` を参照してください
