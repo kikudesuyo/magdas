@@ -22,6 +22,6 @@ class HComponent:
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
         h_values = self.gm_repo.get("h")
         equatorial_h_component = h_values / np.cos(
-            np.deg2rad(self.ut_params.station.gm_lat)
+            np.deg2rad(self.ut_params.station.dip_lat)
         )
         return HData(ut_params=self.ut_params, h_values=equatorial_h_component)

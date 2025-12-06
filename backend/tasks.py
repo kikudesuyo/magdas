@@ -6,44 +6,29 @@ from invoke.tasks import task
 @task
 def run(c, filename):
     path = os.path.abspath(os.path.dirname(__file__))
-    # Windows環境用のコマンド
-    if os.name == "nt":
-        c.run(f'set "pythonpath=%PATH%;{path}" && python {filename}"')
-    else:
-        c.run(f'export PYTHONPATH="$PYTHONPATH:{path}" && python {filename}')
+    env = {"PYTHONPATH": f"{os.environ.get('PYTHONPATH', '')}:{path}"}
+    c.run(f"python {filename}", env=env)
 
 
 @task
 def server(c):
     path = os.path.abspath(os.path.dirname(__file__))
-    if os.name == "nt":
-        c.run(f'set "pythonpath=%PATH%;{path}" && uvicorn main:app --relRoad')
-    else:
-        c.run(f'export PYTHONPATH="$PYTHONPATH:{path}" && uvicorn main:app --reload')
+    env = {"PYTHONPATH": f"{os.environ.get('PYTHONPATH', '')}:{path}"}
+    c.run("uvicorn main:app --reload", env=env)
 
 
 @task
 def debug(c, filename):
     path = os.path.abspath(os.path.dirname(__file__))
-    if os.name == "nt":
-        c.run(
-            f'set "pythonpath=%PATH%;{path}" && python -m debugpy --listen 5678 --wait-for-client {filename}'
-        )
-    else:
-        c.run(
-            f'export PYTHONPATH="$PYTHONPATH:{path}" && python -m debugpy --listen 5678 --wait-for-client {filename}'
-        )
+    env = {"PYTHONPATH": f"{os.environ.get('PYTHONPATH', '')}:{path}"}
+    c.run(f"python -m debugpy --listen 5678 --wait-for-client {filename}", env=env)
 
 
 @task
 def test(c, filename):
     path = os.path.abspath(os.path.dirname(__file__))
-    if os.name == "nt":
-        c.run(f'set "pythonpath=%PATH%;{path}" && python -m unittest {filename}"')
-    else:
-        c.run(
-            f'export PYTHONPATH="$PYTHONPATH:{path}" && python -m unittest {filename}'
-        )
+    env = {"PYTHONPATH": f"{os.environ.get('PYTHONPATH', '')}:{path}"}
+    c.run(f"python -m unittest {filename}", env=env)
 
 
 @task
@@ -54,7 +39,5 @@ def test_all(c):
         Use `invoke test-all` instead.
     """
     path = os.path.abspath(os.path.dirname(__file__))
-    if os.name == "nt":
-        c.run(f'set "pythonpath=%PATH%;{path}" && python -m unittest')
-    else:
-        c.run(f'export PYTHONPATH="$PYTHONPATH:{path}" && python -m unittest')
+    env = {"PYTHONPATH": f"{os.environ.get('PYTHONPATH', '')}:{path}"}
+    c.run("python -m unittest", env=env)
