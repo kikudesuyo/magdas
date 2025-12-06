@@ -43,6 +43,8 @@ make fe-dev
 
 ```
 make up
+
+# http://localhost:5173
 ```
 
 ## 統計解析を行う場合
