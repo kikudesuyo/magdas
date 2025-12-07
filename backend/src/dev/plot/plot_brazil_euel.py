@@ -1,6 +1,8 @@
 """加藤さんからいただいたデータからEUELのプロット"""
 
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,119 +13,199 @@ from src.service.ee_index.euel_from_kato import BrazilEuelDataService
 from src.service.peculiar_eej import PeculiarEejService
 
 
-class KatoEuelPlotter:
-    def __init__(self, ut_period: Period):
-        self.ut_period = ut_period
-        PlotConfig.rcparams()
-        self.fig, self.ax = plt.subplots(figsize=(15, 8))
-        self._set_axis_labels()
-        self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
+@dataclass(frozen=True)
+class CursorData:
+    dt: datetime
+    value: float
 
-    def plot_euel(self, station: EeIndexStation, color: str):
+
+class CursorMapper:
+    def __init__(self, period: Period):
+        self._start = period.start
+
+    def map(self, event) -> Optional[CursorData]:
+        if not self._is_valid_event(event):
+            return None
+
+        return CursorData(
+            dt=self._to_datetime(event.xdata),
+            value=self._to_value(event.ydata),
+        )
+
+    @staticmethod
+    def _is_valid_event(event) -> bool:
+        return (
+            event.inaxes is not None
+            and event.xdata is not None
+            and event.ydata is not None
+        )
+
+    def _to_datetime(self, x: float) -> datetime:
+        return self._start + timedelta(minutes=int(x))
+
+    @staticmethod
+    def _to_value(y: float) -> float:
+        return float(y)
+
+
+class KatoEuelPlotter:
+    # ===== Style 定数 =====
+    FIG_SIZE = (15, 8)
+
+    TITLE_FONT_SIZE = 15
+    LABEL_FONT_SIZE = 12
+    TICK_FONT_SIZE = 10
+
+    INFO_TEXT_X = 0.01
+    INFO_TEXT_Y = 0.98
+
+    Y_LIM_MIN = -150
+    Y_LIM_MAX = 150
+
+    GRID_STYLE = "--"
+    LEGEND_FONT_SIZE = 12
+
+    def __init__(self, ut_period: Period):
+        self._period = ut_period
+
+        PlotConfig.rcparams()
+
+        self.fig, self.ax = plt.subplots(figsize=self.FIG_SIZE)
+
+        self._cursor_mapper = CursorMapper(self._period)
+
+        self._init_axes()
+        self._init_info_box()
+
+        self.fig.canvas.mpl_connect("motion_notify_event", self._on_hover)
+
+    def _init_axes(self) -> None:
+        self._set_limits()
+        self._set_labels()
+        self._set_ticks()
+
+    def _init_info_box(self) -> None:
+        self._info_text = self.ax.text(
+            self.INFO_TEXT_X,
+            self.INFO_TEXT_Y,
+            "",
+            transform=self.ax.transAxes,
+            va="top",
+            fontsize=self.LABEL_FONT_SIZE,
+        )
+
+    def plot_euel(self, station: EeIndexStation, color: str) -> None:
         service = BrazilEuelDataService(station)
-        euel_data = service.get_euel_data_by_range(self.ut_period)
-        if not euel_data:
-            print(f"No data for {station.code} in the given period.")
+        data = service.get_euel_data_by_range(self._period)
+
+        if not data:
+            print(f"No data for {station.code}")
             return
 
-        # full_range = pd.date_range(
-        #     start=self.ut_period.start, end=self.ut_period.end, freq="min"
-        # )
-        # euel_series = pd.Series(index=full_range, dtype=np.float64)
-
-        # for item in euel_data:
-        #     euel_series[item.dt] = item.euel_data
-
-        # euel_values = euel_series.values
-        # x_axis = np.arange(len(euel_values))
-        x_axis = np.arange(len(euel_data))
-        euel_values = np.array(euel_data, dtype=float)
+        x = np.arange(len(data))
+        y = np.array(data, dtype=float)
 
         self.ax.plot(
-            x_axis,
-            euel_values,
+            x,
+            y,
             label=f"{station.code}_EUEL",
             color=color,
             linewidth=0.8,
         )
 
-    def _set_axis_labels(self):
-        data_length = self.ut_period.total_minutes() + 1
-        self.ax.set_ylabel("EUEL (nT)", rotation=90, fontsize=12)
-        self.ax.set_xlim(0, data_length)
-        self.ax.set_ylim(-150, 150)
-        self.ax.set_xlabel("UT", fontsize=15)
+    def _set_limits(self) -> None:
+        length = self._period.total_minutes() + 1
+        self.ax.set_xlim(0, length)
+        self.ax.set_ylim(self.Y_LIM_MIN, self.Y_LIM_MAX)
 
-        tick_interval = max(1, data_length // 10)  # More ticks
-        ticks = range(0, data_length, tick_interval)
-        time_labels = [
-            (self.ut_period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
+    def _set_labels(self) -> None:
+        self.ax.set_ylabel("EUEL (nT)", fontsize=self.LABEL_FONT_SIZE)
+        self.ax.set_xlabel("UT", fontsize=self.TITLE_FONT_SIZE)
+
+    def _set_ticks(self) -> None:
+        length = self._period.total_minutes() + 1
+        interval = self._calc_tick_interval(length)
+
+        ticks = range(0, length, interval)
+        labels = [
+            (self._period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
             for i in ticks
         ]
+
         self.ax.set_xticks(ticks)
-        self.ax.set_xticklabels(time_labels, rotation=45, ha="right")  # Rotate labels
-        self.fig.tight_layout()  # Adjust layout
+        self.ax.set_xticklabels(
+            labels, rotation=45, ha="right", fontsize=self.TICK_FONT_SIZE
+        )
 
-    def _on_move(self, event):
-        if not event.inaxes:
+    @staticmethod
+    def _calc_tick_interval(length: int) -> int:
+        return max(1, length // 10)
+
+    def _on_hover(self, event) -> None:
+        cursor = self._cursor_mapper.map(event)
+        if cursor is None:
             return
-        x, y = event.xdata, event.ydata
-        if x is None or y is None:
-            return
-        minute_offset = int(x)
-        current_time = self.ut_period.start + timedelta(minutes=minute_offset)
-        time_str = current_time.strftime("%Y/%m/%d %H:%M")
-        # Use a text box for the info to avoid title override
-        if not hasattr(self, "info_text"):
-            self.info_text = self.ax.text(0.01, 1.01, "", transform=self.ax.transAxes)
-        self.info_text.set_text(f"Date: {time_str}, Value: {y:.2f} nT")
-        self.ax.figure.canvas.draw()
 
-    def set_title(self, title):
-        self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=20)
+        self._update_info(cursor)
 
-    def show(self):
-        self.ax.legend(loc="upper left", fontsize=12)
-        plt.grid(True, which="both", linestyle="--")
+    def _update_info(self, cursor: CursorData) -> None:
+        text = self._format_cursor_text(cursor)
+        self._info_text.set_text(text)
+        self.fig.canvas.draw_idle()
+
+    @staticmethod
+    def _format_cursor_text(cursor: CursorData) -> str:
+        ts = cursor.dt.strftime("%Y/%m/%d %H:%M")
+        return f"Date: {ts} | Value: {cursor.value:.2f} nT"
+
+    def set_title(self, title: str) -> None:
+        self.ax.set_title(
+            title,
+            fontsize=self.TITLE_FONT_SIZE,
+            fontweight="semibold",
+            pad=20,
+        )
+
+    def show(self) -> None:
+        self._finalize()
         plt.show()
         plt.close(self.fig)
 
-    def save(self, filepath: str):
-        self.ax.legend(loc="lower left", fontsize=18)
-        plt.draw()
-        plt.savefig(filepath)
-        # self.fig.savefig(filepath, dpi=300)
+    def save(self, path: str) -> None:
+        self._finalize()
+        self.fig.savefig(path, dpi=300)
+
+    def _finalize(self) -> None:
+        self.ax.legend(loc="upper right", fontsize=self.LEGEND_FONT_SIZE)
+        self.ax.grid(True, linestyle=self.GRID_STYLE)
+        self.fig.tight_layout()
 
 
 if __name__ == "__main__":
-    # Plot for a shorter period to see details, e.g., one month
     from src.domain.region import Region
     from src.utils.path import generate_parent_abs_path
 
-    p = PeculiarEejService()
-    peculiar_eej_data = p.get_by_region(Region.SOUTH_AMERICA)
-    # dates = p.get_all()
+    service = PeculiarEejService()
+    data_list = service.get_by_region(Region.SOUTH_AMERICA)
 
-    for d in peculiar_eej_data:
-        if d.date.year != 2016:
-            continue
-        ut_period = Period(
+    for d in data_list:
+        period = Period(
             start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
             end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
         )
 
-        plotter = KatoEuelPlotter(ut_period)
-        TTB = EeIndexStation.TTB
-        KOU = EeIndexStation.KOU
-        EUS = EeIndexStation.EUS
+        plotter = KatoEuelPlotter(period)
 
-        plotter.plot_euel(TTB, "blue")
-        plotter.plot_euel(KOU, "green")
-        plotter.plot_euel(EUS, "red")
-        plotter.set_title("EUEL from Kato's data (March 2016)")
+        plotter.plot_euel(EeIndexStation.TTB, "blue")
+        plotter.plot_euel(EeIndexStation.KOU, "green")
+        plotter.plot_euel(EeIndexStation.EUS, "red")
+
+        plotter.set_title("Brazil Region EUEL on " + d.date.strftime("%Y/%m/%d"))
+
         plotter.show()
 
-        img_path = generate_parent_abs_path(
+        out_path = generate_parent_abs_path(
             f"/img/peculiar_eej/brazil_region_by_kato/{d.date.strftime('%Y%m%d')}.png"
         )
-        # plotter.save(img_path)
+
+        # plotter.save(out_path)
