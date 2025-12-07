@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from src.dev.plot.config import PlotConfig
+from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period
-from src.service.ee_index.ee_from_kato import EeFromKatoService
+from src.service.ee_index.euel_from_kato import BrazilEuelDataService
 from src.service.peculiar_eej import PeculiarEejService
 
 
@@ -19,28 +19,30 @@ class KatoEuelPlotter:
         self._set_axis_labels()
         self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
 
-    def plot_euel(self, station_code: str, color: str):
-        service = EeFromKatoService(station_code)
-        data = service.get_ee_data_by_range(self.ut_period)
-        if not data:
-            print(f"No data for {station_code} in the given period.")
+    def plot_euel(self, station: EeIndexStation, color: str):
+        service = BrazilEuelDataService(station)
+        euel_data = service.get_euel_data_by_range(self.ut_period)
+        if not euel_data:
+            print(f"No data for {station.code} in the given period.")
             return
 
-        full_range = pd.date_range(
-            start=self.ut_period.start, end=self.ut_period.end, freq="min"
-        )
-        euel_series = pd.Series(index=full_range, dtype=np.float64)
+        # full_range = pd.date_range(
+        #     start=self.ut_period.start, end=self.ut_period.end, freq="min"
+        # )
+        # euel_series = pd.Series(index=full_range, dtype=np.float64)
 
-        for item in data:
-            euel_series[item.dt] = item.euel_data
+        # for item in euel_data:
+        #     euel_series[item.dt] = item.euel_data
 
-        euel_values = euel_series.values
-        x_axis = np.arange(len(euel_values))
+        # euel_values = euel_series.values
+        # x_axis = np.arange(len(euel_values))
+        x_axis = np.arange(len(euel_data))
+        euel_values = np.array(euel_data, dtype=float)
 
         self.ax.plot(
             x_axis,
             euel_values,
-            label=f"{station_code}_EUEL",
+            label=f"{station.code}_EUEL",
             color=color,
             linewidth=0.8,
         )
@@ -103,18 +105,25 @@ if __name__ == "__main__":
     # dates = p.get_all()
 
     for d in peculiar_eej_data:
+        if d.date.year != 2016:
+            continue
         ut_period = Period(
             start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
             end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
         )
 
         plotter = KatoEuelPlotter(ut_period)
-        plotter.plot_euel("TTB", "blue")
-        plotter.plot_euel("KOU", "green")
-        plotter.plot_euel("EUS", "red")
+        TTB = EeIndexStation.TTB
+        KOU = EeIndexStation.KOU
+        EUS = EeIndexStation.EUS
+
+        plotter.plot_euel(TTB, "blue")
+        plotter.plot_euel(KOU, "green")
+        plotter.plot_euel(EUS, "red")
         plotter.set_title("EUEL from Kato's data (March 2016)")
+        plotter.show()
 
         img_path = generate_parent_abs_path(
             f"/img/peculiar_eej/brazil_region_by_kato/{d.date.strftime('%Y%m%d')}.png"
         )
-        plotter.save(img_path)
+        # plotter.save(img_path)
