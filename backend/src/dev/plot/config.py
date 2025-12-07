@@ -1,6 +1,6 @@
 from matplotlib import font_manager
 from matplotlib import pyplot as plt
-from src.utils.path import generate_parent_abs_path
+from src.utils.path import generate_abs_path
 
 
 class PlotConfig:
@@ -28,6 +28,6 @@ class PlotConfig:
 
 
 def get_font_prop():
-    font_path = generate_parent_abs_path("/fonts/NotoSansJP-Regular.ttf")
+    font_path = generate_abs_path("/dev/plot/NotoSansJP-Regular.ttf")
     font_manager.fontManager.addfont(font_path)
     return font_manager.FontProperties(fname=font_path)  # type: ignore (OSによって型が異なるため)
