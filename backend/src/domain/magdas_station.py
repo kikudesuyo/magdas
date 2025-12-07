@@ -6,7 +6,7 @@ from typing import Optional
 class Organization(Enum):
     MAGDAS = "MAGDAS"
     INTERMAG = "INTERMAG"
-    SUPERMAG = "SUPERMAG"
+    GFZ = "GFZ"
 
 
 @dataclass(frozen=True)
@@ -263,7 +263,10 @@ class EeIndexStation(Enum):
     #  gm_lat は dip_latを参照
     # gm_lon は不明のため None とする
     TTB = Station(
-        "TTB", "Tatuoca", "Brazil", Organization.SUPERMAG, -48.51, None, None, -0.72
+        "TTB", "Tatuoca", "Brazil", Organization.INTERMAG, -48.51, None, None, -0.72
+    )
+    KOU = Station(
+        "KOU", "Kourou", "French Guiana", Organization.GFZ, -52.73, None, None, 7.59
     )
 
     @property
