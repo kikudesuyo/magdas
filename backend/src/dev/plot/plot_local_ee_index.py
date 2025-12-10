@@ -9,13 +9,13 @@ from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.factory_ee import EeFactory
+from src.service.ee_index.magdas_ee_factory import MagdasEeService
 
 
 class LocalEeIndexPlotter:
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
-        self.factory = EeFactory()
+        # self.factory = MagdasEeService()
 
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
@@ -34,8 +34,9 @@ class LocalEeIndexPlotter:
 
     def plot_euel(self, station: EeIndexStation, color):
         ut_param = StationParam(station, self.lt_period).to_ut_params()
-        euel = self.factory.create_euel(ut_param)
-        euel_values = euel.calc_euel()
+        ee_service = MagdasEeService(ut_param)
+        ee_data = ee_service.calc_all()
+        euel_values = ee_data.euel
         # smoothed_euel = calc_moving_avg(
         #     euel_values, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
         # )
@@ -122,7 +123,10 @@ if __name__ == "__main__":
 
     from src.domain.quiet import QuietDayDomain
     from src.domain.station_params import Period, StationParam
-    from src.service.ee_index.factory_ee import EeFactory
+    from src.service.ee_index.magdas_ee_factory import (
+        MagdasEdstService,
+        MagdasEeService,
+    )
     from src.service.kp import Kp
 
     anc = EeIndexStation.ANC
@@ -141,12 +145,11 @@ if __name__ == "__main__":
             + timedelta(days=1)
             - timedelta(minutes=1),
         )
-        f = EeFactory()
-        f.create_edst(p)
+        f = MagdasEdstService(p)
+        edst = f.calc()
 
         max_kp = Kp().get_max_of_day(p)
-        min_edst_val = np.min(f.create_edst(p).calc_edst())
-
+        min_edst_val = np.min(edst)
         q = QuietDayDomain(min_edst=min_edst_val, max_kp=max_kp)
 
         if q.is_quiet_day():

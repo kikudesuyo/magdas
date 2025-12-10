@@ -23,7 +23,7 @@ def write_dip_station_peak_euel_to_csv(
     current_date = ut_period.start.date()
     while current_date <= ut_period.end.date():
         euel_selector = BestEuelSelectorForEej([dip_station], current_date, is_dip=True)
-        euel_data = euel_selector.select_euel_data()
+        euel_data = euel_selector.select_best_euel_data()
 
         day_start = datetime.combine(current_date, datetime.min.time())
         day_end = day_start + timedelta(days=1) - timedelta(minutes=1)
@@ -46,7 +46,7 @@ def write_offdip_station_peak_euel_to_csv(
         euel_selector = BestEuelSelectorForEej(
             [offdip_station], current_date, is_dip=False
         )
-        euel_data = euel_selector.select_euel_data()
+        euel_data = euel_selector.select_best_euel_data()
 
         day_start = datetime.combine(current_date, datetime.min.time())
         day_end = day_start + timedelta(days=1) - timedelta(minutes=1)

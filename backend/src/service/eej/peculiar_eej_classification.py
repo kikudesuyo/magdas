@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from enum import Enum
 from typing import List
 
 import numpy as np
@@ -7,6 +6,7 @@ import pandas as pd
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
+from src.model.eej_category import PeculiarEejType
 from src.model.peculiar_eej import PeculiarEejModel
 from src.service.calc_eej_detection import (
     BestEuelSelectorForEej,
@@ -15,12 +15,6 @@ from src.service.calc_eej_detection import (
     calc_euel_peak_diff,
 )
 from src.service.peculiar_eej import PeculiarEejService
-
-
-class PeculiarEejType(str, Enum):
-    UNDEVELOPED = "未発達型"
-    SUDDEN = "突発型"
-    ERROR = "エラー"
 
 
 def classify_peculiar_eej_type(
@@ -73,13 +67,13 @@ class ClassificationPeculiarEej:
             print(f"[Debug] Processing date: {lt_date}")
             # 使用するEUELのデータを取得
             dip_euel_selector = BestEuelSelectorForEej(
-                self.region, dip_stations, lt_date, True
+                self.region, self.dip_stations, lt_date, True
             )
             offdip_euel_selector = BestEuelSelectorForEej(
-                self.region, offdip_stations, lt_date, False
+                self.region, self.offdip_stations, lt_date, False
             )
-            dip_euel = dip_euel_selector.select_euel_data()
-            offdip_euel = offdip_euel_selector.select_euel_data()
+            dip_euel = dip_euel_selector.select_best_euel_data()
+            offdip_euel = offdip_euel_selector.select_best_euel_data()
             peak_diff = calc_euel_peak_diff(dip_euel, offdip_euel, lt_date)
             # EEJの種類を分類
             eej_detection = EejDetection(peak_diff, lt_date)

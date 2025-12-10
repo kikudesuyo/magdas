@@ -290,6 +290,10 @@ class EeIndexStation(Enum):
     def dip_lat(self):
         return self.value.dip_lat
 
+    @property
+    def organization(self) -> Organization:
+        return self.value.organization
+
     def is_dip(self) -> bool:
         return abs(self.dip_lat) < 3
 

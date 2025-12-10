@@ -10,13 +10,18 @@ from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.factory_ee import EeFactory
+from src.service.ee_index.magdas_ee_factory import (
+    MagdasEdstService,
+    MagdasEeService,
+    MagdasErService,
+    MagdasEuelService,
+)
 
 
 class EeIndexPlotter:
     def __init__(self, ut_period: Period):
         self.ut_period = ut_period
-        self.factory = EeFactory()
+        # self.factory = MagdasEeFactory()
 
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
@@ -34,14 +39,14 @@ class EeIndexPlotter:
         )
 
     def plot_er(self, station: EeIndexStation, color):
-        er = self.factory.create_er(StationParam(station, self.ut_period))
-        er_values = er.calc_er()
+        er = MagdasErService(StationParam(station, self.ut_period))
+        er_values = er.calc()
         x_axis, y_axis = np.arange(0, len(er_values), 1), er_values
         self.ax.plot(x_axis, y_axis, label=f"{station.code}_ER", color=color)
 
     def plot_edst(self):
-        edst = self.factory.create_edst(self.ut_period)
-        edst_raw = edst.calc_edst()
+        edst = MagdasEdstService(self.ut_period)
+        edst_raw = edst.calc()
         edst_values = calc_moving_avg(
             edst_raw, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
         )
@@ -50,8 +55,8 @@ class EeIndexPlotter:
 
     def plot_euel(self, station: EeIndexStation, color):
         p = StationParam(station, self.ut_period)
-        euel = self.factory.create_euel(p)
-        euel_values = euel.calc_euel()
+        euel = MagdasEuelService(p)
+        euel_values = euel.calc()
         # smoothed_euel = calc_moving_avg(
         #     euel_values, TimeUnit.TWO_HOURS.min, TimeUnit.ONE_HOUR.min
         # )
@@ -61,19 +66,17 @@ class EeIndexPlotter:
 
     def plot_ee(self, station: EeIndexStation):
         params = StationParam(station, self.ut_period)
-        er = self.factory.create_er(params)
-        edst = self.factory.create_edst(self.ut_period)
-        euel = self.factory.create_euel(params)
-        er_values = er.calc_er()
-        edst_raw = edst.calc_edst()
+        ee_service = MagdasEeService(params)
+        ee_data = ee_service.calc_all()
+
         edst_values = calc_moving_avg(
-            edst_raw, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
+            ee_data.edst, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
         )
-        euel_values = euel.calc_euel()
-        if len(er_values) != len(edst_values) or len(er_values) != len(euel_values):
+        euel_values = ee_data.euel
+        if len(ee_data.er) != len(edst_values) or len(ee_data.er) != len(euel_values):
             raise ValueError("The length of the arrays must be the same")
-        x_axis = np.arange(0, len(er_values), 1)
-        self.ax.plot(x_axis, er_values, label="ER", color="black", lw=0.5)
+        x_axis = np.arange(0, len(ee_data.er), 1)
+        self.ax.plot(x_axis, ee_data.er, label="ER", color="black", lw=0.5)
         self.ax.plot(x_axis, edst_values, label="EDst", color="green", lw=0.5)
         self.ax.plot(x_axis, euel_values, label="EUEL", color="red", lw=0.5)
 

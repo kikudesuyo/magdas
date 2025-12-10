@@ -17,7 +17,7 @@ class HComponent:
         self.gm_repo = GMPeriodRepository(ut_params)
         self.ut_params = ut_params
 
-    def get_equatorial_h(self) -> HData:
+    def calc_equatorial_h(self) -> HData:
         """指定された観測点のh成分を、磁気赤道（gm_lat=0）の値に換算"""
         # TODO h componentはEE-indexだけで使用するわけではないので, stationの型はMagdasStation等にするのが適当。
         h_values = self.gm_repo.get("h")
