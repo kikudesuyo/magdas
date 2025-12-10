@@ -12,7 +12,7 @@ class HData:
     h_values: NDArray[np.float64]
 
 
-class HComponent:
+class MagdasHComponent:
     def __init__(self, ut_params: StationParam):
         self.gm_repo = GMPeriodRepository(ut_params)
         self.ut_params = ut_params

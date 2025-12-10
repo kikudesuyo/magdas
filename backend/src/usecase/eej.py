@@ -10,7 +10,7 @@ from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
 from src.service.calc_utils.nan_calculator import NanCalculator
 from src.service.calc_utils.sanitize_np import sanitize_np
-from src.service.ee_index.magdas_ee_factory import MagdasEuelService
+from src.service.ee_index.magdas_ee import MagdasEuelService
 from src.service.peculiar_eej import PeculiarEejService
 
 

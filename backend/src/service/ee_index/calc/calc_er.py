@@ -6,7 +6,7 @@ from src.service.calc_utils.nan_calculator import NanCalculator
 from src.service.ee_index.calc.calc_h_component import HData
 
 
-class ErCalculator:
+class MagdasErCalculator:
     def __init__(self, h_data: HData):
         self.h_data = h_data
 

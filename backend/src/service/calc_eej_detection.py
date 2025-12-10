@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Literal
@@ -15,7 +16,12 @@ from src.domain.region import Region
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.linear_completion import interpolate_nan
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.magdas_ee_factory import MagdasEdstService, MagdasEeService
+from src.service.ee_index.intermag_ee import IntermagEuelService
+from src.service.ee_index.magdas_ee import (
+    MagdasEdstService,
+    MagdasEeService,
+    MagdasEuelService,
+)
 from src.service.kp import Kp
 
 
@@ -38,6 +44,86 @@ class EuelData(BaseModel):
 
     # numpyを使うためにConfigDictを設定
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+class BaseEuelSelectorForEej(ABC):
+    def __init__(
+        self,
+        region: Region,
+        stations: List[EeIndexStation],
+        local_date: date,
+        is_dip: bool,
+    ):
+        self._validate_stations(stations, is_dip)
+        self.region = region
+        self.stations = stations
+        self.local_date = local_date
+
+    @abstractmethod
+    def load_daily_euel(self, station: EeIndexStation) -> np.ndarray:
+        """データソース（Magdas or Intermag）から1日のEUELを読み込む。"""
+        ...
+
+    def _validate_stations(self, stations, is_dip):
+        if is_dip:
+            for s in stations:
+                if not s.is_dip():
+                    raise ValueError(f"{s.code} is not dip-region")
+        else:
+            for s in stations:
+                if not s.is_offdip():
+                    raise ValueError(f"{s.code} is not off-dip region")
+
+    def select_best_euel_data(self) -> EuelData:
+        eej_euels = {}
+
+        for station in self.stations:
+            daily_euel = self.load_daily_euel(station)
+            nan_ratio = np.sum(np.isnan(daily_euel)) / len(daily_euel)
+
+            eej_euels[station] = NanRatioData(
+                array=daily_euel,
+                nan_ratio=nan_ratio,
+            )
+
+        best_station, best = min(eej_euels.items(), key=lambda x: x[1].nan_ratio)
+
+        return EuelData(
+            region=self.region,
+            station=best_station,
+            array=best.array,
+        )
+
+
+class MagdasEuelSelectorForEej(BaseEuelSelectorForEej):
+    """EEJ検知する上で、一番良いデータを持つ観測点を判定しそのEUELデータを返すクラス"""
+
+    def load_daily_euel(self, station: EeIndexStation) -> np.ndarray:
+        s_lt = datetime(
+            self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
+        )
+        e_lt = s_lt.replace(hour=23, minute=59)
+        lt_params = StationParam(station, Period(s_lt, e_lt))
+        ut_params = lt_params.to_ut_params()
+
+        ee_service = MagdasEuelService(ut_params)
+        return ee_service.calc()
+
+
+class IntermagEuelSelectorForEej(BaseEuelSelectorForEej):
+    """EEJ検知する上で、一番良いデータを持つ観測点を判定しそのEUELデータを返すクラス"""
+
+    def load_daily_euel(self, station: EeIndexStation) -> np.ndarray:
+        s_lt = datetime(
+            self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
+        )
+        e_lt = s_lt.replace(hour=23, minute=59)
+        lt_params = StationParam(station, Period(s_lt, e_lt))
+        ut_params = lt_params.to_ut_params()
+
+        ee_service = IntermagEuelService(ut_params)
+        euel_data = ee_service.get_euel_data_by_range()
+        return np.array(euel_data)
 
 
 class BestEuelSelectorForEej:

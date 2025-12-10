@@ -4,10 +4,10 @@ from typing import List
 
 import numpy as np
 from src.domain.station_params import Period, StationParam
-from src.service.ee_index.calc.calc_edst import EdstCalculator
-from src.service.ee_index.calc.calc_er import ErCalculator
-from src.service.ee_index.calc.calc_euel import ErEdst, EuelCalculator
-from src.service.ee_index.calc.calc_h_component import HComponent
+from src.service.ee_index.calc.calc_edst import MagdasEdstCalculator
+from src.service.ee_index.calc.calc_er import MagdasErCalculator
+from src.service.ee_index.calc.calc_euel import ErEdst, MagdasEuelCalculator
+from src.service.ee_index.calc.calc_h_component import MagdasHComponent
 
 
 @dataclass
@@ -23,10 +23,10 @@ class MagdasEeService:
         self.ut_params = ut_params
 
     def calc_all(self) -> EeData:
-        h = HComponent(self.ut_params)
-        er = ErCalculator(h.calc_equatorial_h()).calc()
-        edst = EdstCalculator(self.ut_params.period).calc()
-        euel = EuelCalculator(ErEdst(er=er, edst=edst)).calc()
+        h = MagdasHComponent(self.ut_params)
+        er = MagdasErCalculator(h.calc_equatorial_h()).calc()
+        edst = MagdasEdstCalculator(self.ut_params.period).calc()
+        euel = MagdasEuelCalculator(ErEdst(er=er, edst=edst)).calc()
         return EeData(
             er=er,
             edst=edst,
@@ -46,10 +46,10 @@ class MagdasEuelService:
         self.ut_params = ut_params
 
     def calc(self):
-        h = HComponent(self.ut_params)
-        er = ErCalculator(h.calc_equatorial_h()).calc()
-        edst = EdstCalculator(self.ut_params.period).calc()
-        return EuelCalculator(ErEdst(er=er, edst=edst)).calc()
+        h = MagdasHComponent(self.ut_params)
+        er = MagdasErCalculator(h.calc_equatorial_h()).calc()
+        edst = MagdasEdstCalculator(self.ut_params.period).calc()
+        return MagdasEuelCalculator(ErEdst(er=er, edst=edst)).calc()
 
 
 class MagdasErService:
@@ -57,8 +57,8 @@ class MagdasErService:
         self.ut_params = ut_params
 
     def calc(self):
-        h = HComponent(self.ut_params)
-        return ErCalculator(h.calc_equatorial_h()).calc()
+        h = MagdasHComponent(self.ut_params)
+        return MagdasErCalculator(h.calc_equatorial_h()).calc()
 
 
 class MagdasEdstService:
@@ -66,4 +66,4 @@ class MagdasEdstService:
         self.period = period
 
     def calc(self):
-        return EdstCalculator(self.period).calc()
+        return MagdasEdstCalculator(self.period).calc()

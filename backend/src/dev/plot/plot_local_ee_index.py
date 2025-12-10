@@ -9,7 +9,7 @@ from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.magdas_ee_factory import MagdasEeService
+from src.service.ee_index.magdas_ee import MagdasEeService
 
 
 class LocalEeIndexPlotter:
@@ -123,10 +123,7 @@ if __name__ == "__main__":
 
     from src.domain.quiet import QuietDayDomain
     from src.domain.station_params import Period, StationParam
-    from src.service.ee_index.magdas_ee_factory import (
-        MagdasEdstService,
-        MagdasEeService,
-    )
+    from src.service.ee_index.magdas_ee import MagdasEdstService, MagdasEeService
     from src.service.kp import Kp
 
     anc = EeIndexStation.ANC

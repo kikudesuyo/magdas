@@ -9,7 +9,7 @@ class ErEdst:
     edst: np.ndarray
 
 
-class EuelCalculator:
+class MagdasEuelCalculator:
     def __init__(self, er_edst: ErEdst):
         self.er = er_edst.er
         self.edst = er_edst.edst

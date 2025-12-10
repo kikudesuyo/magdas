@@ -6,7 +6,7 @@ from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.model.file import FileModel
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.magdas_ee_factory import MagdasEeService
+from src.service.ee_index.magdas_ee import MagdasEeService
 from src.service.file_exporter.build_iaga import EeIndexIagaService, IagaValues
 from src.service.file_exporter.zip_create import ZipService
 

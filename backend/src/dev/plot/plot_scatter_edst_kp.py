@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from src.dev.plot.config import PlotConfig
 from src.domain.region import Region
 from src.domain.station_params import Period
-from src.service.ee_index.calc.calc_edst import EdstCalculator
+from src.service.ee_index.calc.calc_edst import MagdasEdstCalculator
 from src.service.kp import Kp
 from src.service.peculiar_eej import PeculiarEejService
 
@@ -30,7 +30,7 @@ for sudden_eej in sudden_eej_data:
     )
 
     kp_val = Kp().get_max_of_day(ut_period)
-    edst_val = EdstCalculator(ut_period).get_min_edst()
+    edst_val = MagdasEdstCalculator(ut_period).get_min_edst()
     sudden_kp_edst.append((kp_val, edst_val))
 
 
@@ -58,7 +58,7 @@ for undeveloped_eej in undeveloped_eej_data:
     )
 
     kp_val = Kp().get_max_of_day(ut_period)
-    edst_val = EdstCalculator(ut_period).get_min_edst()
+    edst_val = MagdasEdstCalculator(ut_period).get_min_edst()
     undevelop_kp_edst.append((kp_val, edst_val))
 
 

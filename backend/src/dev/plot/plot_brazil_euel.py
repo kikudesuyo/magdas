@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
-from src.domain.station_params import Period
-from src.service.ee_index.euel_from_kato import BrazilEuelDataService
+from src.domain.station_params import Period, StationParam
+from src.service.ee_index.intermag_ee import IntermagEuelService
 from src.service.peculiar_eej import PeculiarEejService
 
 
@@ -95,8 +95,10 @@ class KatoEuelPlotter:
         )
 
     def plot_euel(self, station: EeIndexStation, color: str) -> None:
-        service = BrazilEuelDataService(station)
-        data = service.get_euel_data_by_range(self._period)
+        service = IntermagEuelService(
+            StationParam(station=station, period=self._period)
+        )
+        data = service.get_euel_data_by_range()
 
         if not data:
             print(f"No data for {station.code}")

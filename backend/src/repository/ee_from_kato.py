@@ -15,6 +15,14 @@ class KatoEeData(BaseModel):
 
 class KatoEeRepository:
     def __init__(self, station: EeIndexStation):
+        if not station.code in [
+            EeIndexStation.KOU,
+            EeIndexStation.TTB,
+            EeIndexStation.EUS,
+        ]:
+            raise ValueError(
+                f"Kato repository does not support station: {station.code}"
+            )
         self.station = station
         self.station_dir_path = Path(f"Storage/kato/{station.code}")
 
