@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Literal
@@ -15,7 +16,12 @@ from src.domain.region import Region
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.linear_completion import interpolate_nan
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.factory_ee import EeFactory
+from src.service.ee_index.intermag_ee import IntermagEuelService
+from src.service.ee_index.magdas_ee import (
+    MagdasEdstService,
+    MagdasEeService,
+    MagdasEuelService,
+)
 from src.service.kp import Kp
 
 
@@ -40,6 +46,86 @@ class EuelData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
+class BaseEuelSelectorForEej(ABC):
+    def __init__(
+        self,
+        region: Region,
+        stations: List[EeIndexStation],
+        local_date: date,
+        is_dip: bool,
+    ):
+        self._validate_stations(stations, is_dip)
+        self.region = region
+        self.stations = stations
+        self.local_date = local_date
+
+    @abstractmethod
+    def load_daily_euel(self, station: EeIndexStation) -> np.ndarray:
+        """データソース（Magdas or Intermag）から1日のEUELを読み込む。"""
+        ...
+
+    def _validate_stations(self, stations, is_dip):
+        if is_dip:
+            for s in stations:
+                if not s.is_dip():
+                    raise ValueError(f"{s.code} is not dip-region")
+        else:
+            for s in stations:
+                if not s.is_offdip():
+                    raise ValueError(f"{s.code} is not off-dip region")
+
+    def select_best_euel_data(self) -> EuelData:
+        eej_euels = {}
+
+        for station in self.stations:
+            daily_euel = self.load_daily_euel(station)
+            nan_ratio = np.sum(np.isnan(daily_euel)) / len(daily_euel)
+
+            eej_euels[station] = NanRatioData(
+                array=daily_euel,
+                nan_ratio=nan_ratio,
+            )
+
+        best_station, best = min(eej_euels.items(), key=lambda x: x[1].nan_ratio)
+
+        return EuelData(
+            region=self.region,
+            station=best_station,
+            array=best.array,
+        )
+
+
+class MagdasEuelSelectorForEej(BaseEuelSelectorForEej):
+    """EEJ検知する上で、一番良いデータを持つ観測点を判定しそのEUELデータを返すクラス"""
+
+    def load_daily_euel(self, station: EeIndexStation) -> np.ndarray:
+        s_lt = datetime(
+            self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
+        )
+        e_lt = s_lt.replace(hour=23, minute=59)
+        lt_params = StationParam(station, Period(s_lt, e_lt))
+        ut_params = lt_params.to_ut_params()
+
+        ee_service = MagdasEuelService(ut_params)
+        return ee_service.calc()
+
+
+class IntermagEuelSelectorForEej(BaseEuelSelectorForEej):
+    """EEJ検知する上で、一番良いデータを持つ観測点を判定しそのEUELデータを返すクラス"""
+
+    def load_daily_euel(self, station: EeIndexStation) -> np.ndarray:
+        s_lt = datetime(
+            self.local_date.year, self.local_date.month, self.local_date.day, 0, 0
+        )
+        e_lt = s_lt.replace(hour=23, minute=59)
+        lt_params = StationParam(station, Period(s_lt, e_lt))
+        ut_params = lt_params.to_ut_params()
+
+        ee_service = IntermagEuelService(ut_params)
+        euel_data = ee_service.get_euel_data_by_range()
+        return np.array(euel_data)
+
+
 class BestEuelSelectorForEej:
     """EEJ検知する上で、一番良いデータを持つ観測点を判定しそのEUELデータを返すクラス"""
 
@@ -50,11 +136,11 @@ class BestEuelSelectorForEej:
         local_date: date,
         is_dip: bool,
     ):
+        self._validate_stations(stations, is_dip)
+
         self.region = region
         self.stations = stations
         self.local_date = local_date
-
-        self._validate_stations(stations, is_dip)
 
     def _validate_stations(self, stations: List[EeIndexStation], is_dip: bool):
         if is_dip:
@@ -70,7 +156,7 @@ class BestEuelSelectorForEej:
                         f"{station.code} is {station.dip_lat}. It is not in off-dip region"
                     )
 
-    def select_euel_data(self) -> EuelData:
+    def select_best_euel_data(self) -> EuelData:
         eej_euels: Dict[EeIndexStation, NanRatioData] = {}
         for station in self.stations:
             eej_euel = self._euel_for_eej_detection(station)
@@ -95,13 +181,15 @@ class BestEuelSelectorForEej:
         lt_params = StationParam(station, Period(s_lt, e_lt))
         ut_params = lt_params.to_ut_params()
 
-        factory = EeFactory()
-        euel = factory.create_euel(ut_params)
-        euel_values = euel.calc_euel()
+        ee_service = MagdasEeService(ut_params)
+        ee_data = ee_service.calc_all()
+        # euel = ee_service.create_euel(ut_params)
+        # euel = factory.create_euel(ut_params)
+        # euel_values = euel.calc()
 
-        if not self._has_night_data(euel_values):
-            return euel_values
-        return self._euel_for_eej(euel_values)
+        if not self._has_night_data(ee_data.euel):
+            return ee_data.euel
+        return self._euel_for_eej(ee_data.euel)
 
     def _has_night_data(self, daily_data: np.ndarray) -> bool:
         """一日の夜間（19:00～05:00データが存在するかどうかを判定する"""
@@ -197,9 +285,9 @@ def calc_euel_peak_diff(
 
 
 class EejDetection:
-    def __init__(self, peak_diff: float, local_date: date):
+    def __init__(self, euel_peak_diff: float, local_date: date):
         self.local_date = local_date
-        self.eej_peak_diff = peak_diff
+        self.euel_peak_diff = euel_peak_diff
 
     def _calc_daily_min_edst(self):
         s_dt = datetime(
@@ -207,9 +295,9 @@ class EejDetection:
         )
         e_dt = s_dt.replace(hour=23, minute=59)
         period = Period(s_dt, e_dt)
-        factory = EeFactory()
-        edst = factory.create_edst(period)
-        return np.min(edst.calc_edst())
+        edst_service = MagdasEdstService(period)
+        edst = edst_service.calc()
+        return np.min(edst)
 
     def _get_daily_max_kp(self):
         ut_period = Period(
@@ -225,10 +313,10 @@ class EejDetection:
 
     def is_eej_peak_diff_nan(self):
         """データ欠損か判定"""
-        return np.isnan(self.eej_peak_diff)
+        return np.isnan(self.euel_peak_diff)
 
     def is_eej_present(self):
-        return self.eej_peak_diff >= EEJ_THRESHOLD
+        return self.euel_peak_diff >= EEJ_THRESHOLD
 
     def is_peculiar_eej(self):
         return self.classify_eej_category().label == "peculiar"
@@ -237,7 +325,7 @@ class EejDetection:
         daily_max_kp = self._get_daily_max_kp()
         daily_min_edst = self._calc_daily_min_edst()
         return EejCategory.from_conditions(
-            peak_diff=self.eej_peak_diff,
+            peak_diff=self.euel_peak_diff,
             daily_max_kp=daily_max_kp,
             daily_min_edst=daily_min_edst,
         )

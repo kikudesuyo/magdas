@@ -10,7 +10,7 @@ from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
 from src.service.calc_utils.nan_calculator import NanCalculator
 from src.service.calc_utils.sanitize_np import sanitize_np
-from src.service.ee_index.factory_ee import EeFactory
+from src.service.ee_index.magdas_ee import MagdasEuelService
 from src.service.peculiar_eej import PeculiarEejService
 
 
@@ -58,14 +58,14 @@ class EejUsecase:
         return [data.date for data in peculiar_eej_data]
 
     def _calc_avg_euel(self, stations: List[EeIndexStation]) -> np.ndarray:
-        f = EeFactory()
         lt_period = Period(self.start_lt, self.start_lt + timedelta(days=self.days))
 
         euel_values = []
         for station in stations:
             params = StationParam(station=station, period=lt_period).to_ut_params()
-            euel = f.create_euel(params)
-            euel_values.append(euel.calc_euel())
+            ee_service = MagdasEuelService(params)
+            euel = ee_service.calc()
+            euel_values.append(euel)
 
         if euel_values:
             return NanCalculator.nanmean(np.array(euel_values), axis=0)

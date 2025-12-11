@@ -5,8 +5,8 @@ from datetime import datetime
 import numpy as np
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
-from src.service.ee_index.calc_er import Er
-from src.service.ee_index.calc_h_component import HComponent
+from src.service.ee_index.calc.calc_er import MagdasErCalculator
+from src.service.ee_index.calc.calc_h_component import MagdasHComponent
 from src.utils.date import DateUtils
 
 
@@ -32,9 +32,9 @@ class TestERValue(unittest.TestCase):
         )
         lt_period = Period(start_lt, end_lt)
         params = StationParam(cls.station, lt_period)
-        h = HComponent(params)
-        h_data = h.get_equatorial_h()
-        cls.er = Er(h_data)
+        h = MagdasHComponent(params)
+        h_data = h.calc_equatorial_h()
+        cls.er = MagdasErCalculator(h_data)
         cls.night_er = cls.er.extract_night_er()
         cls.night_mask = cls.er.nighttime_mask()
 

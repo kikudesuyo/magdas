@@ -4,38 +4,29 @@ from datetime import timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backend_bases import MouseEvent
 from src.dev.plot.config import PlotConfig
+from src.dev.plot.hover import HoverController
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.factory_ee import EeFactory
+from src.service.ee_index.magdas_ee import MagdasEeService
 
 
 class LocalEeIndexPlotter:
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
-        self.factory = EeFactory()
+        # self.factory = MagdasEeService()
 
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
-        self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
-        self.ax.text(
-            0.5,
-            0.95,
-            "",
-            transform=self.ax.transAxes,
-            ha="center",
-            va="center",
-            fontsize=12,
-            color="black",
-        )
+        HoverController(self.fig, self.ax, self.lt_period)
 
     def plot_euel(self, station: EeIndexStation, color):
         ut_param = StationParam(station, self.lt_period).to_ut_params()
-        euel = self.factory.create_euel(ut_param)
-        euel_values = euel.calc_euel()
+        ee_service = MagdasEeService(ut_param)
+        ee_data = ee_service.calc_all()
+        euel_values = ee_data.euel
         # smoothed_euel = calc_moving_avg(
         #     euel_values, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
         # )
@@ -72,18 +63,6 @@ class LocalEeIndexPlotter:
         self.ax.set_xticks(ticks)
         self.ax.set_xticklabels(time_labels, fontsize=8)
         self._draw_vertical_lines()
-
-    def _on_move(self, event: MouseEvent):
-        if not event.inaxes:
-            return
-        x, y = event.xdata, event.ydata
-        if x is None or y is None:
-            return
-        minute_offset = int(x)
-        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
-        time_str = current_time.strftime("%Y/%m/%d %H:%M")
-        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
-        self.ax.figure.canvas.draw()
 
     def _draw_vertical_lines(self):
         for hour in [9, 15]:
@@ -122,7 +101,7 @@ if __name__ == "__main__":
 
     from src.domain.quiet import QuietDayDomain
     from src.domain.station_params import Period, StationParam
-    from src.service.ee_index.factory_ee import EeFactory
+    from src.service.ee_index.magdas_ee import MagdasEdstService, MagdasEeService
     from src.service.kp import Kp
 
     anc = EeIndexStation.ANC
@@ -141,12 +120,11 @@ if __name__ == "__main__":
             + timedelta(days=1)
             - timedelta(minutes=1),
         )
-        f = EeFactory()
-        f.create_edst(p)
+        f = MagdasEdstService(p)
+        edst = f.calc()
 
         max_kp = Kp().get_max_of_day(p)
-        min_edst_val = np.min(f.create_edst(p).calc_edst())
-
+        min_edst_val = np.min(edst)
         q = QuietDayDomain(min_edst=min_edst_val, max_kp=max_kp)
 
         if q.is_quiet_day():

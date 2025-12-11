@@ -6,7 +6,7 @@ from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.model.file import FileModel
 from src.service.calc_utils.moving_avg import calc_moving_avg
-from src.service.ee_index.factory_ee import EeFactory
+from src.service.ee_index.magdas_ee import MagdasEeService
 from src.service.file_exporter.build_iaga import EeIndexIagaService, IagaValues
 from src.service.file_exporter.zip_create import ZipService
 
@@ -56,14 +56,12 @@ class EeIndexZipUsecase:
         period = Period(start_ut, end_ut)
         params = StationParam(station, period)
 
-        factory = EeFactory()
-        er = factory.create_er(params)
-        edst = factory.create_edst(period)
-        euel = factory.create_euel(params)
+        ee_service = MagdasEeService(params)
+        ee_data = ee_service.calc_all()
 
-        er_values = er.calc_er()
-        edst_raw = edst.calc_edst()
-        euel_values = euel.calc_euel()
+        er_values = ee_data.er
+        edst_raw = ee_data.edst
+        euel_values = ee_data.euel
 
         edst_1h_values = calc_moving_avg(edst_raw, TimeUnit.ONE_HOUR.min, 30)
         edst_6h_values = calc_moving_avg(

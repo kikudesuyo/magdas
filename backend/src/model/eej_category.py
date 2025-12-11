@@ -19,3 +19,9 @@ class EejCategoryModel(BaseModel):
     min_edst: float
     kp: float
     category: EejEventCategory
+
+
+class PeculiarEejType(str, Enum):
+    UNDEVELOPED = "未発達型"
+    SUDDEN = "突発型"
+    ERROR = "エラー"

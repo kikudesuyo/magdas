@@ -82,7 +82,6 @@ class PeculiarEejRepository:
 
             # 新しいデータ
             new_data.append(row)
-
         # 追加なしなら終了
         if not new_data:
             return

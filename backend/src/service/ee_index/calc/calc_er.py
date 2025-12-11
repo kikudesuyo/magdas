@@ -3,14 +3,14 @@ from numpy.typing import NDArray
 from src.constants.ee_index import MAX_ER, MIN_ER
 from src.constants.time_relation import DawnAndDusk, TimeUnit
 from src.service.calc_utils.nan_calculator import NanCalculator
-from src.service.ee_index.calc_h_component import HData
+from src.service.ee_index.calc.calc_h_component import HData
 
 
-class Er:
+class MagdasErCalculator:
     def __init__(self, h_data: HData):
         self.h_data = h_data
 
-    def calc_er(self):
+    def calc(self) -> np.ndarray:
         h_values = self.h_data.h_values
         base = NanCalculator.nanmedian(h_values)
         raw_er = h_values - base
@@ -36,5 +36,5 @@ class Er:
 
     def extract_night_er(self) -> np.ndarray:
         """Night definition 18:00 to 05:59"""
-        night_er = np.where(self.nighttime_mask(), self.calc_er(), np.nan)
+        night_er = np.where(self.nighttime_mask(), self.calc(), np.nan)
         return night_er
