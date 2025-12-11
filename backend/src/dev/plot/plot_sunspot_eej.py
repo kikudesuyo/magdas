@@ -9,7 +9,7 @@ from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
-from src.service.calc_eej_detection import BestEuelSelectorForEej
+from src.service.eej.best_euel_selector import BestEuelSelectorFactory
 from src.service.sunspot import Sunspot
 
 
@@ -73,7 +73,8 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(region, stations, date, is_dip)
+                BestEuelSelectorFactory()
+                .create(region, stations, date, is_dip)
                 .select_best_euel_data()
                 .array
             )
@@ -134,7 +135,8 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(region, stations, date, is_dip)
+                BestEuelSelectorFactory()
+                .create(region, stations, date, is_dip)
                 .select_best_euel_data()
                 .array
             )

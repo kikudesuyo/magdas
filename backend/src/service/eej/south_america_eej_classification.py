@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
@@ -12,21 +10,11 @@ class SouthAmericaClassificationPeculiarEej:
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
 
-    def create(self):
-        return ClassificationPeculiarEej(
+    def add_data(self):
+        classification = ClassificationPeculiarEej(
             lt_period=self.lt_period,
-            dip_stations=[EeIndexStation.TTB, EeIndexStation.KOU],
+            dip_stations=[EeIndexStation.ANC, EeIndexStation.HUA],
             offdip_stations=[EeIndexStation.EUS],
-            region=Region.BRAZIL,
+            region=Region.SOUTH_AMERICA,
         )
-
-    def save(self):
-        classification = self.create()
         classification.add_data()
-
-
-# 実行例
-if __name__ == "__main__":
-    lt_period = Period(datetime(2008, 1, 1, 0, 0), datetime(2008, 1, 31, 23, 59))
-    classification = SouthAmericaClassificationPeculiarEej(lt_period)
-    classification.save()

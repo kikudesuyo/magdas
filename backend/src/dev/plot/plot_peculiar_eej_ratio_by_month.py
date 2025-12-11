@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from src.dev.plot.config import PlotConfig
 from src.domain.region import Region
 from src.domain.station_params import Period
-from src.service.eej_category import EejCategoryService
+from src.service.eej.eej_category import EejCategoryService
 from src.service.peculiar_eej import PeculiarEejService
 
 

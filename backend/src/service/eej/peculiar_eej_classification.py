@@ -8,13 +8,9 @@ from src.domain.region import Region
 from src.domain.station_params import Period
 from src.model.eej_category import PeculiarEejType
 from src.model.peculiar_eej import PeculiarEejModel
-from src.service.calc_eej_detection import (
-    BestEuelSelectorFactory,
-    BestEuelSelectorForEej,
-    EejDetection,
-    EuelData,
-    calc_euel_peak_diff,
-)
+from src.service.eej.best_euel_selector import BestEuelSelectorFactory, EuelData
+from src.service.eej.calc.eej_detection import EejDetection
+from src.service.eej.calc.euel_diff import calc_euel_peak_diff
 from src.service.peculiar_eej import PeculiarEejService
 
 
@@ -104,14 +100,3 @@ class ClassificationPeculiarEej:
             )
             peculiar_eej_data_list.append(peculiar_eej_data)
         return peculiar_eej_data_list
-
-
-if __name__ == "__main__":
-    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
-    offdip_stations = [EeIndexStation.EUS]
-    region = Region.SOUTH_AMERICA
-    lt_period = Period(datetime(2008, 1, 1, 0, 0), datetime(2008, 1, 31, 23, 59))
-    classification = ClassificationPeculiarEej(
-        lt_period, dip_stations, offdip_stations, region=region
-    )
-    classification.add_data()

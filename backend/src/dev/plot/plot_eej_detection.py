@@ -10,7 +10,7 @@ from src.dev.plot.hover import HoverController
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
-from src.service.calc_eej_detection import BestEuelSelectorForEej
+from src.service.eej.best_euel_selector import BestEuelSelectorFactory
 
 
 class EejDetectionPlotter:
@@ -39,9 +39,11 @@ class EejDetectionPlotter:
             self.lt_period.start.date() + timedelta(days=i)
             for i in range((self.lt_period.end - self.lt_period.start).days + 1)
         ]
+
         euel = np.hstack(
             [
-                BestEuelSelectorForEej(region, stations, d, is_dip)
+                BestEuelSelectorFactory()
+                .create(region, stations, d, is_dip)
                 .select_best_euel_data()
                 .array
                 for d in date_range
