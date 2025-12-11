@@ -34,9 +34,9 @@ class PeculiarEejRepository:
         self,
         region: Region | None = None,
         type_: str | None = None,
-        start_date: datetime | None = None,
-        end_date: datetime | None = None,
-    ) -> list[PeculiarEejModel]:
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> List[PeculiarEejModel]:
         """条件に応じて絞り込み"""
         data = self._fetch_all_from_storage()  # ← CSV/DB/Firestore など、取得元は自由
         result = []
@@ -46,9 +46,9 @@ class PeculiarEejRepository:
                 continue
             if type_ is not None and row.type != type_:
                 continue
-            if start_date is not None and row.date < start_date.date():
+            if start_date is not None and row.date < start_date:
                 continue
-            if end_date is not None and row.date > end_date.date():
+            if end_date is not None and row.date > end_date:
                 continue
             result.append(row)
         return result

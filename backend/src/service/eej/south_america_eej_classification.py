@@ -1,6 +1,10 @@
+from typing import List
+
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
+from src.model.peculiar_eej import PeculiarEejModel
+from src.repository.peculiar_eej import PeculiarEejRepository
 from src.service.eej.peculiar_eej_classification import ClassificationPeculiarEej
 
 
@@ -9,6 +13,15 @@ class SouthAmericaClassificationPeculiarEej:
 
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
+
+    def get_peculiar_eej_data(self, region: Region, type) -> List[PeculiarEejModel]:
+        repository = PeculiarEejRepository()
+        return repository.select(
+            region=region,
+            type_=type,
+            start_date=self.lt_period.start,
+            end_date=self.lt_period.end,
+        )
 
     def add_data(self):
         classification = ClassificationPeculiarEej(
