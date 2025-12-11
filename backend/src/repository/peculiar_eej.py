@@ -88,6 +88,15 @@ class PeculiarEejRepository:
 
         file_exists = os.path.exists(self.csv_path)
 
+        # 既存ファイルの最後に改行がなければつける
+
+        if file_exists:
+            with open(self.csv_path, "rb+") as f:
+                f.seek(-1, os.SEEK_END)
+                last_char = f.read(1)
+                if last_char != b"\n":
+                    f.write(b"\n")
+
         with open(
             self.csv_path,
             mode="a" if file_exists else "w",

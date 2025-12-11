@@ -17,12 +17,12 @@ class SouthAmericaClassificationPeculiarEej:
             lt_period=self.lt_period,
             dip_stations=[EeIndexStation.TTB, EeIndexStation.KOU],
             offdip_stations=[EeIndexStation.EUS],
-            region=Region.Brazil,
+            region=Region.BRAZIL,
         )
 
     def save(self):
         classification = self.create()
-        classification.save()
+        classification.add_data()
 
 
 # 実行例
