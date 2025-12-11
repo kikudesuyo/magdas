@@ -5,8 +5,8 @@ from typing import List
 
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.backend_bases import MouseEvent
 from src.dev.plot.config import PlotConfig
+from src.dev.plot.hover import HoverController
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
@@ -19,7 +19,7 @@ class EejDetectionPlotter:
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
-        self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
+        HoverController(self.fig, self.ax, self.lt_period)
 
     def _validate_period(self):
         if self.lt_period.start.time() != time(
@@ -67,18 +67,6 @@ class EejDetectionPlotter:
         ]
         self.ax.set_xticks(ticks)
         self.ax.set_xticklabels(time_labels)
-
-    def _on_move(self, event: MouseEvent):
-        if not event.inaxes:
-            return
-        x, y = event.xdata, event.ydata
-        if x is None or y is None:
-            return
-        minute_offset = int(x)
-        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
-        time_str = current_time.strftime("%Y/%m/%d %H:%M")
-        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
-        self.ax.figure.canvas.draw()
 
     def set_title(self, title):
         self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=10)

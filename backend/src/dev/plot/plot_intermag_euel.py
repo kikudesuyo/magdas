@@ -1,51 +1,15 @@
 """加藤さんからいただいたデータからEUELのプロット"""
 
-from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 from src.dev.plot.config import PlotConfig
+from src.dev.plot.hover import HoverController
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.ee_index.intermag_ee import IntermagEuelService
 from src.service.peculiar_eej import PeculiarEejService
-
-
-@dataclass(frozen=True)
-class CursorData:
-    dt: datetime
-    value: float
-
-
-class CursorMapper:
-    def __init__(self, period: Period):
-        self._start = period.start
-
-    def map(self, event) -> Optional[CursorData]:
-        if not self._is_valid_event(event):
-            return None
-
-        return CursorData(
-            dt=self._to_datetime(event.xdata),
-            value=self._to_value(event.ydata),
-        )
-
-    @staticmethod
-    def _is_valid_event(event) -> bool:
-        return (
-            event.inaxes is not None
-            and event.xdata is not None
-            and event.ydata is not None
-        )
-
-    def _to_datetime(self, x: float) -> datetime:
-        return self._start + timedelta(minutes=int(x))
-
-    @staticmethod
-    def _to_value(y: float) -> float:
-        return float(y)
 
 
 class KatoEuelPlotter:
@@ -56,9 +20,6 @@ class KatoEuelPlotter:
     LABEL_FONT_SIZE = 12
     TICK_FONT_SIZE = 10
 
-    INFO_TEXT_X = 0.01
-    INFO_TEXT_Y = 0.98
-
     Y_LIM_MIN = -150
     Y_LIM_MAX = 150
 
@@ -66,37 +27,21 @@ class KatoEuelPlotter:
     LEGEND_FONT_SIZE = 12
 
     def __init__(self, ut_period: Period):
-        self._period = ut_period
-
-        PlotConfig.rcparams()
-
+        self.ut_period = ut_period
         self.fig, self.ax = plt.subplots(figsize=self.FIG_SIZE)
 
-        self._cursor_mapper = CursorMapper(self._period)
-
+        PlotConfig.rcparams()
+        HoverController(self.fig, self.ax, self.ut_period)
         self._init_axes()
-        self._init_info_box()
-
-        self.fig.canvas.mpl_connect("motion_notify_event", self._on_hover)
 
     def _init_axes(self) -> None:
         self._set_limits()
         self._set_labels()
         self._set_ticks()
 
-    def _init_info_box(self) -> None:
-        self._info_text = self.ax.text(
-            self.INFO_TEXT_X,
-            self.INFO_TEXT_Y,
-            "",
-            transform=self.ax.transAxes,
-            va="top",
-            fontsize=self.LABEL_FONT_SIZE,
-        )
-
     def plot_euel(self, station: EeIndexStation, color: str) -> None:
         service = IntermagEuelService(
-            StationParam(station=station, period=self._period)
+            StationParam(station=station, period=self.ut_period)
         )
         data = service.get_euel_data_by_range()
 
@@ -116,7 +61,7 @@ class KatoEuelPlotter:
         )
 
     def _set_limits(self) -> None:
-        length = self._period.total_minutes() + 1
+        length = self.ut_period.total_minutes() + 1
         self.ax.set_xlim(0, length)
         self.ax.set_ylim(self.Y_LIM_MIN, self.Y_LIM_MAX)
 
@@ -125,12 +70,12 @@ class KatoEuelPlotter:
         self.ax.set_xlabel("UT", fontsize=self.TITLE_FONT_SIZE)
 
     def _set_ticks(self) -> None:
-        length = self._period.total_minutes() + 1
+        length = self.ut_period.total_minutes() + 1
         interval = self._calc_tick_interval(length)
 
         ticks = range(0, length, interval)
         labels = [
-            (self._period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
+            (self.ut_period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
             for i in ticks
         ]
 
@@ -142,23 +87,6 @@ class KatoEuelPlotter:
     @staticmethod
     def _calc_tick_interval(length: int) -> int:
         return max(1, length // 10)
-
-    def _on_hover(self, event) -> None:
-        cursor = self._cursor_mapper.map(event)
-        if cursor is None:
-            return
-
-        self._update_info(cursor)
-
-    def _update_info(self, cursor: CursorData) -> None:
-        text = self._format_cursor_text(cursor)
-        self._info_text.set_text(text)
-        self.fig.canvas.draw_idle()
-
-    @staticmethod
-    def _format_cursor_text(cursor: CursorData) -> str:
-        ts = cursor.dt.strftime("%Y/%m/%d %H:%M")
-        return f"Date: {ts} | Value: {cursor.value:.2f} nT"
 
     def set_title(self, title: str) -> None:
         self.ax.set_title(
@@ -184,30 +112,33 @@ class KatoEuelPlotter:
 
 
 if __name__ == "__main__":
+
     from src.domain.region import Region
     from src.utils.path import generate_parent_abs_path
 
     service = PeculiarEejService()
     data_list = service.get_by_region(Region.SOUTH_AMERICA)
 
-    for d in data_list:
+    peculiar_eej_dates = [d.date for d in data_list]
+
+    for d in peculiar_eej_dates:
         period = Period(
-            start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
-            end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
+            start=datetime(d.year, d.month, d.day, 0, 0),
+            end=datetime(d.year, d.month, d.day, 23, 59),
         )
 
         plotter = KatoEuelPlotter(period)
 
+        plotter.plot_euel(EeIndexStation.EUS, "red")
         plotter.plot_euel(EeIndexStation.TTB, "blue")
         plotter.plot_euel(EeIndexStation.KOU, "green")
-        plotter.plot_euel(EeIndexStation.EUS, "red")
 
-        plotter.set_title("Brazil Region EUEL on " + d.date.strftime("%Y/%m/%d"))
+        plotter.set_title("Brazil Region EUEL on " + d.strftime("%Y/%m/%d"))
 
         plotter.show()
 
         out_path = generate_parent_abs_path(
-            f"/img/peculiar_eej/brazil_region_by_kato/{d.date.strftime('%Y%m%d')}.png"
+            f"/img/peculiar_eej/brazil_region_by_kato/{d.strftime('%Y%m%d')}.png"
         )
 
         # plotter.save(out_path)

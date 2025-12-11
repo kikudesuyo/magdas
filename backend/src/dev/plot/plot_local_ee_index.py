@@ -4,8 +4,8 @@ from datetime import timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backend_bases import MouseEvent
 from src.dev.plot.config import PlotConfig
+from src.dev.plot.hover import HoverController
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
@@ -20,17 +20,7 @@ class LocalEeIndexPlotter:
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
         self._set_axis_labels()
-        self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
-        self.ax.text(
-            0.5,
-            0.95,
-            "",
-            transform=self.ax.transAxes,
-            ha="center",
-            va="center",
-            fontsize=12,
-            color="black",
-        )
+        HoverController(self.fig, self.ax, self.lt_period)
 
     def plot_euel(self, station: EeIndexStation, color):
         ut_param = StationParam(station, self.lt_period).to_ut_params()
@@ -73,18 +63,6 @@ class LocalEeIndexPlotter:
         self.ax.set_xticks(ticks)
         self.ax.set_xticklabels(time_labels, fontsize=8)
         self._draw_vertical_lines()
-
-    def _on_move(self, event: MouseEvent):
-        if not event.inaxes:
-            return
-        x, y = event.xdata, event.ydata
-        if x is None or y is None:
-            return
-        minute_offset = int(x)
-        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
-        time_str = current_time.strftime("%Y/%m/%d %H:%M")
-        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
-        self.ax.figure.canvas.draw()
 
     def _draw_vertical_lines(self):
         for hour in [9, 15]:

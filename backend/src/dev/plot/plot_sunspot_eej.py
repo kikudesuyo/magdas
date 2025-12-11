@@ -4,10 +4,10 @@ from datetime import datetime, time, timedelta
 from typing import List
 
 from matplotlib import pyplot as plt
-from matplotlib.backend_bases import MouseEvent
 from matplotlib.dates import DateFormatter, DayLocator
 from src.dev.plot.config import PlotConfig
 from src.domain.magdas_station import EeIndexStation
+from src.domain.region import Region
 from src.domain.station_params import Period
 from src.service.calc_eej_detection import BestEuelSelectorForEej
 from src.service.sunspot import Sunspot
@@ -53,7 +53,7 @@ class SunspotPlotter:
             self.ax_sunspot.xaxis.set_major_formatter(DateFormatter("%m/%d"))
 
     def plot_euel_to_detect_eej(
-        self, stations: List[EeIndexStation], color, is_dip: bool
+        self, region: Region, stations: List[EeIndexStation], color, is_dip: bool
     ):
         """EEJを検知するためのプロット - 1分データをそのまま表示
         注意:
@@ -73,7 +73,7 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(stations, date, is_dip)
+                BestEuelSelectorForEej(region, stations, date, is_dip)
                 .select_best_euel_data()
                 .array
             )
@@ -113,6 +113,7 @@ class SunspotPlotter:
 
     def plot_euel_subsampled_for_display(
         self,
+        region: Region,
         stations: List[EeIndexStation],
         color,
         is_dip: bool,
@@ -133,7 +134,7 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(stations, date, is_dip)
+                BestEuelSelectorForEej(region, stations, date, is_dip)
                 .select_best_euel_data()
                 .array
             )
@@ -169,26 +170,6 @@ class SunspotPlotter:
         self.ax_eej.tick_params(axis="x", which="major", labelsize=10)
         plt.setp(self.ax_eej.xaxis.get_majorticklabels(), rotation=45)
 
-    def _on_move(self, event: MouseEvent):
-        """マウスホバー時の詳細表示"""
-        if not event.inaxes or event.inaxes != self.ax_eej:
-            return
-        x, y = event.xdata, event.ydata
-        if x is None or y is None:
-            return
-
-        # matplotlib の日付フォーマットから datetime に変換
-        from matplotlib.dates import num2date
-
-        dt = num2date(x)
-        time_str = dt.strftime("%m/%d %H:%M")
-        self.ax_eej.set_title(f"Time: {time_str}, Value: {y:.2f}")
-        self.ax_eej.figure.canvas.draw()
-
-    def enable_interactive_mode(self):
-        """インタラクティブモードを有効化"""
-        self.fig.canvas.mpl_connect("motion_notify_event", self._on_move)
-
     def set_title(self, title):
         self.fig.suptitle(title, fontsize=15, fontweight="semibold", y=0.95)
 
@@ -210,6 +191,7 @@ if __name__ == "__main__":
 
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
     offdip_stations = [EeIndexStation.EUS]
+    region = Region.SOUTH_AMERICA
 
     start = datetime(2017, 1, 1, 0, 0)
     end = datetime(2017, 12, 31, 23, 59)
@@ -219,14 +201,13 @@ if __name__ == "__main__":
     # sunspotデータ（日次）をプロット
     d.plot_sunspot("blue")
 
-    # # 方法1: 全EEJデータ（1分間隔）をプロット - 大容量注意
-    # d.plot_euel_to_detect_eej(dip_stations, "red", "dip")
+    # # # 方法1: 全EEJデータ（1分間隔）をプロット - 大容量注意
+    # d.plot_euel_to_detect_eej(region, dip_stations, "red", is_dip=True)
 
-    # 方法2: 表示用にサブサンプリング（推奨）
-    # d.plot_euel_subsampled_for_display(dip_stations, "red", "dip", subsample_minutes=10)
-
-    # インタラクティブ機能を有効化
-    d.enable_interactive_mode()
+    # # 方法2: 表示用にサブサンプリング（推奨）
+    # d.plot_euel_subsampled_for_display(
+    #     region, dip_stations, "red", is_dip=True, subsample_minutes=10
+    # )
 
     d.set_title(f"SSW Temperature Plot {2017}")
     d.show()

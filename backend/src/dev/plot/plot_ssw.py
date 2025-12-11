@@ -1,10 +1,9 @@
 """SSWのプロット"""
 
-from datetime import time, timedelta
+from datetime import time
 
 import matplotlib.dates as mdates
 from matplotlib import pyplot as plt
-from matplotlib.backend_bases import MouseEvent
 from src.dev.plot.config import PlotConfig
 from src.domain.station_params import Period
 from src.service.ssw import Ssw
@@ -32,18 +31,6 @@ class SswPlotter:
         self.ax.xaxis.set_major_formatter(date_format)
 
         return self.ax
-
-    def _on_move(self, event: MouseEvent):
-        if not event.inaxes:
-            return
-        x, y = event.xdata, event.ydata
-        if x is None or y is None:
-            return
-        minute_offset = int(x)
-        current_time = self.lt_period.start + timedelta(minutes=minute_offset)
-        time_str = current_time.strftime("%Y/%m/%d %H:%M")
-        self.ax.set_title(f"Date: {time_str}, Value: {y:.2f}")
-        self.ax.figure.canvas.draw()
 
     def set_title(self, title):
         self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=10)
