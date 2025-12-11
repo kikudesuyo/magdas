@@ -11,7 +11,7 @@ class RegionInfo:
 class Region(Enum):
     SOUTH_AMERICA = RegionInfo("south_america", "South America")
     SOUTHEAST_ASIA = RegionInfo("southeast_asia", "Southeast Asia")
-    Brazil = RegionInfo("brazil", "Brazil")
+    BRAZIL = RegionInfo("brazil", "Brazil")
 
     @property
     def label(self):

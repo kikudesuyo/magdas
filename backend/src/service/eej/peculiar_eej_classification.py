@@ -9,36 +9,13 @@ from src.domain.station_params import Period
 from src.model.eej_category import PeculiarEejType
 from src.model.peculiar_eej import PeculiarEejModel
 from src.service.calc_eej_detection import (
+    BestEuelSelectorFactory,
     BestEuelSelectorForEej,
     EejDetection,
     EuelData,
     calc_euel_peak_diff,
 )
 from src.service.peculiar_eej import PeculiarEejService
-
-
-def classify_peculiar_eej_type(
-    times, dip_euel_data: EuelData, offdip_euel_data: EuelData
-) -> PeculiarEejType:
-    # 細かい変動を捉えるために、スムージングしていないデータを使う
-    dip_euel_val = np.array(dip_euel_data.array, dtype=float)
-    offdip_euel_val = np.array(offdip_euel_data.array, dtype=float)
-    times = np.array(times)
-
-    hours = np.array([t.hour for t in times])
-    mask_noon = (hours >= 9) & (hours < 15)
-
-    if not mask_noon.any():
-        return PeculiarEejType.ERROR
-
-    dip_noon = dip_euel_val[mask_noon]
-    off_noon = offdip_euel_val[mask_noon]
-    corr = pd.Series(dip_noon).corr(pd.Series(off_noon))  # nanを無視して相関を計算
-
-    if corr > 0.6:
-        return PeculiarEejType.UNDEVELOPED
-
-    return PeculiarEejType.SUDDEN
 
 
 class ClassificationPeculiarEej:
@@ -56,6 +33,31 @@ class ClassificationPeculiarEej:
         self.offdip_stations = offdip_stations
         self.region = region
 
+    def add_data(self):
+        peculiar_eej_data_list = self.aggregate_peculiar_eej_data()
+        PeculiarEejService().add_peculiar_eej(peculiar_eej_data_list)
+
+    def classify_peculiar_eej_type(
+        self, times: List[datetime], dip_euel_data: EuelData, offdip_euel_data: EuelData
+    ) -> PeculiarEejType:
+        # 細かい変動を捉えるために、スムージングしていないデータを使う
+        dip_euel_val = np.array(dip_euel_data.array, dtype=float)
+        offdip_euel_val = np.array(offdip_euel_data.array, dtype=float)
+
+        hours = np.array([t.hour for t in times])
+        mask_noon = (hours >= 9) & (hours < 15)
+
+        if not mask_noon.any():
+            return PeculiarEejType.ERROR
+
+        dip_noon = dip_euel_val[mask_noon]
+        offdip_noon = offdip_euel_val[mask_noon]
+        # nanを無視して相関を計算
+        corr = pd.Series(dip_noon).corr(pd.Series(offdip_noon))
+        if corr > 0.6:
+            return PeculiarEejType.UNDEVELOPED
+        return PeculiarEejType.SUDDEN
+
     def aggregate_peculiar_eej_data(self) -> List[PeculiarEejModel]:
         peculiar_eej_data_list: List[PeculiarEejModel] = []
         for lt_date in (
@@ -64,30 +66,35 @@ class ClassificationPeculiarEej:
                 (self.lt_period.end.date() - self.lt_period.start.date()).days + 1
             )
         ):
-            print(f"[Debug] Processing date: {lt_date}")
             # 使用するEUELのデータを取得
-            dip_euel_selector = BestEuelSelectorForEej(
-                self.region, self.dip_stations, lt_date, True
+            dip_euel_selector = BestEuelSelectorFactory().create(
+                self.region, self.dip_stations, lt_date, is_dip=True
             )
-            offdip_euel_selector = BestEuelSelectorForEej(
-                self.region, self.offdip_stations, lt_date, False
+            offdip_euel_selector = BestEuelSelectorFactory().create(
+                self.region, self.offdip_stations, lt_date, is_dip=False
             )
-            dip_euel = dip_euel_selector.select_best_euel_data()
+
+            dip_euel_selector = dip_euel_selector.select_best_euel_data()
             offdip_euel = offdip_euel_selector.select_best_euel_data()
-            peak_diff = calc_euel_peak_diff(dip_euel, offdip_euel, lt_date)
+            peak_diff = calc_euel_peak_diff(dip_euel_selector, offdip_euel, lt_date)
             # EEJの種類を分類
             eej_detection = EejDetection(peak_diff, lt_date)
             eej_type = eej_detection.classify_eej_category()
+
+            print(
+                f"[Debug] Processing date: {lt_date}, type:{eej_type}, peak_diff:{peak_diff}"
+            )
+
             if eej_type.label != "peculiar":
                 continue
             # 特異型EEJの中で未発達型か突発型かを分類
-            peculiar_eej_type = classify_peculiar_eej_type(
+            peculiar_eej_type = self.classify_peculiar_eej_type(
                 times=[
                     datetime.combine(lt_date, datetime.min.time())
                     + timedelta(minutes=i)
                     for i in range(1440)
                 ],
-                dip_euel_data=dip_euel,
+                dip_euel_data=dip_euel_selector,
                 offdip_euel_data=offdip_euel,
             )
             peculiar_eej_data = PeculiarEejModel(
@@ -98,10 +105,6 @@ class ClassificationPeculiarEej:
             peculiar_eej_data_list.append(peculiar_eej_data)
         return peculiar_eej_data_list
 
-    def save(self):
-        peculiar_eej_data_list = self.aggregate_peculiar_eej_data()
-        PeculiarEejService().add_peculiar_eej(peculiar_eej_data_list)
-
 
 if __name__ == "__main__":
     dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
@@ -111,4 +114,4 @@ if __name__ == "__main__":
     classification = ClassificationPeculiarEej(
         lt_period, dip_stations, offdip_stations, region=region
     )
-    classification.save()
+    classification.add_data()

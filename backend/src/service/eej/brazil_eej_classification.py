@@ -10,22 +10,11 @@ class BrazilClassificationPeculiarEej:
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
 
-    def create(self):
-        return ClassificationPeculiarEej(
+    def add_data(self):
+        classification = ClassificationPeculiarEej(
             lt_period=self.lt_period,
             dip_stations=[EeIndexStation.TTB],
             offdip_stations=[EeIndexStation.EUS, EeIndexStation.KOU],
-            region=Region.Brazil,
+            region=Region.BRAZIL,
         )
-
-    def save(self):
-        classification = self.create()
-        classification.save()
-
-
-if __name__ == "__main__":
-    from datetime import datetime
-
-    lt_period = Period(datetime(2008, 1, 1, 0, 0), datetime(2008, 1, 31, 23, 59))
-    classification = BrazilClassificationPeculiarEej(lt_period)
-    classification.save()
+        classification.add_data()

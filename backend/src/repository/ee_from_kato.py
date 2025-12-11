@@ -15,7 +15,7 @@ class KatoEeData(BaseModel):
 
 class KatoEeRepository:
     def __init__(self, station: EeIndexStation):
-        if not station.code in [
+        if not station in [
             EeIndexStation.KOU,
             EeIndexStation.TTB,
             EeIndexStation.EUS,

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, final
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -74,6 +74,7 @@ class BaseEuelSelectorForEej(ABC):
                 if not s.is_offdip():
                     raise ValueError(f"{s.code} is not off-dip region")
 
+    @final
     def select_best_euel_data(self) -> EuelData:
         eej_euels = {}
 
@@ -124,6 +125,21 @@ class IntermagEuelSelectorForEej(BaseEuelSelectorForEej):
         ee_service = IntermagEuelService(ut_params)
         euel_data = ee_service.get_euel_data_by_range()
         return np.array(euel_data)
+
+
+class BestEuelSelectorFactory:
+    def create(
+        self,
+        region: Region,
+        stations: List[EeIndexStation],
+        local_date: date,
+        is_dip: bool,
+    ) -> BaseEuelSelectorForEej:
+        if region == Region.SOUTH_AMERICA:
+            return MagdasEuelSelectorForEej(region, stations, local_date, is_dip)
+        if region == Region.BRAZIL:
+            return IntermagEuelSelectorForEej(region, stations, local_date, is_dip)
+        raise ValueError(f"Unsupported region: {region}")
 
 
 class BestEuelSelectorForEej:
