@@ -9,15 +9,15 @@ from src.service.eej.peculiar_eej_classification import ClassificationPeculiarEe
 
 
 class SouthAmericaClassificationPeculiarEej:
-    """南アメリカ地域の特異型EEJの分類を行い,CSVに保存するクラス"""
+    """南アメリカ地域の特異型EEJの分類を行い、CSV操作を行うクラス"""
 
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
 
-    def get_peculiar_eej_data(self, region: Region, type) -> List[PeculiarEejModel]:
+    def get_peculiar_eej_data(self, type) -> List[PeculiarEejModel]:
         repository = PeculiarEejRepository()
         return repository.select(
-            region=region,
+            region=Region.SOUTH_AMERICA,
             type_=type,
             start_date=self.lt_period.start,
             end_date=self.lt_period.end,
