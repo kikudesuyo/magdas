@@ -4,9 +4,7 @@ from src.utils.path import generate_abs_path
 
 
 class PlotConfig:
-    def __init__(self, plt: plt):
-        self.plt = plt
-
+    @staticmethod
     def rcparams():
         font_prop = get_font_prop()
         plt.rcParams["font.family"] = font_prop.get_name()
