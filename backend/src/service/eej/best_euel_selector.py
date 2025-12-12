@@ -92,6 +92,9 @@ class BaseEuelSelectorForEej(ABC):
         """
         if len(daily_euel_values) != TimeUnit.ONE_DAY.min:
             raise ValueError("daily_euel_values must have 1440 elements.")
+        if np.all(np.isnan(daily_euel_values)):
+            return daily_euel_values
+
         euel_for_baseline = np.concatenate(
             (
                 daily_euel_values[: TimeUnit.FIVE_HOURS.min],
