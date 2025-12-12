@@ -13,6 +13,7 @@ dependencies = [
     "click==8.1.7",
     "contourpy==1.2.0",
     "cycler==0.12.1",
+    "debugpy>=1.8.18",
     "dnspython==2.6.1",
     "email-validator==2.1.1",
     "ephem==4.1.6",

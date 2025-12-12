@@ -26,7 +26,8 @@ def server(c):
 @task
 def debug(c, filename):
     c.run(
-        f"python -m debugpy --listen 5678 --wait-for-client {filename}", env=get_env()
+        f"python -m debugpy --listen 5678 --wait-for-client {filename}",
+        env=get_env({"PYTHONUNBUFFERED": "1"}),
     )
 
 
