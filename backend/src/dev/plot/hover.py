@@ -7,7 +7,7 @@ from matplotlib.backend_bases import MouseEvent
 from matplotlib.figure import Figure
 
 
-class HoverController:
+class HoverConfigurator:
     """
     Plot 側で用いるためのラッパークラス
     """

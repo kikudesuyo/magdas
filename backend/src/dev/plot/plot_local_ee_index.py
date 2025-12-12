@@ -4,8 +4,9 @@ from datetime import timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
+from src.dev.plot.axis import AxisConfigurator
 from src.dev.plot.config import PlotConfig
-from src.dev.plot.hover import HoverController
+from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
@@ -17,10 +18,11 @@ class LocalEeIndexPlotter:
         self.lt_period = lt_period
         # self.factory = MagdasEeService()
 
-        PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
-        self._set_axis_labels()
-        HoverController(self.fig, self.ax, self.lt_period)
+
+        PlotConfig.rcparams()
+        HoverConfigurator(self.fig, self.ax, self.lt_period)
+        AxisConfigurator(self.ax, self.lt_period).apply()
 
     def plot_euel(self, station: EeIndexStation, color):
         ut_param = StationParam(station, self.lt_period).to_ut_params()
@@ -47,22 +49,6 @@ class LocalEeIndexPlotter:
         self.ax.text(
             index + d, value + 5, f"{value:.2f}", fontsize=12, ha="center", color=color
         )
-
-    def _set_axis_labels(self):
-        data_length = self.lt_period.total_minutes() + 1
-        self.ax.set_ylabel("nT", rotation=0)
-        self.ax.set_xlim(0, data_length)
-        self.ax.set_ylim(-100, 200)
-        self.ax.set_xlabel("LT", fontsize=15)
-        tick_interval = max(1, data_length // 8)
-        ticks = range(0, data_length, tick_interval)
-        time_labels = [
-            (self.lt_period.start + timedelta(minutes=i)).strftime("%H:%M")
-            for i in ticks
-        ]
-        self.ax.set_xticks(ticks)
-        self.ax.set_xticklabels(time_labels, fontsize=8)
-        self._draw_vertical_lines()
 
     def _draw_vertical_lines(self):
         for hour in [9, 15]:

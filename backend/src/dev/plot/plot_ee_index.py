@@ -5,8 +5,9 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from src.constants.time_relation import TimeUnit
+from src.dev.plot.axis import AxisConfigurator
 from src.dev.plot.config import PlotConfig
-from src.dev.plot.hover import HoverController
+from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
@@ -25,8 +26,8 @@ class EeIndexPlotter:
 
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
-        self._set_axis_labels()
-        HoverController(self.fig, self.ax, self.ut_period)
+        HoverConfigurator(self.fig, self.ax, self.ut_period)
+        AxisConfigurator(self.ax, self.ut_period).apply()
 
     def plot_er(self, station: EeIndexStation, color):
         er = MagdasErService(StationParam(station, self.ut_period))
@@ -69,21 +70,6 @@ class EeIndexPlotter:
         self.ax.plot(x_axis, ee_data.er, label="ER", color="black", lw=0.5)
         self.ax.plot(x_axis, edst_values, label="EDst", color="green", lw=0.5)
         self.ax.plot(x_axis, euel_values, label="EUEL", color="red", lw=0.5)
-
-    def _set_axis_labels(self):
-        data_length = self.ut_period.total_minutes() + 1
-        self.ax.set_ylabel("nT", rotation=0)
-        self.ax.set_xlim(0, data_length)
-        self.ax.set_ylim(-100, 200)
-        self.ax.set_xlabel("UT", fontsize=15)
-        tick_interval = max(1, data_length // 8)
-        ticks = range(0, data_length, tick_interval)
-        time_labels = [
-            (self.ut_period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
-            for i in ticks
-        ]
-        self.ax.set_xticks(ticks)
-        self.ax.set_xticklabels(time_labels)
 
     def set_title(self, title):
         self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=10)

@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
+from src.dev.plot.axis import AxisConfigurator
 from src.dev.plot.config import PlotConfig
-from src.dev.plot.hover import HoverController
+from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.ee_index.intermag_ee import IntermagEuelService
@@ -31,13 +32,8 @@ class KatoEuelPlotter:
         self.fig, self.ax = plt.subplots(figsize=self.FIG_SIZE)
 
         PlotConfig.rcparams()
-        HoverController(self.fig, self.ax, self.ut_period)
-        self._init_axes()
-
-    def _init_axes(self) -> None:
-        self._set_limits()
-        self._set_labels()
-        self._set_ticks()
+        HoverConfigurator(self.fig, self.ax, self.ut_period)
+        AxisConfigurator(self.ax, self.ut_period).apply()
 
     def plot_euel(self, station: EeIndexStation, color: str) -> None:
         service = IntermagEuelService(
@@ -58,30 +54,6 @@ class KatoEuelPlotter:
             label=f"{station.code}_EUEL",
             color=color,
             linewidth=0.8,
-        )
-
-    def _set_limits(self) -> None:
-        length = self.ut_period.total_minutes() + 1
-        self.ax.set_xlim(0, length)
-        self.ax.set_ylim(self.Y_LIM_MIN, self.Y_LIM_MAX)
-
-    def _set_labels(self) -> None:
-        self.ax.set_ylabel("EUEL (nT)", fontsize=self.LABEL_FONT_SIZE)
-        self.ax.set_xlabel("UT", fontsize=self.TITLE_FONT_SIZE)
-
-    def _set_ticks(self) -> None:
-        length = self.ut_period.total_minutes() + 1
-        interval = self._calc_tick_interval(length)
-
-        ticks = range(0, length, interval)
-        labels = [
-            (self.ut_period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
-            for i in ticks
-        ]
-
-        self.ax.set_xticks(ticks)
-        self.ax.set_xticklabels(
-            labels, rotation=45, ha="right", fontsize=self.TICK_FONT_SIZE
         )
 
     @staticmethod
@@ -137,8 +109,7 @@ if __name__ == "__main__":
 
         plotter.show()
 
-        out_path = generate_parent_abs_path(
-            f"/img/peculiar_eej/brazil_region_by_kato/{d.strftime('%Y%m%d')}.png"
-        )
-
+        # out_path = generate_parent_abs_path(
+        #     f"/img/peculiar_eej/brazil_region_by_kato/{d.strftime('%Y%m%d')}.png"
+        # )
         # plotter.save(out_path)

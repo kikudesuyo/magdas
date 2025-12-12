@@ -5,8 +5,9 @@ from typing import List
 
 import numpy as np
 from matplotlib import pyplot as plt
+from src.dev.plot.axis import AxisConfigurator
 from src.dev.plot.config import PlotConfig
-from src.dev.plot.hover import HoverController
+from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
@@ -18,8 +19,8 @@ class EejDetectionPlotter:
         self.lt_period = lt_period
         PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
-        self._set_axis_labels()
-        HoverController(self.fig, self.ax, self.lt_period)
+        HoverConfigurator(self.fig, self.ax, self.lt_period)
+        AxisConfigurator(self.ax, self.lt_period).apply()
 
     def _validate_period(self):
         if self.lt_period.start.time() != time(
@@ -39,7 +40,6 @@ class EejDetectionPlotter:
             self.lt_period.start.date() + timedelta(days=i)
             for i in range((self.lt_period.end - self.lt_period.start).days + 1)
         ]
-
         euel = np.hstack(
             [
                 BestEuelSelectorFactory()
@@ -88,6 +88,9 @@ if __name__ == "__main__":
 
     from src.domain.magdas_station import EeIndexStation
     from src.domain.station_params import Period
+    from src.service.eej.brazil_eej_classification import (
+        BrazilClassificationPeculiarEej,
+    )
 
     region = Region.SOUTH_AMERICA
 
@@ -109,6 +112,6 @@ if __name__ == "__main__":
             region, offdip_stations, color="blue", is_dip=False
         )
         plotter.set_title(f"EEJ Detection Plot for {current_date.strftime('%Y-%m-%d')}")
-        # plotter.show()
-        plotter.save(f"refactor/eej_detection_{current_date.strftime('%Y%m%d')}.png")
+        plotter.show()
+        # plotter.save(f"refactor/eej_detection_{current_date.strftime('%Y%m%d')}.png")
         current_date += timedelta(days=1)
