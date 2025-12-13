@@ -7,7 +7,7 @@ from typing import List
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from pydantic import BaseModel
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.domain.region import Region
 from src.domain.station_params import Period
 from src.service.eej.eej_category import EejCategoryService
@@ -79,8 +79,9 @@ class PeculiarEejMonthPlotter:
         month_bins = self.build_month_bins()
         x = [bin.month for bin in month_bins]
         ratio = [bin.ratio for bin in month_bins]
-        PlotConfig.rcparams()
-        plt.figure(figsize=(10, 6))
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        PlotConfigurator(fig, ax).apply()
 
         bars = plt.bar(x, ratio, width=0.6, edgecolor="black")
 

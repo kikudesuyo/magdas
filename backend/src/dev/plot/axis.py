@@ -29,21 +29,6 @@ class AxisConfigurator:
         self.ax.set_ylabel(self.config.y_label, rotation=0)
         self.ax.set_ylim(self.config.y_min, self.config.y_max)
 
-    # def _set_x_axis_with_time_labels(self) -> None:
-    #     data_length = self.ut_period.total_minutes() + 1
-    #     self.ax.set_xlim(0, data_length)
-    #     self.ax.set_xlabel(self.config.x_label)
-
-    #     tick_interval = max(1, data_length // self.config.xtick_divisions)
-    #     ticks = range(0, data_length, tick_interval)
-
-    #     time_labels = [
-    #         (self.ut_period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
-    #         for i in ticks
-    #     ]
-    #     self.ax.set_xticks(ticks)
-    #     self.ax.set_xticklabels(time_labels)
-
     def _set_x_axis_with_time_labels(self) -> None:
         data_length = self.ut_period.total_minutes() + 1
         self.ax.set_xlim(0, data_length)

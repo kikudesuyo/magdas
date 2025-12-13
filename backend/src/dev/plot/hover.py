@@ -5,6 +5,7 @@ from typing import Callable, Optional
 from matplotlib.axes import Axes
 from matplotlib.backend_bases import MouseEvent
 from matplotlib.figure import Figure
+from src.domain.station_params import Period
 
 
 class HoverConfigurator:
@@ -12,16 +13,20 @@ class HoverConfigurator:
     Plot 側で用いるためのラッパークラス
     """
 
-    def __init__(self, fig: Figure, ax: Axes, period):
+    def __init__(self, fig: Figure, ax: Axes, period: Period):
+        self.fig = fig
+        self.ax = ax
+        self.period = period
+
+    def apply(self):
         # カーソル変換ロジック
-        x_conv = lambda x: period.start + timedelta(minutes=int(x))
+        x_conv = lambda x: self.period.start + timedelta(minutes=int(x))
         y_conv = float
 
         cursor = CursorConverter(x_conv, y_conv)
-        hover_text = HoverText(fig, ax, cursor)
+        hover_text = HoverText(self.fig, self.ax, cursor)
 
-        # Matplotlibにイベント登録
-        fig.canvas.mpl_connect("motion_notify_event", hover_text.on_hover)
+        self.fig.canvas.mpl_connect("motion_notify_event", hover_text.on_hover)
 
 
 @dataclass(frozen=True)

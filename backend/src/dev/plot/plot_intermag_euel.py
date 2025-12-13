@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from src.dev.plot.axis import AxisConfigurator
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
@@ -24,15 +24,16 @@ class KatoEuelPlotter:
     Y_LIM_MIN = -150
     Y_LIM_MAX = 150
 
-    GRID_STYLE = "--"
     LEGEND_FONT_SIZE = 12
 
     def __init__(self, ut_period: Period):
         self.ut_period = ut_period
-        self.fig, self.ax = plt.subplots(figsize=self.FIG_SIZE)
 
-        PlotConfig.rcparams()
-        HoverConfigurator(self.fig, self.ax, self.ut_period)
+        # PlotConfig.rcparams()
+
+        self.fig, self.ax = plt.subplots(figsize=self.FIG_SIZE)
+        PlotConfigurator(self.fig, self.ax).apply()
+        HoverConfigurator(self.fig, self.ax, self.ut_period).apply()
         AxisConfigurator(self.ax, self.ut_period).apply()
 
     def plot_euel(self, station: EeIndexStation, color: str) -> None:
@@ -69,18 +70,13 @@ class KatoEuelPlotter:
         )
 
     def show(self) -> None:
-        self._finalize()
+        self.ax.legend(loc="lower left", fontsize=self.LEGEND_FONT_SIZE)
         plt.show()
         plt.close(self.fig)
 
     def save(self, path: str) -> None:
-        self._finalize()
+        self.ax.legend(loc="lower left", fontsize=self.LEGEND_FONT_SIZE)
         self.fig.savefig(path, dpi=300)
-
-    def _finalize(self) -> None:
-        self.ax.legend(loc="upper right", fontsize=self.LEGEND_FONT_SIZE)
-        self.ax.grid(True, linestyle=self.GRID_STYLE)
-        self.fig.tight_layout()
 
 
 if __name__ == "__main__":
@@ -89,9 +85,10 @@ if __name__ == "__main__":
     from src.utils.path import generate_parent_abs_path
 
     service = PeculiarEejService()
-    data_list = service.get_by_region(Region.SOUTH_AMERICA)
+    data_list = service.get_by_region(Region.BRAZIL)
 
     peculiar_eej_dates = [d.date for d in data_list]
+    print(f"Peculiar EEJ dates in Brazil region: {peculiar_eej_dates}")
 
     for d in peculiar_eej_dates:
         period = Period(

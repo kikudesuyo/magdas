@@ -7,7 +7,7 @@ from typing import List
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from pydantic import BaseModel
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.domain.region import Region
 from src.domain.station_params import Period
 from src.service.eej.eej_category import EejCategoryService
@@ -79,7 +79,8 @@ class PeculiarEejLunarTimePlotter:
         x = [d.lunar_age for d in lunar_bins]
         ratio = [d.ratio for d in lunar_bins]
 
-        PlotConfig.rcparams()
+        fig, ax = plt.subplots()
+        PlotConfigurator(fig, ax).apply()
         plt.figure(figsize=(10, 6))
 
         bars = plt.bar(x, ratio, width=1, edgecolor="black")

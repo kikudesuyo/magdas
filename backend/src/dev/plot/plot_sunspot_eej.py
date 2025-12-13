@@ -5,7 +5,7 @@ from typing import List
 
 from matplotlib import pyplot as plt
 from matplotlib.dates import DateFormatter, DayLocator
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
@@ -16,10 +16,11 @@ from src.service.sunspot import Sunspot
 class SunspotPlotter:
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
-        PlotConfig.rcparams()
         self.fig, (self.ax_sunspot, self.ax_eej) = plt.subplots(
             nrows=2, ncols=1, figsize=(15, 8), sharex=False  # sharex=Falseに変更
         )
+        PlotConfigurator(self.fig, self.ax_sunspot).apply()
+        PlotConfigurator(self.fig, self.ax_eej).apply()
 
     def _validate_period(self):
         if self.lt_period.start.time() != time(

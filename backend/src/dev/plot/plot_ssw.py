@@ -4,7 +4,7 @@ from datetime import time
 
 import matplotlib.dates as mdates
 from matplotlib import pyplot as plt
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.domain.station_params import Period
 from src.service.ssw import Ssw
 
@@ -12,8 +12,8 @@ from src.service.ssw import Ssw
 class SswPlotter:
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
-        PlotConfig.rcparams()
         self.fig, self.ax = plt.subplots()
+        PlotConfigurator(self.fig, self.ax).apply()
 
     def _validate_period(self):
         if self.lt_period.start.time() != time(

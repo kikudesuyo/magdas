@@ -5,7 +5,7 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 from src.dev.plot.axis import AxisConfigurator
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
@@ -20,8 +20,8 @@ class LocalEeIndexPlotter:
 
         self.fig, self.ax = plt.subplots()
 
-        PlotConfig.rcparams()
-        HoverConfigurator(self.fig, self.ax, self.lt_period)
+        PlotConfigurator(self.fig, self.ax).apply()
+        HoverConfigurator(self.fig, self.ax, self.lt_period).apply()
         AxisConfigurator(self.ax, self.lt_period).apply()
 
     def plot_euel(self, station: EeIndexStation, color):
