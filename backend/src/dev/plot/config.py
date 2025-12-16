@@ -1,4 +1,5 @@
 from matplotlib import font_manager
+from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from src.utils.path import generate_abs_path
@@ -9,10 +10,11 @@ class PlotConfigurator:
         self.fig = fig
         self.ax = ax
         self.font_prop = FontLoader().font_prop
+        # グローバル設定(日本語フォント対応)
+        plt.rcParams["font.family"] = self.font_prop.get_name()
+        plt.rcParams["axes.unicode_minus"] = False
 
     def apply(self):
-        # font設定
-        self.fig.text(0.01, 0.01, "", fontproperties=self.font_prop)
         # tick設定
         self.ax.tick_params(
             axis="x", direction="in", labelsize=11, top=True, which="both"
@@ -29,5 +31,6 @@ class FontLoader:
 
     def __init__(self):
         font_path = generate_abs_path(self.FONT_PATH)
-        font_manager.fontManager.addfont(font_path)
+        if font_path not in [f.fname for f in font_manager.fontManager.ttflist]:
+            font_manager.fontManager.addfont(font_path)
         self.font_prop = font_manager.FontProperties(fname=font_path)  # type: ignore (OSによって型が異なるため)

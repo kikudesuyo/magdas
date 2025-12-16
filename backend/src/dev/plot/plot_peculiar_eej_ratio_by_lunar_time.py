@@ -81,12 +81,12 @@ class PeculiarEejLunarTimePlotter:
 
         fig, ax = plt.subplots()
         PlotConfigurator(fig, ax).apply()
-        plt.figure(figsize=(10, 6))
 
-        bars = plt.bar(x, ratio, width=1, edgecolor="black")
+        bars = ax.bar(x, ratio, width=1, edgecolor="black")
+
         for bar, bin_data in zip(bars, lunar_bins):
             height = bar.get_height()
-            plt.text(
+            ax.text(
                 bar.get_x() + bar.get_width() / 2,
                 height,
                 f"{bin_data.peculiar_eej_count}/{bin_data.quiet_count}",
@@ -95,15 +95,16 @@ class PeculiarEejLunarTimePlotter:
                 fontsize=11,
             )
 
-        plt.margins(x=0)
-        plt.gca().yaxis.set_major_locator(mticker.MaxNLocator(integer=True))
-        plt.xlabel("Lunar Time")
-        plt.ylabel("Peculiar EEJ Ratio (%)")
-        plt.grid(True)
-        plt.title(title)
+        ax.margins(x=0)
+        ax.yaxis.set_major_locator(mticker.MaxNLocator(integer=True))
+        ax.set_xlabel("Lunar Time")
+        ax.set_ylabel("Peculiar EEJ Ratio (%)")
+        ax.grid(True)
+        ax.set_title(title)
 
     def show(self):
         plt.show()
+        plt.close()
 
     def save(self, filename: str):
         plt.savefig(f"img/peculiar_eej/{filename}")
@@ -116,13 +117,17 @@ if __name__ == "__main__":
     )
 
     # 未発達型のプロット"""
-    undev_plotter = PeculiarEejLunarTimePlotter(p, Region.SOUTH_AMERICA, "未発達型")
-    undev_plotter.plot_peculiar_ratio(title="南アメリカ地域 未発達型EEJ発生割合")
-    undev_plotter.show()
-    # undev_plotter.save(filename="2009-2020_南アメリカ_未発達型_月齢.png")
+    undev_plotter = PeculiarEejLunarTimePlotter(p, Region.BRAZIL, "未発達型")
+    undev_plotter.plot_peculiar_ratio(
+        title="Brazil Region Undeveloped EEJ Ratio by Lunar Time"
+    )
+    # undev_plotter.show()
+    undev_plotter.save(filename="2009-2020_ブラジル_未発達型_月齢.png")
 
-    # 突発型のプロット"""
-    sudden_plotter = PeculiarEejLunarTimePlotter(p, Region.SOUTH_AMERICA, "突発型")
-    sudden_plotter.plot_peculiar_ratio(title="南アメリカ地域 突発型EEJ発生割合")
-    # sudden_plotter.save(filename="2009-2020_南アメリカ_突発型_月齢.png")
-    sudden_plotter.show()
+    # # 突発型のプロット"""
+    sudden_plotter = PeculiarEejLunarTimePlotter(p, Region.BRAZIL, "突発型")
+    sudden_plotter.plot_peculiar_ratio(
+        title="Brazil Region Sudden EEJ Ratio by Lunar Time"
+    )
+    # sudden_plotter.show()
+    sudden_plotter.save(filename="2009-2020_ブラジル_突発型_月齢.png")

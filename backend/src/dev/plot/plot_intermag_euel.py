@@ -1,6 +1,6 @@
 """加藤さんからいただいたデータからEUELのプロット"""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,7 +38,8 @@ class KatoEuelPlotter:
 
     def plot_euel(self, station: EeIndexStation, color: str) -> None:
         service = IntermagEuelService(
-            StationParam(station=station, period=self.ut_period)
+            StationParam(station=station, period=self.ut_period),
+            Region.BRAZIL,
         )
         data = service.get_euel_data_by_range()
 
@@ -46,8 +47,8 @@ class KatoEuelPlotter:
             print(f"No data for {station.code}")
             return
 
-        x = np.arange(len(data))
-        y = np.array(data, dtype=float)
+        x = np.arange(len(data.array))
+        y = np.array(data.array, dtype=float)
 
         self.ax.plot(
             x,

@@ -26,6 +26,12 @@ def calc_euel_peak_diff(
         ]
     )
     is_noon = np.array([DaytimeInterval.contains(dt.time()) for dt in timestamp])
+
+    if (
+        np.isnan(dip_euel.array[is_noon]).all()
+        or np.isnan(offdip_euel.array[is_noon]).all()
+    ):
+        return float("nan")
     dip_max = np.max(dip_euel.array[is_noon])
     offdip_max = np.max(offdip_euel.array[is_noon])
     return float(dip_max - offdip_max)

@@ -74,7 +74,7 @@ class ClassificationPeculiarEej:
             offdip_euel = offdip_euel_selector.select_best_euel_data()
             peak_diff = calc_euel_peak_diff(dip_euel_selector, offdip_euel, lt_date)
             # EEJの種類を分類
-            eej_detection = EejDetection(peak_diff, lt_date)
+            eej_detection = EejDetection(peak_diff, lt_date, self.region)
             eej_type = eej_detection.classify_eej_category()
 
             print(

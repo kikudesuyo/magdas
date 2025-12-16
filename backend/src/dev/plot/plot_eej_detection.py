@@ -89,9 +89,6 @@ if __name__ == "__main__":
 
     from src.domain.magdas_station import EeIndexStation
     from src.domain.station_params import Period
-    from src.service.eej.brazil_eej_classification import (
-        BrazilClassificationPeculiarEej,
-    )
 
     region = Region.SOUTH_AMERICA
 
