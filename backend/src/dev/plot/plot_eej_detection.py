@@ -87,29 +87,30 @@ class EejDetectionPlotter:
 if __name__ == "__main__":
     from datetime import datetime
 
-    from src.domain.magdas_station import EeIndexStation
-    from src.domain.station_params import Period
+    from src.domain.region import Region
+    from src.service.peculiar_eej import PeculiarEejService
+    from src.utils.path import generate_parent_abs_path
 
-    region = Region.SOUTH_AMERICA
+    region = Region.BRAZIL
 
-    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
+    dip_stations = [EeIndexStation.TTB]
     offdip_stations = [EeIndexStation.EUS]
 
-    start_date = datetime(2017, 2, 1, 0, 0)
-    end_date = datetime(2017, 2, 28, 23, 59)
+    service = PeculiarEejService()
+    data_list = service.get_by_region_and_type(region, "未発達型")
 
-    current_date = start_date
-    while current_date <= end_date:
+    peculiar_eej_dates = [d.date for d in data_list]
+
+    for d in peculiar_eej_dates:
         lt_period = Period(
-            start=current_date,
-            end=current_date + timedelta(days=1) - timedelta(minutes=1),
+            start=datetime(d.year, d.month, d.day, 0, 0),
+            end=datetime(d.year, d.month, d.day, 23, 59),
         )
         plotter = EejDetectionPlotter(lt_period)
         plotter.plot_euel_to_detect_eej(region, dip_stations, color="red", is_dip=True)
         plotter.plot_euel_to_detect_eej(
             region, offdip_stations, color="blue", is_dip=False
         )
-        plotter.set_title(f"EEJ Detection Plot for {current_date.strftime('%Y-%m-%d')}")
+        plotter.set_title(f"EEJ Detection Plot for {d.strftime('%Y-%m-%d')}")
         plotter.show()
-        # plotter.save(f"refactor/eej_detection_{current_date.strftime('%Y%m%d')}.png")
-        current_date += timedelta(days=1)
+        # plotter.save(f"refactor/eej_detection_{d.strftime('%Y%m%d')}.png")

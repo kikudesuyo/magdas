@@ -4,13 +4,17 @@ from datetime import timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
+from src.constants.time_relation import TimeUnit
 from src.dev.plot.axis import AxisConfigurator
 from src.dev.plot.config import PlotConfigurator
 from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
+from src.domain.region import Region
 from src.domain.station_params import Period, StationParam
 from src.service.calc_utils.moving_avg import calc_moving_avg
+from src.service.ee_index.intermag_ee import IntermagEuelService
 from src.service.ee_index.magdas_ee import MagdasEeService
+from src.utils.path import generate_parent_abs_path
 
 
 class LocalEeIndexPlotter:
@@ -26,23 +30,27 @@ class LocalEeIndexPlotter:
 
     def plot_euel(self, station: EeIndexStation, color):
         ut_param = StationParam(station, self.lt_period).to_ut_params()
-        ee_service = MagdasEeService(ut_param)
-        ee_data = ee_service.calc_all()
-        euel_values = ee_data.euel
-        # smoothed_euel = calc_moving_avg(
-        #     euel_values, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
-        # )
-        # x_axis = np.arange(0, len(smoothed_euel), 1)
+        # ee_service = MagdasEeService(ut_param)
 
-        # self._plot_peak_point(
-        #     x_axis[np.nanargmax(smoothed_euel)],
-        #     np.nanmax(smoothed_euel),
-        #     color="black",
-        #     d=50,
-        # )
+        service = IntermagEuelService(ut_param, Region.BRAZIL)
+        euel_data = service.get_euel_data_by_range()
+        euel_values = euel_data.array
 
-        x_axis = np.arange(0, len(euel_values), 1)
-        self.ax.plot(x_axis, euel_values, label=f"{station.code}_EUEL", color=color)
+        # ee_data = ee_service.calc_all()
+        # euel_values = ee_data.euel
+
+        smoothed_euel = calc_moving_avg(
+            euel_values, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
+        )
+        x_axis = np.arange(0, len(smoothed_euel), 1)
+
+        self._plot_peak_point(
+            x_axis[np.nanargmax(smoothed_euel)],
+            np.nanmax(smoothed_euel),
+            color="black",
+            d=50,
+        )
+        self.ax.plot(x_axis, smoothed_euel, label=f"{station.code}_EUEL", color=color)
 
     def _plot_peak_point(self, index, value, color, d):
         self.ax.plot(index, value, marker="o", markersize=5, color=color)
@@ -89,41 +97,28 @@ if __name__ == "__main__":
     from src.domain.station_params import Period, StationParam
     from src.service.ee_index.magdas_ee import MagdasEdstService, MagdasEeService
     from src.service.kp import Kp
+    from src.service.peculiar_eej import PeculiarEejService
 
-    anc = EeIndexStation.ANC
-    hua = EeIndexStation.HUA
-    eus = EeIndexStation.EUS
+    service = PeculiarEejService()
+    data_list = service.get_by_region(Region.BRAZIL)
 
-    start_dt = datetime(2017, 9, 14)
-    end_dt = datetime(2018, 9, 14)
-
-    for single_date in (
-        start_dt + timedelta(n) for n in range((end_dt - start_dt).days + 1)
-    ):
-        p = Period(
-            start=datetime.combine(single_date, datetime.min.time()),
-            end=datetime.combine(single_date, datetime.min.time())
-            + timedelta(days=1)
-            - timedelta(minutes=1),
+    for d in data_list:
+        period = Period(
+            start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
+            end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
         )
-        f = MagdasEdstService(p)
-        edst = f.calc()
 
-        max_kp = Kp().get_max_of_day(p)
-        min_edst_val = np.min(edst)
-        q = QuietDayDomain(min_edst=min_edst_val, max_kp=max_kp)
+        plotter = LocalEeIndexPlotter(period)
 
-        if q.is_quiet_day():
-            print(f"skip {single_date} (not quiet day)", max_kp, min_edst_val)
-            continue
-        p = LocalEeIndexPlotter(
-            Period(
-                start=single_date,
-                end=single_date + timedelta(days=1) - timedelta(minutes=1),
-            )
-        )
-        p.plot_euel(anc, "red")
-        p.plot_euel(hua, "red")
-        p.plot_euel(eus, "purple")
-        p.set_title(f"EUEL ({single_date.strftime('%Y-%m-%d')})")
-        p.show()
+        plotter.plot_euel(EeIndexStation.EUS, "red")
+        plotter.plot_euel(EeIndexStation.TTB, "blue")
+        # plotter.plot_euel(EeIndexStation.KOU, "green")
+
+        plotter.set_title("Brazil Region EUEL on " + d.date.strftime("%Y/%m/%d.date"))
+
+        plotter.show()
+
+        # path = generate_parent_abs_path(
+        #     f"/img/peculiar_eej/brazil_region_by_kato/{d.type}/{d.date.strftime('%Y%m%d')}.png"
+        # )
+        # plotter.save(path)

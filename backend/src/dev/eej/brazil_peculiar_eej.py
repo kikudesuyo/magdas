@@ -27,7 +27,7 @@ class BrazilClassificationPeculiarEej:
         classification = ClassificationPeculiarEej(
             lt_period=self.lt_period,
             dip_stations=[EeIndexStation.TTB],
-            offdip_stations=[EeIndexStation.EUS, EeIndexStation.KOU],
+            offdip_stations=[EeIndexStation.EUS],
             region=Region.BRAZIL,
         )
         classification.add_data()
@@ -36,6 +36,6 @@ class BrazilClassificationPeculiarEej:
 if __name__ == "__main__":
     from datetime import datetime
 
-    lt_period = Period(datetime(2017, 1, 1, 0, 0), datetime(2020, 12, 31, 23, 59))
+    lt_period = Period(datetime(2009, 1, 1, 0, 0), datetime(2020, 12, 31, 23, 59))
     classification = BrazilClassificationPeculiarEej(lt_period)
     classification.add_data()

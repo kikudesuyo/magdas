@@ -38,8 +38,7 @@ class KatoEuelPlotter:
 
     def plot_euel(self, station: EeIndexStation, color: str) -> None:
         service = IntermagEuelService(
-            StationParam(station=station, period=self.ut_period),
-            Region.BRAZIL,
+            StationParam(station=station, period=self.ut_period), Region.BRAZIL
         )
         data = service.get_euel_data_by_range()
 
@@ -50,34 +49,25 @@ class KatoEuelPlotter:
         x = np.arange(len(data.array))
         y = np.array(data.array, dtype=float)
 
-        self.ax.plot(
-            x,
-            y,
-            label=f"{station.code}_EUEL",
-            color=color,
-            linewidth=0.8,
-        )
+        self.ax.plot(x, y, label=f"{station.code}_EUEL", color=color)
 
     @staticmethod
     def _calc_tick_interval(length: int) -> int:
         return max(1, length // 10)
 
     def set_title(self, title: str) -> None:
-        self.ax.set_title(
-            title,
-            fontsize=self.TITLE_FONT_SIZE,
-            fontweight="semibold",
-            pad=20,
-        )
+        self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=10)
 
     def show(self) -> None:
-        self.ax.legend(loc="lower left", fontsize=self.LEGEND_FONT_SIZE)
+        self.ax.legend(loc="lower left", fontsize=10)
+        plt.draw()
         plt.show()
-        plt.close(self.fig)
+        plt.close()
 
     def save(self, path: str) -> None:
-        self.ax.legend(loc="lower left", fontsize=self.LEGEND_FONT_SIZE)
+        self.ax.legend(loc="lower left", fontsize=12)
         self.fig.savefig(path, dpi=300)
+        self.fig.clf()
 
 
 if __name__ == "__main__":
@@ -91,23 +81,23 @@ if __name__ == "__main__":
     peculiar_eej_dates = [d.date for d in data_list]
     print(f"Peculiar EEJ dates in Brazil region: {peculiar_eej_dates}")
 
-    for d in peculiar_eej_dates:
+    for d in data_list:
         period = Period(
-            start=datetime(d.year, d.month, d.day, 0, 0),
-            end=datetime(d.year, d.month, d.day, 23, 59),
+            start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
+            end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
         )
 
         plotter = KatoEuelPlotter(period)
 
         plotter.plot_euel(EeIndexStation.EUS, "red")
         plotter.plot_euel(EeIndexStation.TTB, "blue")
-        plotter.plot_euel(EeIndexStation.KOU, "green")
+        # plotter.plot_euel(EeIndexStation.KOU, "green")
 
-        plotter.set_title("Brazil Region EUEL on " + d.strftime("%Y/%m/%d"))
+        plotter.set_title("Brazil Region EUEL on " + d.date.strftime("%Y/%m/%d.date"))
 
         plotter.show()
 
-        # out_path = generate_parent_abs_path(
-        #     f"/img/peculiar_eej/brazil_region_by_kato/{d.strftime('%Y%m%d')}.png"
-        # )
-        # plotter.save(out_path)
+        path = generate_parent_abs_path(
+            f"/img/peculiar_eej/brazil_region_by_kato/{d.type}/{d.date.strftime('%Y%m%d')}.png"
+        )
+        # plotter.save(path)
