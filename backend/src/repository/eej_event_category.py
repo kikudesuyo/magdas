@@ -8,7 +8,7 @@ from src.model.eej_category import EejCategoryModel, EejEventCategory
 
 class EejCategoryRepository:
     def __init__(self):
-        self.csv_path = "Storage/eej_category.csv"
+        self.csv_path = "Storage/eej_category_2009_2020.csv"
 
     def _fetch_all_from_storage(self) -> List[EejCategoryModel]:
         data: List[EejCategoryModel] = []

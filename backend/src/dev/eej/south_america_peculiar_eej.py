@@ -8,8 +8,8 @@ from src.repository.peculiar_eej import PeculiarEejRepository
 from src.service.eej.peculiar_eej_classification import ClassificationPeculiarEej
 
 
-class BrazilClassificationPeculiarEej:
-    """ブラジル地域の特異型EEJの分類を行い、CSV操作を行うクラス"""
+class SouthAmericaClassificationPeculiarEej:
+    """南アメリカ地域の特異型EEJの分類を行い、CSV操作を行うクラス"""
 
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
@@ -17,7 +17,7 @@ class BrazilClassificationPeculiarEej:
     def get_peculiar_eej_data(self, type) -> List[PeculiarEejModel]:
         repository = PeculiarEejRepository()
         return repository.select(
-            region=Region.BRAZIL,
+            region=Region.SOUTH_AMERICA,
             type_=type,
             start_date=self.lt_period.start,
             end_date=self.lt_period.end,
@@ -26,9 +26,9 @@ class BrazilClassificationPeculiarEej:
     def add_data(self):
         classification = ClassificationPeculiarEej(
             lt_period=self.lt_period,
-            dip_stations=[EeIndexStation.TTB],
+            dip_stations=[EeIndexStation.ANC, EeIndexStation.HUA],
             offdip_stations=[EeIndexStation.EUS],
-            region=Region.BRAZIL,
+            region=Region.SOUTH_AMERICA,
         )
         classification.add_data()
 
@@ -36,6 +36,6 @@ class BrazilClassificationPeculiarEej:
 if __name__ == "__main__":
     from datetime import datetime
 
-    lt_period = Period(datetime(2009, 1, 1, 0, 0), datetime(2020, 12, 31, 23, 59))
-    classification = BrazilClassificationPeculiarEej(lt_period)
+    lt_period = Period(datetime(2008, 1, 1, 0, 0), datetime(2008, 1, 31, 23, 59))
+    classification = SouthAmericaClassificationPeculiarEej(lt_period)
     classification.add_data()

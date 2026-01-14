@@ -1,11 +1,12 @@
 """加藤さんからいただいたデータからEUELのプロット"""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
-from src.dev.plot.config import PlotConfig
-from src.dev.plot.hover import HoverController
+from src.dev.plot.axis import AxisConfigurator
+from src.dev.plot.config import PlotConfigurator
+from src.dev.plot.hover import HoverConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.station_params import Period, StationParam
 from src.service.ee_index.intermag_ee import IntermagEuelService
@@ -23,25 +24,21 @@ class KatoEuelPlotter:
     Y_LIM_MIN = -150
     Y_LIM_MAX = 150
 
-    GRID_STYLE = "--"
     LEGEND_FONT_SIZE = 12
 
     def __init__(self, ut_period: Period):
         self.ut_period = ut_period
+
+        # PlotConfig.rcparams()
+
         self.fig, self.ax = plt.subplots(figsize=self.FIG_SIZE)
-
-        PlotConfig.rcparams()
-        HoverController(self.fig, self.ax, self.ut_period)
-        self._init_axes()
-
-    def _init_axes(self) -> None:
-        self._set_limits()
-        self._set_labels()
-        self._set_ticks()
+        PlotConfigurator(self.fig, self.ax).apply()
+        HoverConfigurator(self.fig, self.ax, self.ut_period).apply()
+        AxisConfigurator(self.ax, self.ut_period).apply()
 
     def plot_euel(self, station: EeIndexStation, color: str) -> None:
         service = IntermagEuelService(
-            StationParam(station=station, period=self.ut_period)
+            StationParam(station=station, period=self.ut_period), Region.BRAZIL
         )
         data = service.get_euel_data_by_range()
 
@@ -49,66 +46,28 @@ class KatoEuelPlotter:
             print(f"No data for {station.code}")
             return
 
-        x = np.arange(len(data))
-        y = np.array(data, dtype=float)
+        x = np.arange(len(data.array))
+        y = np.array(data.array, dtype=float)
 
-        self.ax.plot(
-            x,
-            y,
-            label=f"{station.code}_EUEL",
-            color=color,
-            linewidth=0.8,
-        )
-
-    def _set_limits(self) -> None:
-        length = self.ut_period.total_minutes() + 1
-        self.ax.set_xlim(0, length)
-        self.ax.set_ylim(self.Y_LIM_MIN, self.Y_LIM_MAX)
-
-    def _set_labels(self) -> None:
-        self.ax.set_ylabel("EUEL (nT)", fontsize=self.LABEL_FONT_SIZE)
-        self.ax.set_xlabel("UT", fontsize=self.TITLE_FONT_SIZE)
-
-    def _set_ticks(self) -> None:
-        length = self.ut_period.total_minutes() + 1
-        interval = self._calc_tick_interval(length)
-
-        ticks = range(0, length, interval)
-        labels = [
-            (self.ut_period.start + timedelta(minutes=i)).strftime("%m/%d %H:%M")
-            for i in ticks
-        ]
-
-        self.ax.set_xticks(ticks)
-        self.ax.set_xticklabels(
-            labels, rotation=45, ha="right", fontsize=self.TICK_FONT_SIZE
-        )
+        self.ax.plot(x, y, label=f"{station.code}_EUEL", color=color)
 
     @staticmethod
     def _calc_tick_interval(length: int) -> int:
         return max(1, length // 10)
 
     def set_title(self, title: str) -> None:
-        self.ax.set_title(
-            title,
-            fontsize=self.TITLE_FONT_SIZE,
-            fontweight="semibold",
-            pad=20,
-        )
+        self.ax.set_title(title, fontsize=15, fontweight="semibold", pad=10)
 
     def show(self) -> None:
-        self._finalize()
+        self.ax.legend(loc="lower left", fontsize=10)
+        plt.draw()
         plt.show()
-        plt.close(self.fig)
+        plt.close()
 
     def save(self, path: str) -> None:
-        self._finalize()
+        self.ax.legend(loc="lower left", fontsize=12)
         self.fig.savefig(path, dpi=300)
-
-    def _finalize(self) -> None:
-        self.ax.legend(loc="upper right", fontsize=self.LEGEND_FONT_SIZE)
-        self.ax.grid(True, linestyle=self.GRID_STYLE)
-        self.fig.tight_layout()
+        self.fig.clf()
 
 
 if __name__ == "__main__":
@@ -117,28 +76,28 @@ if __name__ == "__main__":
     from src.utils.path import generate_parent_abs_path
 
     service = PeculiarEejService()
-    data_list = service.get_by_region(Region.SOUTH_AMERICA)
+    data_list = service.get_by_region(Region.BRAZIL)
 
     peculiar_eej_dates = [d.date for d in data_list]
+    print(f"Peculiar EEJ dates in Brazil region: {peculiar_eej_dates}")
 
-    for d in peculiar_eej_dates:
+    for d in data_list:
         period = Period(
-            start=datetime(d.year, d.month, d.day, 0, 0),
-            end=datetime(d.year, d.month, d.day, 23, 59),
+            start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
+            end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
         )
 
         plotter = KatoEuelPlotter(period)
 
         plotter.plot_euel(EeIndexStation.EUS, "red")
         plotter.plot_euel(EeIndexStation.TTB, "blue")
-        plotter.plot_euel(EeIndexStation.KOU, "green")
+        # plotter.plot_euel(EeIndexStation.KOU, "green")
 
-        plotter.set_title("Brazil Region EUEL on " + d.strftime("%Y/%m/%d"))
+        plotter.set_title("Brazil Region EUEL on " + d.date.strftime("%Y/%m/%d.date"))
 
         plotter.show()
 
-        out_path = generate_parent_abs_path(
-            f"/img/peculiar_eej/brazil_region_by_kato/{d.strftime('%Y%m%d')}.png"
+        path = generate_parent_abs_path(
+            f"/img/peculiar_eej/brazil_region_by_kato/{d.type}/{d.date.strftime('%Y%m%d')}.png"
         )
-
-        # plotter.save(out_path)
+        # plotter.save(path)

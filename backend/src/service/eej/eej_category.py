@@ -1,3 +1,5 @@
+"""このモジュールはCSVファイルにデータがあるのを前提にしています。将来的にDBに移行する場合はリポジトリを修正してください。"""
+
 from typing import List
 
 from src.domain.station_params import Period
@@ -15,6 +17,6 @@ class EejCategoryService:
         categories = self.repository.select(period=period, category=eej_type)
         if not categories:
             raise ValueError(
-                f"No category found for type {eej_type} in period {period}."
+                f"No category found for type {eej_type} in period {period}. if you want to get data, please set eej_type to 'quiet', 'disturbance' or 'missing'"
             )
         return categories

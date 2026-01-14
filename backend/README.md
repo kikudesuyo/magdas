@@ -26,40 +26,21 @@ backend/Storage/magdas/AAB/Min/1999/AAB_MIN_199911300000.mgd
 KP データは Storage ディレクトリ内にあります。
 Storage/ee_idex/kpdata.csv
 
-### 仮想環境の作成
-
-```bash
-python -m venv .venv
-```
-
-### 仮想環境の有効化
-
-```bash
-#Windows環境
-source .venv/Scripts/activate
-#Unix環境
-source .venv/bin/activate
-```
-
-### パッケージのインストール
-
-```bash
-pip install -r requirements.txt
-```
-
 ### 実行方法
 
-invoke モジュールを使用
+本プロジェクトではパッケージマネージャーに uv を使用しています。
+また、タスクランナーに invoke を使用しています
+(※uv と invoke の組み合わせが汚く感じるため makefile への移行を検討中)
 
 ```bash
 #ファイルの実行
-inv run 'your-filename'
+uv run inv run 'your-filename'
 #サーバー実行
-inv server
+uv run inv server
 #テストファイルの実行
-inv test 'test-file'
+uv run inv test 'test-file'
 #全てのテストファイルの実行
-inv test-all
+uv run inv test-all
 ```
 
 ## 全体規則

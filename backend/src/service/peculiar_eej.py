@@ -22,8 +22,8 @@ class PeculiarEejService:
         return self.repo.select(
             region=region,
             type_=peculiar_eej_type,
-            start_date=period.start,
-            end_date=period.end,
+            start_date=period.start.date(),
+            end_date=period.end.date(),
         )
 
     def add_peculiar_eej(self, peculiar_eej: List[PeculiarEejModel]):

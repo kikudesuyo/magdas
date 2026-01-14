@@ -8,13 +8,10 @@ from src.domain.region import Region
 from src.domain.station_params import Period
 from src.model.eej_category import PeculiarEejType
 from src.model.peculiar_eej import PeculiarEejModel
-from src.service.calc_eej_detection import (
-    BestEuelSelectorFactory,
-    BestEuelSelectorForEej,
-    EejDetection,
-    EuelData,
-    calc_euel_peak_diff,
-)
+from src.service.calc_utils.moving_avg import calc_moving_avg
+from src.service.eej.best_euel_selector import BestEuelSelectorFactory, EuelData
+from src.service.eej.calc.eej_detection import EejDetection
+from src.service.eej.calc.euel_diff import calc_euel_peak_diff
 from src.service.peculiar_eej import PeculiarEejService
 
 
@@ -40,9 +37,15 @@ class ClassificationPeculiarEej:
     def classify_peculiar_eej_type(
         self, times: List[datetime], dip_euel_data: EuelData, offdip_euel_data: EuelData
     ) -> PeculiarEejType:
-        # 細かい変動を捉えるために、スムージングしていないデータを使う
         dip_euel_val = np.array(dip_euel_data.array, dtype=float)
         offdip_euel_val = np.array(offdip_euel_data.array, dtype=float)
+        # 細かい変動(DP2等)を除くために移動平均を取る
+        smoothed_dip_euel_val = calc_moving_avg(
+            dip_euel_val, window=60, nan_threshold=30
+        )
+        smoothed_offdip_euel_val = calc_moving_avg(
+            offdip_euel_val, window=60, nan_threshold=30
+        )
 
         hours = np.array([t.hour for t in times])
         mask_noon = (hours >= 9) & (hours < 15)
@@ -50,13 +53,25 @@ class ClassificationPeculiarEej:
         if not mask_noon.any():
             return PeculiarEejType.ERROR
 
-        dip_noon = dip_euel_val[mask_noon]
-        offdip_noon = offdip_euel_val[mask_noon]
+        # dip_noon = dip_euel_val[mask_noon]
+        # offdip_noon = offdip_euel_val[mask_noon]
+        dip_noon = smoothed_dip_euel_val[mask_noon]
+        offdip_noon = smoothed_offdip_euel_val[mask_noon]
+
         # nanを無視して相関を計算
         corr = pd.Series(dip_noon).corr(pd.Series(offdip_noon))
-        if corr > 0.6:
-            return PeculiarEejType.UNDEVELOPED
-        return PeculiarEejType.SUDDEN
+
+        if self.region == Region.SOUTH_AMERICA:
+            if corr > 0.6:
+                return PeculiarEejType.UNDEVELOPED
+            return PeculiarEejType.SUDDEN
+
+        elif self.region == Region.BRAZIL:
+            if corr > 0.5:
+                return PeculiarEejType.UNDEVELOPED
+            return PeculiarEejType.SUDDEN
+
+        raise ValueError("Invalid region for peculiar EEJ classification.")
 
     def aggregate_peculiar_eej_data(self) -> List[PeculiarEejModel]:
         peculiar_eej_data_list: List[PeculiarEejModel] = []
@@ -78,7 +93,7 @@ class ClassificationPeculiarEej:
             offdip_euel = offdip_euel_selector.select_best_euel_data()
             peak_diff = calc_euel_peak_diff(dip_euel_selector, offdip_euel, lt_date)
             # EEJの種類を分類
-            eej_detection = EejDetection(peak_diff, lt_date)
+            eej_detection = EejDetection(peak_diff, lt_date, self.region)
             eej_type = eej_detection.classify_eej_category()
 
             print(
@@ -104,14 +119,3 @@ class ClassificationPeculiarEej:
             )
             peculiar_eej_data_list.append(peculiar_eej_data)
         return peculiar_eej_data_list
-
-
-if __name__ == "__main__":
-    dip_stations = [EeIndexStation.ANC, EeIndexStation.HUA]
-    offdip_stations = [EeIndexStation.EUS]
-    region = Region.SOUTH_AMERICA
-    lt_period = Period(datetime(2008, 1, 1, 0, 0), datetime(2008, 1, 31, 23, 59))
-    classification = ClassificationPeculiarEej(
-        lt_period, dip_stations, offdip_stations, region=region
-    )
-    classification.add_data()

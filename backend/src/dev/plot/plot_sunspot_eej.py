@@ -5,21 +5,22 @@ from typing import List
 
 from matplotlib import pyplot as plt
 from matplotlib.dates import DateFormatter, DayLocator
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.domain.magdas_station import EeIndexStation
 from src.domain.region import Region
 from src.domain.station_params import Period
-from src.service.calc_eej_detection import BestEuelSelectorForEej
+from src.service.eej.best_euel_selector import BestEuelSelectorFactory
 from src.service.sunspot import Sunspot
 
 
 class SunspotPlotter:
     def __init__(self, lt_period: Period):
         self.lt_period = lt_period
-        PlotConfig.rcparams()
         self.fig, (self.ax_sunspot, self.ax_eej) = plt.subplots(
             nrows=2, ncols=1, figsize=(15, 8), sharex=False  # sharex=Falseに変更
         )
+        PlotConfigurator(self.fig, self.ax_sunspot).apply()
+        PlotConfigurator(self.fig, self.ax_eej).apply()
 
     def _validate_period(self):
         if self.lt_period.start.time() != time(
@@ -73,7 +74,8 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(region, stations, date, is_dip)
+                BestEuelSelectorFactory()
+                .create(region, stations, date, is_dip)
                 .select_best_euel_data()
                 .array
             )
@@ -134,7 +136,8 @@ class SunspotPlotter:
 
         for date in date_range:
             daily_euel = (
-                BestEuelSelectorForEej(region, stations, date, is_dip)
+                BestEuelSelectorFactory()
+                .create(region, stations, date, is_dip)
                 .select_best_euel_data()
                 .array
             )

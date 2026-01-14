@@ -6,7 +6,7 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-from src.dev.plot.config import PlotConfig
+from src.dev.plot.config import PlotConfigurator
 from src.domain.region import Region
 from src.domain.station_params import Period
 from src.service.ee_index.calc.calc_edst import MagdasEdstCalculator
@@ -66,8 +66,8 @@ sudden_kp, sudden_edst = zip(*sudden_kp_edst)
 undevelop_kp, undevelop_edst = zip(*undevelop_kp_edst)
 
 
-PlotConfig.rcparams()
 fig, ax = plt.subplots(figsize=(10, 6))
+PlotConfigurator(fig, ax).apply()
 ax.scatter(
     sudden_kp,
     sudden_edst,
