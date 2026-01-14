@@ -19,12 +19,12 @@ const Eej = () => {
   const handleButtonClick = async (
     startDate: string,
     days: number,
-    region: string
+    stations: string
   ) => {
     const reqParams: EeJReq = {
       startDate,
       days,
-      region,
+      stations,
     };
     const data = await fetchEejData(reqParams);
     if (!data) return;
@@ -34,7 +34,7 @@ const Eej = () => {
   if (!rawData) {
     return (
       <Main style="items-center gap-8 pt-4">
-        <h1 className="text-4xl font-bold">EEJ Plot</h1>
+        <h1 className="text-4xl font-bold">EUEL Plot</h1>
         <DataRangeSelector onSelect={handleButtonClick} />
       </Main>
     );
