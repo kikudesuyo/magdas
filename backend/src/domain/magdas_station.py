@@ -30,7 +30,7 @@ class EeIndexStation(Enum):
     # MAGDAS観測点 藤本論文2015での観測点データ
     AAB = Station(
         "AAB",
-        "Adis Ababa",
+        "Addis Ababa",
         "Ethiopia",
         Organization.MAGDAS,
         gg_lat=9.04,
