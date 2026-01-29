@@ -30,26 +30,26 @@ class LocalEeIndexPlotter:
 
     def plot_euel(self, station: EeIndexStation, color):
         ut_param = StationParam(station, self.lt_period).to_ut_params()
-        # ee_service = MagdasEeService(ut_param)
+        ee_service = MagdasEeService(ut_param)
 
-        service = IntermagEuelService(ut_param, Region.BRAZIL)
-        euel_data = service.get_euel_data_by_range()
-        euel_values = euel_data.array
+        # service = IntermagEuelService(ut_param, Region.BRAZIL)
+        # euel_data = service.get_euel_data_by_range()
+        # euel_values = euel_data.array
 
-        # ee_data = ee_service.calc_all()
-        # euel_values = ee_data.euel
+        ee_data = ee_service.calc_all()
+        euel_values = ee_data.euel
 
         smoothed_euel = calc_moving_avg(
             euel_values, TimeUnit.ONE_HOUR.min, TimeUnit.THIRTY_MINUTES.min
         )
         x_axis = np.arange(0, len(smoothed_euel), 1)
 
-        self._plot_peak_point(
-            x_axis[np.nanargmax(smoothed_euel)],
-            np.nanmax(smoothed_euel),
-            color="black",
-            d=50,
-        )
+        # self._plot_peak_point(
+        #     x_axis[np.nanargmax(smoothed_euel)],
+        #     np.nanmax(smoothed_euel),
+        #     color="black",
+        #     d=50,
+        # )
         self.ax.plot(x_axis, smoothed_euel, label=f"{station.code}_EUEL", color=color)
 
     def _plot_peak_point(self, index, value, color, d):
@@ -99,26 +99,38 @@ if __name__ == "__main__":
     from src.service.kp import Kp
     from src.service.peculiar_eej import PeculiarEejService
 
-    service = PeculiarEejService()
-    data_list = service.get_by_region(Region.BRAZIL)
+    start = datetime(2020, 10, 17, 0, 0)
+    end = datetime(2020, 10, 17, 23, 59)
 
-    for d in data_list:
-        period = Period(
-            start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
-            end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
-        )
+    period = Period(start, end)
 
-        plotter = LocalEeIndexPlotter(period)
+    plotter = LocalEeIndexPlotter(period)
 
-        plotter.plot_euel(EeIndexStation.EUS, "red")
-        plotter.plot_euel(EeIndexStation.TTB, "blue")
-        # plotter.plot_euel(EeIndexStation.KOU, "green")
+    plotter.plot_euel(EeIndexStation.ANC, "red")
+    # plotter.plot_euel(EeIndexStation.HUA, "red")
 
-        plotter.set_title("Brazil Region EUEL on " + d.date.strftime("%Y/%m/%d.date"))
+    plotter.plot_euel(EeIndexStation.EUS, "blue")
+    # plotter.plot_euel(EeIndexStation.KOU, "green")
 
-        plotter.show()
+    # plotter.set_title("Brazil Region EUEL on " + start.strftime("%Y/%m/%d"))
 
-        # path = generate_parent_abs_path(
-        #     f"/img/peculiar_eej/brazil_region_by_kato/{d.type}/{d.date.strftime('%Y%m%d')}.png"
-        # )
-        # plotter.save(path)
+    plotter.show()
+
+    # service = PeculiarEejService()
+    # data_list = service.get_by_region(Region.BRAZIL)
+
+    # for d in data_list:
+    #     period = Period(
+    #         start=datetime(d.date.year, d.date.month, d.date.day, 0, 0),
+    #         end=datetime(d.date.year, d.date.month, d.date.day, 23, 59),
+    #     )
+    #     plotter = LocalEeIndexPlotter(period)
+    #     plotter.plot_euel(EeIndexStation.EUS, "red")
+    #     plotter.plot_euel(EeIndexStation.TTB, "blue")
+    #     # plotter.plot_euel(EeIndexStation.KOU, "green")
+    #     plotter.set_title("Brazil Region EUEL on " + d.date.strftime("%Y/%m/%d.date"))
+    #     plotter.show()
+    #     # path = generate_parent_abs_path(
+    #     #     f"/img/peculiar_eej/brazil_region_by_kato/{d.type}/{d.date.strftime('%Y%m%d')}.png"
+    #     # )
+    #     # plotter.save(path)
