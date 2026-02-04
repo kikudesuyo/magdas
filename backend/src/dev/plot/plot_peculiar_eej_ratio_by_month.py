@@ -28,11 +28,7 @@ class MonthBinData(BaseModel):
 
 
 class PeculiarEejMonthPlotter:
-    def __init__(self, region: Region, peculiar_eej_type: str):
-        period = Period(
-            start=datetime(2009, 1, 1),
-            end=datetime(2020, 12, 31),
-        )
+    def __init__(self, period: Period, region: Region, peculiar_eej_type: str):
 
         peculiar_eej_service = PeculiarEejService()
         self.peculiar_eej_data = peculiar_eej_service.get_by_region_and_type(
@@ -113,24 +109,29 @@ class PeculiarEejMonthPlotter:
 
 
 if __name__ == "__main__":
+    period = Period(
+        start=datetime(2009, 1, 1),
+        end=datetime(2020, 12, 31),
+    )
+
     # 未発達型のプロット
     # undev_plotter = PeculiarEejMonthPlotter(Region.SOUTH_AMERICA, "未発達型")
     # undev_plotter.plot_peculiar_ratio(title="南アメリカ地域 未発達型EEJ発生割合")
     # undev_plotter.save(filename="2009-2020_南アメリカ_未発達型_月.png")
     # undev_plotter.show()
-    undev_plotter = PeculiarEejMonthPlotter(Region.BRAZIL, "未発達型")
+    undev_plotter = PeculiarEejMonthPlotter(period, Region.BRAZIL, "未発達型")
     undev_plotter.plot_peculiar_ratio(
         title="Brazil Region Undeveloped EEJ Ratio by Month"
     )
-    undev_plotter.save(filename="2009-2020_ブラジル_未発達型_月.png")
-    # undev_plotter.show()
+    # undev_plotter.save(filename="2009-2020_ブラジル_未発達型_月.png")
+    undev_plotter.show()
 
     # 突発型のプロット
     # sudden_plotter = PeculiarEejMonthPlotter(Region.SOUTH_AMERICA, "突発型")
     # sudden_plotter.plot_peculiar_ratio(title="南アメリカ地域 突発型EEJ発生割合")
     # sudden_plotter.save(filename="2009-2020_南アメリカ_突発型_月.png")
     # sudden_plotter.show()
-    sudden_plotter = PeculiarEejMonthPlotter(Region.BRAZIL, "突発型")
+    sudden_plotter = PeculiarEejMonthPlotter(period, Region.BRAZIL, "突発型")
     sudden_plotter.plot_peculiar_ratio(title="Brazil Region Sudden EEJ Ratio by Month")
-    sudden_plotter.save(filename="2009-2020_ブラジル_突発型_月.png")
-    # sudden_plotter.show()
+    # sudden_plotter.save(filename="2009-2020_ブラジル_突発型_月.png")
+    sudden_plotter.show()

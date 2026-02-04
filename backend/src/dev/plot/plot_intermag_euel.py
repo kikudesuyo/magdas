@@ -40,8 +40,9 @@ class KatoEuelPlotter:
         )
         data = service.get_euel_data_by_range()
         smoothed_array = calc_moving_avg(
-            np.array(data.array, dtype=float), window=60, nan_threshold=30
+            np.array(data.array, dtype=float), window=90, nan_threshold=30
         )
+
 
         x = np.arange(len(data.array))
         y = smoothed_array
@@ -124,9 +125,9 @@ if __name__ == "__main__":
         )
 
         plotter.set_title("Brazil Region EUEL on " + d.strftime("%Y/%m/%d"))
-        plotter.show()
+        # plotter.show()
 
-        # path = generate_parent_abs_path(
-        #     f"/img/peculiar_eej/brazil_region_by_kato/{peculiar_eej_type.value}/{d.strftime('%Y%m%d')}.png"
-        # )
-        # plotter.save(path)
+        path = generate_parent_abs_path(
+            f"/img/peculiar_eej/brazil_region_by_kato/{peculiar_eej_type.value}/{d.strftime('%Y%m%d')}.png"
+        )
+        plotter.save(path)
