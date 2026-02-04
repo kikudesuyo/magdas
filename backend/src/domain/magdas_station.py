@@ -205,7 +205,9 @@ class EeIndexStation(Enum):
         dip_lat=-2.07,
     )
     ILR = Station(
-        "ILR", "Ilorin", "Nigeria",
+        "ILR",
+        "Ilorin",
+        "Nigeria",
         Organization.MAGDAS,
         gg_lat=8.5,
         gg_lon=4.68,
@@ -225,7 +227,10 @@ class EeIndexStation(Enum):
         dip_lat=7.91,
     )
     LAG = Station(
-        "LAG", "Lagos", "Nigeria", Organization.MAGDAS,
+        "LAG",
+        "Lagos",
+        "Nigeria",
+        Organization.MAGDAS,
         gg_lat=6.48,
         gg_lon=3.27,
         gm_lat=-3.04,
@@ -244,7 +249,10 @@ class EeIndexStation(Enum):
         dip_lat=6.76,
     )
     LKW = Station(
-        "LKW", "Langkawi", "Malaysia", Organization.MAGDAS,
+        "LKW",
+        "Langkawi",
+        "Malaysia",
+        Organization.MAGDAS,
         gg_lat=6.3,
         gg_lon=99.78,
         gm_lat=-3.3,
@@ -252,7 +260,10 @@ class EeIndexStation(Enum):
         dip_lat=-1.41,
     )
     LWA = Station(
-        "LWA", "Liwa", "Indonesia", Organization.MAGDAS, 
+        "LWA",
+        "Liwa",
+        "Indonesia",
+        Organization.MAGDAS,
         gg_lat=-5.02,
         gg_lon=104.06,
         gm_lat=-16.19,
@@ -282,7 +293,10 @@ class EeIndexStation(Enum):
         dip_lat=8.32,
     )
     NAB = Station(
-        "NAB", "Nairobi", "Kenya", Organization.MAGDAS,
+        "NAB",
+        "Nairobi",
+        "Kenya",
+        Organization.MAGDAS,
         gg_lat=-1.16,
         gg_lon=36.48,
         gm_lat=-10.65,
@@ -323,12 +337,15 @@ class EeIndexStation(Enum):
         dip_lat=12.06,
     )
     TIR = Station(
-        "TIR", "Tirunelveli", "India", Organization.MAGDAS, 
+        "TIR",
+        "Tirunelveli",
+        "India",
+        Organization.MAGDAS,
         gg_lat=8.7,
         gg_lon=77.8,
         gm_lat=0.25,
         gm_lon=150.8,
-        dip_lat=1.74
+        dip_lat=1.74,
     )
     YAP = Station(
         "YAP",
@@ -347,10 +364,26 @@ class EeIndexStation(Enum):
     #  gm_lat は dip_latを参照
     # gm_lon は不明のため None とする
     TTB = Station(
-        "TTB", "Tatuoca", "Brazil", Organization.INTERMAG, -48.51, None, None, -0.72
+        "TTB",
+        "Tatuoca",
+        "Brazil",
+        Organization.INTERMAG,
+        gg_lat=None,
+        gg_lon=-48.51,
+        gm_lat=None,
+        gm_lon=None,
+        dip_lat=-0.72,
     )
     KOU = Station(
-        "KOU", "Kourou", "French Guiana", Organization.GFZ, -52.73, None, None, 7.59
+        "KOU",
+        "Kourou",
+        "French Guiana",
+        Organization.GFZ,
+        gg_lat=None,
+        gg_lon=-52.73,
+        gm_lat=None,
+        gm_lon=None,
+        dip_lat=7.59,
     )
 
     @property
