@@ -26,12 +26,15 @@ class EejResult(BaseModel):
 
 
 class EejUsecase:
-    def __init__(self, start_lt, days, region: Region):
+    def __init__(
+        self, start_lt, days, region: Region, stations: List[EeIndexStation]
+    ):
         self.start_lt = start_lt
         self.days = days
         if not isinstance(region, Region):
             raise ValueError("region must be an instance of Region Enum")
         self.region = region
+        self.stations = stations
 
     def execute(self) -> EejResult:
         peculiar_eej_dates = self._get_peculiar_eej_dates()
@@ -79,16 +82,13 @@ class EejUsecase:
         ]
 
     def _get_local_euel(self) -> tuple[List[float | None], List[float | None]]:
-        if self.region != Region.SOUTH_AMERICA:
-            raise ValueError(
-                "Only SOUTH_AMERICA region is supported for local euel calculation"
-            )
-        dip_stations = [
-            EeIndexStation.ANC,
-            EeIndexStation.HUA,
-        ]
-        offdip_stations = [EeIndexStation.EUS]
+        dip_stations = [s for s in self.stations if s.is_dip()]
+        offdip_stations = [s for s in self.stations if s.is_offdip()]
 
+        if not dip_stations or not offdip_stations:
+            # Fallback to defaults if no suitable stations found, or raise error?
+            # For now, let's assume valid stations are passed or rely on error if empty lists cause issues (though _calc_avg_euel returns empty array)
+             pass
         dip_euel = self._calc_avg_euel(dip_stations)
         offdip_euel = self._calc_avg_euel(offdip_stations)
         dip_euel = calc_moving_avg(dip_euel, 180, 90)

@@ -3,7 +3,7 @@ import { apiClient } from "./config";
 export type EeJReq = {
   startDate: string;
   days: number;
-  region: "south_america" | string;
+  stations: string;
 };
 
 type EejRow = {

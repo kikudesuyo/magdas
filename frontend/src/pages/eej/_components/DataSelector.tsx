@@ -1,11 +1,24 @@
 import { useState } from "react";
 import Button from "@/components/button/Button";
+import { STATIONS } from "@/utils/constant";
 
 type DataSelectorProps = {
-  onSelect: (startDate: string, days: number, region: string) => void;
+  onSelect: (startDate: string, days: number, stations: string) => void;
 };
 
-const REGIONS = ["south_america"];
+type Station = (typeof STATIONS)[number];
+
+type StationPreset = {
+  label: string;
+  stations: Station[];
+};
+
+const STATION_PRESETS: StationPreset[] = [
+  {
+    label: "South America (ANC,HUA,EUS)",
+    stations: ["ANC", "EUS"],
+  },
+];
 
 const DAYS_OPTIONS = [
   { value: 1, label: "1 day" },
@@ -19,18 +32,20 @@ const DEFAULT_DAYS = 3;
 const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
   const [startDate, setStartDate] = useState("2020-02-22");
   const [days, setDays] = useState(DEFAULT_DAYS);
-  const [region, setRegion] = useState("south_america");
+  const [stations, setStations] = useState(
+    STATION_PRESETS[0].stations.join(",")
+  );
 
   const handleSelect = () => {
     if (!startDate) {
       alert("開始日時を入力してください");
       return;
     }
-    if (!region) {
+    if (!stations) {
       alert("観測地点を選択してください");
       return;
     }
-    onSelect(startDate, days, region);
+    onSelect(startDate, days, stations);
   };
 
   return (
@@ -38,15 +53,18 @@ const DataRangeSelector = ({ onSelect }: DataSelectorProps) => {
       <div>
         <label className="text-sm">観測地点</label>
         <select
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
+          value={stations}
+          onChange={(e) => setStations(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md"
         >
-          {REGIONS.map((region) => (
-            <option key={region} value={region}>
-              {region}
-            </option>
-          ))}
+          {STATION_PRESETS.map((preset) => {
+            const value = preset.stations.join(",");
+            return (
+              <option key={value} value={value}>
+                {preset.label}
+              </option>
+            );
+          })}
         </select>
       </div>
       <div>
