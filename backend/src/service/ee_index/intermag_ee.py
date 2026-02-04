@@ -1,6 +1,7 @@
 import numpy as np
 from src.domain.region import Region
 from src.domain.station_params import StationParam
+from src.model.edst_data import EdstData
 from src.model.euel_data import EuelData
 from src.repository.ee_from_kato import KatoEeRepository
 
@@ -15,3 +16,8 @@ class IntermagEuelService:
         data = self.kato_repo.select_by_range(self.ut_params.period)
         array = np.array([item.euel_data for item in data], dtype=float)
         return EuelData(region=self.region, station=self.ut_params.station, array=array)
+
+    def get_edst_data(self) -> EdstData:
+        data = self.kato_repo.select_by_range(self.ut_params.period)
+        array = np.array([item.edst_data for item in data], dtype=float)
+        return EdstData(array=array)
