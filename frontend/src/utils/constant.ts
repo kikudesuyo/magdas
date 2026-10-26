@@ -35,4 +35,5 @@ export const STATIONS = [
   "TGG",
   "TIR",
   "YAP",
+  "TTB",
 ];

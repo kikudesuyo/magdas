@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import iSpesLogo from "@/assets/imgs/i-spes-logo.png";
+import Sidebar from "@/components/Sidebar";
 
 const Header = () => {
   return (
@@ -7,7 +8,9 @@ const Header = () => {
       <Link to="/" className="flex flex-col justify-center text-xl">
         <img src={iSpesLogo} />
       </Link>
-      <div className="flex gap-2"></div>
+      <div className="flex gap-2">
+        <Sidebar />
+      </div>
     </header>
   );
 };

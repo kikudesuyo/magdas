@@ -121,7 +121,7 @@ if __name__ == "__main__":
     undev_plotter.plot_peculiar_ratio(
         title="Brazil Region Undeveloped EEJ Ratio by Lunar Time"
     )
-    # undev_plotter.show()
+    undev_plotter.show()
     undev_plotter.save(filename="2009-2020_ブラジル_未発達型_月齢.png")
 
     # # 突発型のプロット"""
@@ -129,5 +129,5 @@ if __name__ == "__main__":
     sudden_plotter.plot_peculiar_ratio(
         title="Brazil Region Sudden EEJ Ratio by Lunar Time"
     )
-    # sudden_plotter.show()
-    sudden_plotter.save(filename="2009-2020_ブラジル_突発型_月齢.png")
+    sudden_plotter.show()
+    # sudden_plotter.save(filename="2009-2020_ブラジル_突発型_月齢.png")

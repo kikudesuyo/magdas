@@ -26,5 +26,5 @@ class PeculiarEejService:
             end_date=period.end.date(),
         )
 
-    def add_peculiar_eej(self, peculiar_eej: List[PeculiarEejModel]):
+    def save_peculiar_eej(self, peculiar_eej: List[PeculiarEejModel]):
         self.repo.insert(peculiar_eej)
